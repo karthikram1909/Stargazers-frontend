@@ -1,0 +1,121 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Moon as MoonIcon } from "lucide-react";
+
+const lunarMonths = [
+  { name: "Makaliʻi", meaning: "Eyes of the Chief", description: "November-December. A time of cool weather and calm seas." },
+  { name: "Kaʻelo", meaning: "The Moisture", description: "December-January. Season of rain and growth." },
+  { name: "Kaulua", meaning: "Two Placed Together", description: "January-February. A time of twin blessings." },
+  { name: "Nana", meaning: "Spring", description: "February-March. Plants begin to blossom." },
+  { name: "Welo", meaning: "Dark Red", description: "March-April. Red earth exposed by spring rains." },
+  { name: "Ikiiki", meaning: "Little", description: "April-May. A short month of transition." },
+  { name: "Kaʻaona", meaning: "The Whistling", description: "May-June. Whistling trade winds." },
+  { name: "Hilinehu", meaning: "Held Down by Fog", description: "June-July. Misty summer mornings." },
+  { name: "Hilinaehu", meaning: "Held Down by Moisture", description: "July-August. Humid season begins." },
+  { name: "Hilinama", meaning: "Held Down by Dew", description: "August-September. Heavy dew falls." },
+  { name: "Ikuā", meaning: "Strong", description: "September-October. Strong winds and high seas." },
+  { name: "Welehu", meaning: "Dark Red Skin", description: "October-November. Reddish hue in the sky." },
+];
+
+const moonPhases = [
+  { day: "1-3", name: "Hilo", meaning: "New Moon", description: "Time for new beginnings and planning." },
+  { day: "4-7", name: "Hoaka", meaning: "Crescent", description: "Time to plant and start projects." },
+  { day: "8-11", name: "Māhealani", meaning: "Full Moon Near", description: "Preparation and growth." },
+  { day: "12-15", name: "Poepoe", meaning: "Round", description: "Full moon - time for gathering and celebration." },
+  { day: "16-19", name: "Olekūkahi", meaning: "Waning", description: "Time to harvest and complete projects." },
+  { day: "20-24", name: "Kaloa", meaning: "Long", description: "Rest and reflection period." },
+  { day: "25-30", name: "Muku", meaning: "Cut Off", description: "Dark moon - time for rest and introspection." },
+];
+
+export default function Moon() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center mx-auto mb-4">
+          <MoonIcon className="w-8 h-8 text-[#0A1929]" />
+        </div>
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Mahina - Hawaiian Lunar Calendar
+        </h1>
+        <p className="text-white/70 text-lg">
+          Ancient timekeeping by the moon
+        </p>
+      </div>
+
+      {/* Lunar Months */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-bold text-white mb-6">
+          Nā Malama - The Months
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {lunarMonths.map((month, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white text-lg">
+                  {month.name}
+                </CardTitle>
+                <p className="text-[#FFA07A] text-sm">{month.meaning}</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-white/70 text-sm">{month.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Moon Phases */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-6">
+          Nā Pō o ka Mahina - Moon Phases
+        </h2>
+        <div className="space-y-4">
+          {moonPhases.map((phase, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+            >
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
+                      <span className="text-[#0A1929] font-bold text-sm">
+                        {phase.day}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-bold text-lg mb-1">
+                      {phase.name}
+                    </h3>
+                    <p className="text-[#FFA07A] text-sm mb-2">
+                      {phase.meaning}
+                    </p>
+                    <p className="text-white/70 text-sm">
+                      {phase.description}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Cultural Note */}
+      <Card className="mt-12 bg-gradient-to-br from-[#FF6B6B]/20 to-[#FFA07A]/20 border-[#FFA07A]/30">
+        <CardContent className="p-6">
+          <p className="text-white/90 italic leading-relaxed">
+            "The Hawaiian people used the phases of the moon to guide fishing, farming, and cultural practices. 
+            Each night of the lunar month had its own name and significance, creating a detailed calendar 
+            that connected daily life with the rhythms of nature."
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
