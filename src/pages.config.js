@@ -3,6 +3,7 @@ import Stars from './pages/Stars';
 import Moon from './pages/Moon';
 import Wayfinding from './pages/Wayfinding';
 import Planets from './pages/Planets';
+import StarDetail from './pages/StarDetail';
 import Layout from './Layout.jsx';
 
 
@@ -12,6 +13,7 @@ export const PAGES = {
     "Moon": Moon,
     "Wayfinding": Wayfinding,
     "Planets": Planets,
+    "StarDetail": StarDetail,
 }
 
 export const pagesConfig = {
