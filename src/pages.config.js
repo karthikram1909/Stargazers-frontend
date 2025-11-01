@@ -4,6 +4,7 @@ import Moon from './pages/Moon';
 import Wayfinding from './pages/Wayfinding';
 import Planets from './pages/Planets';
 import StarDetail from './pages/StarDetail';
+import SkyMap from './pages/SkyMap';
 import Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "Wayfinding": Wayfinding,
     "Planets": Planets,
     "StarDetail": StarDetail,
+    "SkyMap": SkyMap,
 }
 
 export const pagesConfig = {
