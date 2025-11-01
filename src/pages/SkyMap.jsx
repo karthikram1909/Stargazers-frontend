@@ -60,12 +60,12 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a detailed sky map for tonight ${dateStr} in Hawaii (Mauna Kea: 19.82°N, 155.47°W) at ${timeStr} local time.
+        prompt: `Generate a detailed sky map for tonight ${dateStr} (October 31, 2025) in Hawaii (Mauna Kea: 19.82°N, 155.47°W) at ${timeStr} local time.
         
         CRITICAL: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do NOT include Mercury, Venus, Mars, or Jupiter in the planets array.
         
         Return JSON with:
-        1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, Kauluakoko/Sirius, Iwakeliʻi/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades),
+        1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, A'a/Sirius, Kauluakoko/Betelgeuse, Nānāhope/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades), 
            azimuth (0-360 degrees, accurate for the current date and time), altitude (0-90 degrees, accurate for current date and time), magnitude, constellation
         2. An array of visible planets - ONLY include Saturn, Uranus, Neptune, and Pluto with: name, hawaiian_name (if known), azimuth (accurate), altitude (accurate), magnitude
         3. An array of major constellation outlines visible (at least 10) with: name, star_connections (array of arrays showing which stars connect, using star names)

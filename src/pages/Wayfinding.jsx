@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation, Compass, Waves, Wind } from "lucide-react";
@@ -28,7 +29,8 @@ const keyStars = [
   { name: "Hōkūpaʻa", western: "Polaris (North Star)", position: "North", use: "Marks true north, stays fixed in the sky" },
   { name: "Nānāhope", western: "Cassiopeia", position: "North", use: "Guides northern navigation" },
   { name: "Newe", western: "Southern Cross", position: "South", use: "Guides southern navigation" },
-  { name: "Kauluakoko", western: "Sirius", position: "Zenith over Tahiti", use: "Guides to southern islands" },
+  { name: "A'a", western: "Sirius", position: "Southeast", use: "Brightest star, important navigation marker" },
+  { name: "Kauluakoko", western: "Betelgeuse", position: "Orion", use: "Marks the warrior constellation, guides to Tahiti" },
 ];
 
 export default function Wayfinding() {
