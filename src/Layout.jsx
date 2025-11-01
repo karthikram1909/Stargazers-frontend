@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -60,7 +61,7 @@ export default function Layout({ children }) {
                   <Sparkles className="w-5 h-5 text-[#0A1929]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">Hōkū</h1>
+                  <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
                   <p className="text-xs text-white/60">Hawaiian Astronomy</p>
                 </div>
               </div>
