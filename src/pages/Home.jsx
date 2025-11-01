@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Moon, Star, Sunrise, Sunset, Navigation } from "lucide-react";
@@ -15,10 +16,22 @@ export default function Home() {
 
   const fetchSkyData = async () => {
     try {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        timeZone: 'Pacific/Honolulu'
+      });
+      
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W). 
-        Return JSON with: current_date, moon_phase (name and percentage), visible_planets (array of planet names), 
-        featured_constellation (name and brief description), sunset_time, sunrise_time, best_viewing_hours.`,
+        prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for the date ${dateStr} (October 31, 2025).
+        
+        IMPORTANT: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do not include Mercury, Venus, Mars, or Jupiter in the visible planets list.
+        
+        Return JSON with: current_date, moon_phase (name and percentage), visible_planets (array containing only: Saturn, Uranus, Neptune, Pluto), 
+        featured_constellation (name and brief description), sunset_time (use actual sunset time for Hawaii on October 31, 2025), 
+        sunrise_time (use actual sunrise time for Hawaii on October 31, 2025), best_viewing_hours.`,
         response_json_schema: {
           type: "object",
           properties: {

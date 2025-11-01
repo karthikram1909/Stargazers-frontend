@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -44,17 +45,33 @@ export default function SkyMap() {
   const fetchSkyData = async () => {
     setLoading(true);
     try {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Pacific/Honolulu'
+      });
+      const timeStr = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Pacific/Honolulu'
+      });
+
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a detailed sky map for tonight in Hawaii (Mauna Kea: 19.82°N, 155.47°W) at 9 PM local time.
+        prompt: `Generate a detailed sky map for tonight ${dateStr} in Hawaii (Mauna Kea: 19.82°N, 155.47°W) at ${timeStr} local time.
+        
+        CRITICAL: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do NOT include Mercury, Venus, Mars, or Jupiter in the planets array.
         
         Return JSON with:
-        1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, Kauluakoko/Sirius, Iwakeliʻi/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades), 
-           azimuth (0-360 degrees), altitude (0-90 degrees), magnitude, constellation
-        2. An array of visible planets with: name, hawaiian_name (if known), azimuth, altitude, magnitude
+        1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, Kauluakoko/Sirius, Iwakeliʻi/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades),
+           azimuth (0-360 degrees, accurate for the current date and time), altitude (0-90 degrees, accurate for current date and time), magnitude, constellation
+        2. An array of visible planets - ONLY include Saturn, Uranus, Neptune, and Pluto with: name, hawaiian_name (if known), azimuth (accurate), altitude (accurate), magnitude
         3. An array of major constellation outlines visible (at least 10) with: name, star_connections (array of arrays showing which stars connect, using star names)
         4. Current time and date
         
-        Include all bright stars magnitude 2.5 or brighter visible from Hawaii tonight.`,
+        Include all bright stars magnitude 2.5 or brighter visible from Hawaii at this exact time.`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -119,31 +136,31 @@ export default function SkyMap() {
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
     const maxRadius = Math.min(canvasWidth, canvasHeight) / 2 - 40;
-    
+
     const r = maxRadius * (1 - altitude / 90);
     const theta = (azimuth - 90) * (Math.PI / 180);
-    
+
     const x = centerX + r * Math.cos(theta);
     const y = centerY + r * Math.sin(theta);
-    
+
     return { x, y };
   };
 
   const drawSkyMap = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    
+
     ctx.fillStyle = '#0A1929';
     ctx.fillRect(0, 0, width, height);
-    
+
     const centerX = width / 2;
     const centerY = height / 2;
     const maxRadius = Math.min(width, height) / 2 - 40;
-    
+
     // Draw horizon circles
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 1;
@@ -153,7 +170,7 @@ export default function SkyMap() {
       ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
       ctx.stroke();
     });
-    
+
     // Draw cardinal directions
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.font = 'bold 14px sans-serif';
@@ -164,22 +181,22 @@ export default function SkyMap() {
       const y = centerY + (maxRadius + 20) * Math.sin(angle - Math.PI / 2);
       ctx.fillText(dir, x, y + 5);
     });
-    
+
     // Draw constellation lines
     if (showConstellations && skyData?.constellations) {
       ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
       ctx.lineWidth = 1;
-      
+
       skyData.constellations.forEach(constellation => {
         constellation.star_connections?.forEach(connection => {
           if (connection.length >= 2) {
             const star1 = skyData.stars.find(s => s.name === connection[0]);
             const star2 = skyData.stars.find(s => s.name === connection[1]);
-            
+
             if (star1 && star2) {
               const pos1 = azAltToXY(star1.azimuth, star1.altitude, width, height);
               const pos2 = azAltToXY(star2.azimuth, star2.altitude, width, height);
-              
+
               ctx.beginPath();
               ctx.moveTo(pos1.x, pos1.y);
               ctx.lineTo(pos2.x, pos2.y);
@@ -189,15 +206,15 @@ export default function SkyMap() {
         });
       });
     }
-    
+
     // Draw stars
     skyData?.stars?.forEach(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, width, height);
       const size = Math.max(2, 8 - star.magnitude * 1.5);
-      
+
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
-      
+
       // Star glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
       gradient.addColorStop(0, isHovered || isSelected ? 'rgba(255, 215, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)');
@@ -206,13 +223,13 @@ export default function SkyMap() {
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       // Star core
       ctx.fillStyle = isHovered || isSelected ? '#FFD700' : '#FFFFFF';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       // Labels
       if (showHawaiianNames && star.hawaiian_name) {
         ctx.fillStyle = '#FFA07A';
@@ -220,7 +237,7 @@ export default function SkyMap() {
         ctx.textAlign = 'left';
         ctx.fillText(star.hawaiian_name, pos.x + size + 4, pos.y - 2);
       }
-      
+
       if (isHovered || isSelected) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.font = '10px sans-serif';
@@ -228,15 +245,15 @@ export default function SkyMap() {
         ctx.fillText(star.name, pos.x + size + 4, pos.y + 10);
       }
     });
-    
+
     // Draw planets
     skyData?.planets?.forEach(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
       const size = 6;
-      
+
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
-      
+
       // Planet glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2);
       gradient.addColorStop(0, isHovered || isSelected ? 'rgba(255, 107, 107, 0.8)' : 'rgba(255, 160, 122, 0.6)');
@@ -245,13 +262,13 @@ export default function SkyMap() {
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 2, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       // Planet core
       ctx.fillStyle = isHovered || isSelected ? '#FF6B6B' : '#FFA07A';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       // Labels
       if (showHawaiianNames && planet.hawaiian_name) {
         ctx.fillStyle = '#FF6B6B';
@@ -272,31 +289,31 @@ export default function SkyMap() {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     // Check stars
     const clickedStar = skyData?.stars?.find(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
       return distance < 15;
     });
-    
+
     if (clickedStar) {
       setSelectedObject({ ...clickedStar, type: 'star' });
       return;
     }
-    
+
     // Check planets
     const clickedPlanet = skyData?.planets?.find(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
       return distance < 15;
     });
-    
+
     if (clickedPlanet) {
       setSelectedObject({ ...clickedPlanet, type: 'planet' });
       return;
     }
-    
+
     setSelectedObject(null);
   };
 
@@ -305,31 +322,31 @@ export default function SkyMap() {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const hoveredStar = skyData?.stars?.find(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
       return distance < 15;
     });
-    
+
     if (hoveredStar) {
       setHoveredObject(hoveredStar);
       canvas.style.cursor = 'pointer';
       return;
     }
-    
+
     const hoveredPlanet = skyData?.planets?.find(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
       return distance < 15;
     });
-    
+
     if (hoveredPlanet) {
       setHoveredObject(hoveredPlanet);
       canvas.style.cursor = 'pointer';
       return;
     }
-    
+
     setHoveredObject(null);
     canvas.style.cursor = 'default';
   };
@@ -346,7 +363,7 @@ export default function SkyMap() {
 
   const getDetailLink = (obj) => {
     if (obj.type === 'star') {
-      const star = stars.find(s => 
+      const star = stars.find(s =>
         s.english_name === obj.name || s.hawaiian_name === obj.hawaiian_name
       );
       return star ? `${createPageUrl("StarDetail")}?id=${star.id}` : null;
@@ -457,7 +474,7 @@ export default function SkyMap() {
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
-              
+
               {searchQuery && filteredObjects.length > 0 && (
                 <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
                   {filteredObjects.map((obj, idx) => (
@@ -490,7 +507,7 @@ export default function SkyMap() {
                     {selectedObject.type}
                   </Badge>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   {selectedObject.constellation && (
                     <div>

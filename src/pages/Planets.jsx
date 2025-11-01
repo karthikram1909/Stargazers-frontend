@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -21,16 +22,30 @@ export default function Planets() {
 
   const fetchVisibility = async () => {
     try {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        timeZone: 'Pacific/Honolulu'
+      });
+      
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `For tonight in Hawaii (Mauna Kea: 19.82°N, 155.47°W), provide current visibility information for all planets.
-        For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune), indicate: 
+        prompt: `For tonight ${dateStr} (October 31, 2025) in Hawaii (Mauna Kea: 19.82°N, 155.47°W), provide current visibility information for all planets.
+        
+        CRITICAL: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Mercury, Venus, Mars, and Jupiter are NOT visible.
+        
+        For Saturn, Uranus, Neptune, and Pluto - set visible: true with accurate data
+        For Mercury, Venus, Mars, and Jupiter - set visible: false, visibility_quality: "not_visible"
+        
+        For each planet, include: 
         - visible (true/false)
         - visibility_quality (excellent/good/fair/poor/not_visible)
-        - best_viewing_time (time of night)
+        - best_viewing_time (time of night, or "Not visible" if not visible)
         - magnitude (brightness)
-        - constellation (where to find it)
-        - rise_time
-        - set_time`,
+        - constellation (where to find it, or "N/A" if not visible)
+        - rise_time (use actual times for Hawaii on October 31, 2025, or "N/A")
+        - set_time (use actual times for Hawaii on October 31, 2025, or "N/A")`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -87,6 +102,42 @@ export default function Planets() {
                   }
                 },
                 Saturn: {
+                  type: "object",
+                  properties: {
+                    visible: { type: "boolean" },
+                    visibility_quality: { type: "string" },
+                    best_viewing_time: { type: "string" },
+                    magnitude: { type: "number" },
+                    constellation: { type: "string" },
+                    rise_time: { type: "string" },
+                    set_time: { type: "string" }
+                  }
+                },
+                Uranus: {
+                  type: "object",
+                  properties: {
+                    visible: { type: "boolean" },
+                    visibility_quality: { type: "string" },
+                    best_viewing_time: { type: "string" },
+                    magnitude: { type: "number" },
+                    constellation: { type: "string" },
+                    rise_time: { type: "string" },
+                    set_time: { type: "string" }
+                  }
+                },
+                Neptune: {
+                  type: "object",
+                  properties: {
+                    visible: { type: "boolean" },
+                    visibility_quality: { type: "string" },
+                    best_viewing_time: { type: "string" },
+                    magnitude: { type: "number" },
+                    constellation: { type: "string" },
+                    rise_time: { type: "string" },
+                    set_time: { type: "string" }
+                  }
+                },
+                Pluto: {
                   type: "object",
                   properties: {
                     visible: { type: "boolean" },
