@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -131,22 +132,40 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
               />
             </div>
             <div>
-              <Label htmlFor="best_viewing_months" className="text-white/90">
-                Best Viewing Months
+              <Label htmlFor="brightness" className="text-white/90">
+                Magnitude (Brightness)
               </Label>
               <Input
-                id="best_viewing_months"
-                value={formData.best_viewing_months}
+                id="brightness"
+                type="number"
+                step="0.01"
+                value={formData.brightness}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    best_viewing_months: e.target.value,
-                  })
+                  setFormData({ ...formData, brightness: parseFloat(e.target.value) || 0 })
                 }
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                placeholder="April - June"
+                placeholder="0.0"
               />
+              <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius)</p>
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="best_viewing_months" className="text-white/90">
+              Best Viewing Months
+            </Label>
+            <Input
+              id="best_viewing_months"
+              value={formData.best_viewing_months}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  best_viewing_months: e.target.value,
+                })
+              }
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+              placeholder="April - June"
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

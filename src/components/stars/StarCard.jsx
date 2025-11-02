@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,12 +57,21 @@ export default function StarCard({ star, onEdit, onDelete }) {
         </Link>
 
         <div className="flex items-center justify-between pt-2 border-t border-white/10">
-          <div className="flex gap-4 flex-1">
+          <div className="flex gap-4 flex-1 flex-wrap">
             {star.constellation && (
               <div>
                 <span className="text-white/50 text-xs">Constellation</span>
                 <p className="text-white/80 text-sm font-medium">
                   {star.constellation}
+                </p>
+              </div>
+            )}
+
+            {star.brightness !== undefined && star.brightness !== null && (
+              <div>
+                <span className="text-white/50 text-xs">Magnitude</span>
+                <p className="text-white/80 text-sm font-medium">
+                  {star.brightness.toFixed(2)}
                 </p>
               </div>
             )}
