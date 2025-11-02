@@ -64,10 +64,16 @@ export default function SkyMap() {
         
         CRITICAL: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do NOT include Mercury, Venus, Mars, or Jupiter in the planets array.
         
+        IMPORTANT: Use these exact Hawaiian names for planets:
+        - Saturn: Makulu
+        - Uranus: Heleʻekela
+        - Neptune: Naholoholo
+        - Pluto: Poʻeleʻele
+        
         Return JSON with:
         1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, A'a/Sirius, Kauluakoko/Betelgeuse, Nānāhope/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades), 
            azimuth (0-360 degrees, accurate for the current date and time), altitude (0-90 degrees, accurate for current date and time), magnitude, constellation
-        2. An array of visible planets - ONLY include Saturn, Uranus, Neptune, and Pluto with: name, hawaiian_name (if known), azimuth (accurate), altitude (accurate), magnitude
+        2. An array of visible planets - ONLY include Saturn, Uranus, Neptune, and Pluto with EXACT Hawaiian names above: name, hawaiian_name (using exact names above), azimuth (accurate), altitude (accurate), magnitude
         3. An array of major constellation outlines visible (at least 10) with: name, star_connections (array of arrays showing which stars connect, using star names)
         4. Current time and date
         
