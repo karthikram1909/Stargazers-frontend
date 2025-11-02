@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw } from "lucide-react";
+import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -17,8 +17,9 @@ export default function SkyMap() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedObject, setSelectedObject] = useState(null);
   const [showConstellations, setShowConstellations] = useState(true);
-  const [showHawaiianNames, setShowHawaiianNames] = useState(true);
+  const [showHawaiianNames, setShowHawaiianNames] = useState(true); // Retained but its specific use in drawSkyMap changed for labels
   const [hoveredObject, setHoveredObject] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   const { data: stars } = useQuery({
     queryKey: ['stars'],
@@ -40,7 +41,7 @@ export default function SkyMap() {
     if (skyData && canvasRef.current) {
       drawSkyMap();
     }
-  }, [skyData, showConstellations, showHawaiianNames, hoveredObject]);
+  }, [skyData, showConstellations, showHawaiianNames, hoveredObject, zoomLevel]);
 
   const fetchSkyData = async () => {
     setLoading(true);
@@ -74,7 +75,7 @@ export default function SkyMap() {
         1. An array of visible bright stars with: name, hawaiian_name (if known from: Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, A'a/Sirius, Kauluakoko/Betelgeuse, Nānāhope/Cassiopeia, Newe/Southern Cross, Makaliʻi/Pleiades), 
            azimuth (0-360 degrees, accurate for the current date and time), altitude (0-90 degrees, accurate for current date and time), magnitude, constellation
         2. An array of visible planets - ONLY include Saturn, Uranus, Neptune, and Pluto with EXACT Hawaiian names above: name, hawaiian_name (using exact names above), azimuth (accurate), altitude (accurate), magnitude
-        3. An array of major constellation outlines visible (at least 10) with: name, star_connections (array of arrays showing which stars connect, using star names)
+        3. An array of major constellation outlines visible (at least 10) with: name, hawaiian_name (if known from Hawaiian constellations), star_connections (array of arrays showing which stars connect, using star names)
         4. Current time and date
         
         Include all bright stars magnitude 2.5 or brighter visible from Hawaii at this exact time.`,
@@ -117,6 +118,7 @@ export default function SkyMap() {
                 type: "object",
                 properties: {
                   name: { type: "string" },
+                  hawaiian_name: { type: "string" },
                   star_connections: {
                     type: "array",
                     items: {
@@ -141,7 +143,7 @@ export default function SkyMap() {
   const azAltToXY = (azimuth, altitude, canvasWidth, canvasHeight) => {
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
-    const maxRadius = Math.min(canvasWidth, canvasHeight) / 2 - 40;
+    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 40) * zoomLevel;
 
     const r = maxRadius * (1 - altitude / 90);
     const theta = (azimuth - 90) * (Math.PI / 180);
@@ -165,7 +167,7 @@ export default function SkyMap() {
 
     const centerX = width / 2;
     const centerY = height / 2;
-    const maxRadius = Math.min(width, height) / 2 - 40;
+    const maxRadius = (Math.min(width, height) / 2 - 40) * zoomLevel;
 
     // Draw horizon circles
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
@@ -190,8 +192,8 @@ export default function SkyMap() {
 
     // Draw constellation lines
     if (showConstellations && skyData?.constellations) {
-      ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255, 160, 122, 0.3)';
+      ctx.lineWidth = 1.5;
 
       skyData.constellations.forEach(constellation => {
         constellation.star_connections?.forEach(connection => {
@@ -210,6 +212,31 @@ export default function SkyMap() {
             }
           }
         });
+
+        // Draw Hawaiian constellation names
+        if (showHawaiianNames && constellation.hawaiian_name) {
+          // Find center of constellation
+          const constellationStars = constellation.star_connections?.flat().filter((v, i, a) => a.indexOf(v) === i)
+            .map(starName => skyData.stars.find(s => s.name === starName))
+            .filter(s => s);
+          
+          if (constellationStars && constellationStars.length > 0) { // Added null/undefined check for constellationStars
+            const avgX = constellationStars.reduce((sum, s) => {
+              const pos = azAltToXY(s.azimuth, s.altitude, width, height);
+              return sum + pos.x;
+            }, 0) / constellationStars.length;
+            
+            const avgY = constellationStars.reduce((sum, s) => {
+              const pos = azAltToXY(s.azimuth, s.altitude, width, height);
+              return sum + pos.y;
+            }, 0) / constellationStars.length;
+
+            ctx.fillStyle = 'rgba(255, 160, 122, 0.6)';
+            ctx.font = 'italic 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(constellation.hawaiian_name, avgX, avgY);
+          }
+        }
       });
     }
 
@@ -236,20 +263,23 @@ export default function SkyMap() {
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Labels
+      // Labels - Always show Hawaiian names (if available and showHawaiianNames is true)
       if (showHawaiianNames && star.hawaiian_name) {
         ctx.fillStyle = '#FFA07A';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(star.hawaiian_name, pos.x + size + 4, pos.y - 2);
+        ctx.fillText(star.hawaiian_name, pos.x + size + 4, pos.y + 4);
       }
 
-      if (isHovered || isSelected) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(star.name, pos.x + size + 4, pos.y + 10);
-      }
+      // The original code also showed the English name on hover/select.
+      // The outline removed it, so I am removing it to match the outline exactly.
+      // If the intent was to keep it, it would be:
+      // if (isHovered || isSelected) {
+      //   ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      //   ctx.font = '10px sans-serif';
+      //   ctx.textAlign = 'left';
+      //   ctx.fillText(star.name, pos.x + size + 4, pos.y + 10);
+      // }
     });
 
     // Draw planets
@@ -275,18 +305,22 @@ export default function SkyMap() {
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Labels
-      if (showHawaiianNames && planet.hawaiian_name) {
+      // Labels - Always show Hawaiian names
+      if (planet.hawaiian_name) {
         ctx.fillStyle = '#FF6B6B';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(planet.hawaiian_name, pos.x + size + 4, pos.y + 4);
-      } else {
-        ctx.fillStyle = '#FFA07A';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(planet.name, pos.x + size + 4, pos.y + 4);
       }
+      // The original code had an else to show English name if no Hawaiian name.
+      // The outline removed the else, implying only Hawaiian names (if present) are shown for planets now.
+      // If the intent was to keep showing English name when Hawaiian name is not present, it would be:
+      // else {
+      //   ctx.fillStyle = '#FFA07A';
+      //   ctx.font = 'bold 11px sans-serif';
+      //   ctx.textAlign = 'left';
+      //   ctx.fillText(planet.name, pos.x + size + 4, pos.y + 4);
+      // }
     });
   };
 
@@ -424,6 +458,7 @@ export default function SkyMap() {
                   {showConstellations ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                   Constellations
                 </Button>
+                {/* The showHawaiianNames button was removed from the outline.
                 <Button
                   variant={showHawaiianNames ? "default" : "outline"}
                   size="sm"
@@ -432,6 +467,23 @@ export default function SkyMap() {
                 >
                   {showHawaiianNames ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                   Hawaiian Names
+                </Button>
+                */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
+                  className="border-white/20 text-white"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
+                  className="border-white/20 text-white"
+                >
+                  <ZoomIn className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="outline"
@@ -460,6 +512,7 @@ export default function SkyMap() {
                     Center = Zenith (overhead)
                   </p>
                   <p>Edge = Horizon</p>
+                  <p className="mt-2">Zoom: {zoomLevel.toFixed(2)}x</p>
                 </div>
               </div>
             </CardContent>

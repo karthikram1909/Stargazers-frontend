@@ -1,17 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Stars, Plus, Edit, Trash2 } from "lucide-react";
+import { Stars, Plus, Trash2 } from "lucide-react";
+import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
 
 export default function Constellations() {
   const queryClient = useQueryClient();
+  const [selectedConstellation, setSelectedConstellation] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
-    queryFn: () => base44.entities.Constellation.list(),
+    queryFn: async () => {
+      const data = await base44.entities.Constellation.list();
+      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+    },
     initialData: [],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Constellation.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['constellations'] });
+      setShowForm(false);
+      setSelectedConstellation(null);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Constellation.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['constellations'] });
+      setShowForm(false);
+      setSelectedConstellation(null);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -20,6 +44,19 @@ export default function Constellations() {
       queryClient.invalidateQueries({ queryKey: ['constellations'] });
     },
   });
+
+  const handleSave = (data) => {
+    if (selectedConstellation) {
+      updateMutation.mutate({ id: selectedConstellation.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const handleEdit = (constellation) => {
+    setSelectedConstellation(constellation);
+    setShowForm(true);
+  };
 
   const handleDelete = (id) => {
     if (confirm('Remove this constellation from the guide?')) {
@@ -30,16 +67,28 @@ export default function Constellations() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center mx-auto mb-4">
-          <Stars className="w-8 h-8 text-[#0A1929]" />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="text-center md:text-left">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center mx-auto md:mx-0 mb-4">
+            <Stars className="w-8 h-8 text-[#0A1929]" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Constellation Guide
+          </h1>
+          <p className="text-white/70 text-lg">
+            Hawaiian star patterns and their navigation significance
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Constellation Guide
-        </h1>
-        <p className="text-white/70 text-lg">
-          Hawaiian star patterns and their navigation significance
-        </p>
+        <Button
+          onClick={() => {
+            setSelectedConstellation(null);
+            setShowForm(true);
+          }}
+          className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] hover:opacity-90"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Constellation
+        </Button>
       </div>
 
       {/* Introduction */}
@@ -66,9 +115,15 @@ export default function Constellations() {
           <CardContent className="p-12 text-center">
             <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">No constellations yet</h3>
-            <p className="text-white/60">
+            <p className="text-white/60 mb-6">
               Start building your Hawaiian constellation guide
             </p>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A]"
+            >
+              Add Your First Constellation
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -150,6 +205,14 @@ export default function Constellations() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="text-white/70 hover:text-white hover:bg-white/10"
+                      onClick={() => handleEdit(constellation)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-white/70 hover:text-red-400 hover:bg-white/10"
                       onClick={() => handleDelete(constellation.id)}
                     >
@@ -173,6 +236,15 @@ export default function Constellations() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Form Dialog */}
+      <ConstellationFormDialog
+        open={showForm}
+        onOpenChange={setShowForm}
+        constellation={selectedConstellation}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+      />
     </div>
   );
 }

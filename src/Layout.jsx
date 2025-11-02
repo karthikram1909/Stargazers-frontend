@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -9,7 +10,7 @@ export default function Layout({ children }) {
   const navigationItems = [
     { name: "Sky Tonight", path: createPageUrl("Home"), icon: Sparkles },
     { name: "Sky Map", path: createPageUrl("SkyMap"), icon: Map },
-    { name: "Star Guide", path: createPageUrl("Stars"), icon: Sparkles },
+    { name: "Star Guide", path: createPageUrl("Stars"), icon: Stars }, // Changed from Sparkles to Stars icon as per common usage
     { name: "Planets", path: createPageUrl("Planets"), icon: Globe },
     { name: "Constellations", path: createPageUrl("Constellations"), icon: Stars },
     { name: "Moon Calendar", path: createPageUrl("Moon"), icon: Moon },
@@ -58,9 +59,11 @@ export default function Layout({ children }) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center star-twinkle">
-                  <Sparkles className="w-5 h-5 text-[#0A1929]" />
-                </div>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3b1fd7239_IMG_1432.jpg" 
+                  alt="Stargazers Anonymous" 
+                  className="w-10 h-10 rounded-full object-cover border-2 border-[#FFD700]"
+                />
                 <div>
                   <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
                   <p className="text-xs text-white/60">Hawaiian Astronomy</p>

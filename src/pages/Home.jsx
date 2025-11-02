@@ -29,7 +29,15 @@ export default function Home() {
         
         IMPORTANT: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do not include Mercury, Venus, Mars, or Jupiter in the visible planets list.
         
-        Return JSON with: current_date, moon_phase (name and percentage), visible_planets (array containing only: Saturn, Uranus, Neptune, Pluto), 
+        CRITICAL: The moon phase tonight is Waxing Gibbous at 90% illumination.
+        
+        Use these exact Hawaiian names for planets:
+        - Saturn: Makulu
+        - Uranus: Heleʻekela
+        - Neptune: Naholoholo
+        - Pluto: Poʻeleʻele
+        
+        Return JSON with: current_date, moon_phase (name should be "Waxing Gibbous" and percentage should be 90), visible_planets (array containing objects with both english_name and hawaiian_name for only: Saturn/Makulu, Uranus/Heleʻekela, Neptune/Naholoholo, Pluto/Poʻeleʻele), 
         featured_constellation (name and brief description), sunset_time (use actual sunset time for Hawaii on October 31, 2025), 
         sunrise_time (use actual sunrise time for Hawaii on October 31, 2025), best_viewing_hours.`,
         response_json_schema: {
@@ -45,7 +53,13 @@ export default function Home() {
             },
             visible_planets: {
               type: "array",
-              items: { type: "string" }
+              items: {
+                type: "object",
+                properties: {
+                  english_name: { type: "string" },
+                  hawaiian_name: { type: "string" }
+                }
+              }
             },
             featured_constellation: {
               type: "object",
@@ -151,7 +165,8 @@ export default function Home() {
                     key={index}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] text-white text-sm font-medium"
                   >
-                    {planet}
+                    <div className="font-bold">{planet.hawaiian_name}</div>
+                    <div className="text-xs opacity-80">{planet.english_name}</div>
                   </div>
                 ))}
               </div>

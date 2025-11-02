@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +15,10 @@ export default function Stars() {
 
   const { data: stars, isLoading } = useQuery({
     queryKey: ['stars'],
-    queryFn: () => base44.entities.Star.list(),
+    queryFn: async () => {
+      const data = await base44.entities.Star.list();
+      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+    },
     initialData: [],
   });
 
