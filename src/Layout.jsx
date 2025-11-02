@@ -60,9 +60,9 @@ export default function Layout({ children }) {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-3">
                 <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3b1fd7239_IMG_1432.jpg" 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c48fece3e_KILOHAKU2.png" 
                   alt="Stargazers Anonymous" 
-                  className="w-10 h-10 rounded-full object-cover border-2 border-[#FFD700]"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-[#FFD700]"
                 />
                 <div>
                   <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
