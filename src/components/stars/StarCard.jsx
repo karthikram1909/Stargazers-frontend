@@ -2,11 +2,20 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Edit, Trash2, Navigation, ArrowRight } from "lucide-react";
+import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 export default function StarCard({ star, onEdit, onDelete }) {
+  const playPronunciation = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (star.pronunciation_audio_url) {
+      const audio = new Audio(star.pronunciation_audio_url);
+      audio.play();
+    }
+  };
+
   return (
     <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
       <Link to={`${createPageUrl("StarDetail")}?id=${star.id}`}>
@@ -17,9 +26,20 @@ export default function StarCard({ star, onEdit, onDelete }) {
                 <Star className="w-5 h-5 text-[#0A1929]" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-white text-lg group-hover:text-[#FFD700] transition-colors">
-                  {star.hawaiian_name}
-                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-white text-lg group-hover:text-[#FFD700] transition-colors">
+                    {star.hawaiian_name}
+                  </CardTitle>
+                  {star.pronunciation_audio_url && (
+                    <button
+                      onClick={playPronunciation}
+                      className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                      title="Play pronunciation"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
                 <p className="text-white/60 text-sm">{star.english_name}</p>
               </div>
               <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-[#FFD700] group-hover:translate-x-1 transition-all" />

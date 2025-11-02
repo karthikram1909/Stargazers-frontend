@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Globe, Eye, EyeOff, Sparkles, Volume2 } from "lucide-react";
 
 export default function Planets() {
   const [visibilityData, setVisibilityData] = useState(null);
@@ -162,6 +162,13 @@ export default function Planets() {
     }
   };
 
+  const playPronunciation = (audioUrl) => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
+    }
+  };
+
   const getPlanetInfo = (englishName) => {
     return planets.find(p => p.english_name === englishName);
   };
@@ -234,9 +241,20 @@ export default function Planets() {
                           <Globe className="w-7 h-7 text-[#0A1929]" />
                         </div>
                         <div>
-                          <CardTitle className="text-white text-2xl mb-1">
-                            {planetInfo?.hawaiian_name || planetName}
-                          </CardTitle>
+                          <div className="flex items-center gap-2 mb-1">
+                            <CardTitle className="text-white text-2xl">
+                              {planetInfo?.hawaiian_name || planetName}
+                            </CardTitle>
+                            {planetInfo?.pronunciation_audio_url && (
+                              <button
+                                onClick={() => playPronunciation(planetInfo.pronunciation_audio_url)}
+                                className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                                title="Play pronunciation"
+                              >
+                                <Volume2 className="w-5 h-5" />
+                              </button>
+                            )}
+                          </div>
                           <p className="text-white/60 mb-2">{planetName}</p>
                           {planetInfo?.meaning && (
                             <p className="text-[#FFA07A] text-sm italic">
@@ -331,9 +349,20 @@ export default function Planets() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-white text-lg">
-                        {planet.hawaiian_name}
-                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-white text-lg">
+                          {planet.hawaiian_name}
+                        </CardTitle>
+                        {planet.pronunciation_audio_url && (
+                          <button
+                            onClick={() => playPronunciation(planet.pronunciation_audio_url)}
+                            className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                            title="Play pronunciation"
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                       <p className="text-white/60 text-sm">{planet.english_name}</p>
                     </div>
                     {isVisible ? (

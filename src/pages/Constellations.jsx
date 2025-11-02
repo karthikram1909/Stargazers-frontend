@@ -1,9 +1,10 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Stars, Plus, Trash2 } from "lucide-react";
+import { Stars, Plus, Trash2, Volume2 } from "lucide-react";
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
 
 export default function Constellations() {
@@ -44,6 +45,13 @@ export default function Constellations() {
       queryClient.invalidateQueries({ queryKey: ['constellations'] });
     },
   });
+
+  const playPronunciation = (audioUrl) => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
+    }
+  };
 
   const handleSave = (data) => {
     if (selectedConstellation) {
@@ -142,9 +150,20 @@ export default function Constellations() {
                   </div>
                   <div className="flex-1">
                     <div className="mb-3">
-                      <h3 className="text-white font-bold text-lg mb-1">
-                        {constellation.hawaiian_name}
-                      </h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-white font-bold text-lg">
+                          {constellation.hawaiian_name}
+                        </h3>
+                        {constellation.pronunciation_audio_url && (
+                          <button
+                            onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
+                            className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                            title="Play pronunciation"
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                       <p className="text-white/60 text-sm">
                         {constellation.english_name}
                       </p>

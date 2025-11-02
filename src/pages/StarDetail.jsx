@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Star, Navigation, Calendar, Sparkles, Eye } from "lucide-react";
+import { ArrowLeft, Star, Navigation, Calendar, Sparkles, Eye, Volume2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -16,6 +17,13 @@ export default function StarDetail() {
     const id = urlParams.get('id');
     setStarId(id);
   }, []);
+
+  const playPronunciation = () => {
+    if (star?.pronunciation_audio_url) {
+      const audio = new Audio(star.pronunciation_audio_url);
+      audio.play();
+    }
+  };
 
   const { data: stars, isLoading } = useQuery({
     queryKey: ['stars'],
@@ -77,9 +85,20 @@ export default function StarDetail() {
               <Star className="w-10 h-10 text-[#0A1929]" />
             </div>
             <div className="flex-1">
-              <CardTitle className="text-4xl text-white mb-2">
-                {star.hawaiian_name}
-              </CardTitle>
+              <div className="flex items-center gap-3 mb-2">
+                <CardTitle className="text-4xl text-white">
+                  {star.hawaiian_name}
+                </CardTitle>
+                {star.pronunciation_audio_url && (
+                  <button
+                    onClick={playPronunciation}
+                    className="text-[#FFD700] hover:text-[#FFA07A] transition-colors p-2 rounded-full hover:bg-white/10"
+                    title="Play pronunciation"
+                  >
+                    <Volume2 className="w-6 h-6" />
+                  </button>
+                )}
+              </div>
               <p className="text-white/60 text-xl mb-3">{star.english_name}</p>
               {star.constellation && (
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20">
@@ -160,11 +179,11 @@ export default function StarDetail() {
                 {star.brightness}
               </p>
               <p className="text-white/60 text-sm mt-2">
-                {star.brightness < 0 
-                  ? "Exceptionally bright - one of the brightest stars" 
-                  : star.brightness < 1 
-                  ? "Very bright - easily visible" 
-                  : star.brightness < 2 
+                {star.brightness < 0
+                  ? "Exceptionally bright - one of the brightest stars"
+                  : star.brightness < 1
+                  ? "Very bright - easily visible"
+                  : star.brightness < 2
                   ? "Bright - prominent in the sky"
                   : "Moderate brightness"}
               </p>
@@ -180,8 +199,8 @@ export default function StarDetail() {
             <Sparkles className="w-5 h-5 text-[#FFD700] mt-1 flex-shrink-0" />
             <div>
               <p className="text-white/90 leading-relaxed mb-3">
-                Hawaiian navigators memorized the rising and setting positions of key stars like {star.hawaiian_name} 
-                to create a mental star compass. This knowledge, passed down through generations, enabled them to 
+                Hawaiian navigators memorized the rising and setting positions of key stars like {star.hawaiian_name}
+                to create a mental star compass. This knowledge, passed down through generations, enabled them to
                 navigate thousands of miles across the open ocean without instruments.
               </p>
               <p className="text-white/70 text-sm italic">

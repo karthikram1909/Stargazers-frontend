@@ -20,8 +20,11 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
     navigation_use: "",
     best_viewing_months: "",
     constellation: "",
-    brightness: null, // Changed from 0 to null
+    brightness: null,
+    pronunciation_audio_url: "", // Added
   });
+  const [audioFile, setAudioFile] = useState(null); // Added
+  const [uploading, setUploading] = useState(false); // Added
 
   useEffect(() => {
     if (star) {
@@ -34,10 +37,32 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
         navigation_use: "",
         best_viewing_months: "",
         constellation: "",
-        brightness: null, // Changed from 0 to null
+        brightness: null,
+        pronunciation_audio_url: "", // Added
       });
     }
+    setAudioFile(null); // Added
   }, [star, open]);
+
+  const handleAudioUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      // Assuming 'base44' is globally available or imported elsewhere in the project.
+      // If 'base44' is not defined, this line will cause an error.
+      // A common pattern is to pass this utility as a prop or import it directly.
+      const result = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, pronunciation_audio_url: result.file_url });
+      setAudioFile(file); // Stores the local file object, though URL is what's typically saved
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+      // Optionally, show an error message to the user
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -85,6 +110,28 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
               />
             </div>
           </div>
+
+          {/* New Audio Upload Section */}
+          <div>
+            <Label htmlFor="audio" className="text-white/90">
+              Pronunciation Audio
+            </Label>
+            <div className="flex gap-2 items-center">
+              <Input
+                id="audio"
+                type="file"
+                accept="audio/*"
+                onChange={handleAudioUpload}
+                disabled={uploading} // Disable input while uploading
+                className="bg-white/10 border-white/20 text-white file:bg-white/20 file:text-white file:border-0 file:px-4 file:py-2 file:rounded file:mr-4"
+              />
+              {uploading && <span className="text-white/60 text-sm">Uploading...</span>}
+            </div>
+            {formData.pronunciation_audio_url && (
+              <p className="text-[#FFD700] text-xs mt-1">✓ Audio file uploaded</p>
+            )}
+          </div>
+          {/* End New Audio Upload Section */}
 
           <div>
             <Label htmlFor="meaning" className="text-white/90">
@@ -139,18 +186,18 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
                 id="brightness"
                 type="number"
                 step="0.01"
-                value={formData.brightness ?? ""} // Added nullish coalescing operator
+                value={formData.brightness ?? ""}
                 onChange={(e) => {
                   const val = e.target.value;
                   setFormData({ 
                     ...formData, 
-                    brightness: val === "" ? null : parseFloat(val) // Updated logic for null
+                    brightness: val === "" ? null : parseFloat(val)
                   });
                 }}
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                placeholder="e.g., -1.46 or 2.5" // Updated placeholder
+                placeholder="e.g., -1.46 or 2.5"
               />
-              <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius, +2.5 for dim stars)</p> {/* Updated helper text */}
+              <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius, +2.5 for dim stars)</p>
             </div>
           </div>
 
@@ -177,18 +224,18 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isLoading || uploading} // Disable if uploading
               className="border-white/20 text-white hover:bg-white/10"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || uploading} // Disable if uploading
               className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] hover:opacity-90"
             >
               <Save className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save Star"}
+              {isLoading ? "Saving..." : (uploading ? "Uploading Audio..." : "Save Star")}
             </Button>
           </div>
         </form>
