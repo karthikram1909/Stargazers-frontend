@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Navigation, Compass, Waves, Wind, Stars } from "lucide-react";
+import { Navigation, Compass, Waves, Wind } from "lucide-react";
 
 const techniques = [
   {
@@ -28,30 +28,6 @@ const keyStars = [
   { name: "Hōkūpaʻa", western: "Polaris (North Star)", position: "North", use: "Marks true north, stays fixed in the sky" },
   { name: "A'a", western: "Sirius", position: "Southeast", use: "Brightest star, important navigation marker" },
   { name: "Kauluakoko", western: "Betelgeuse", position: "Orion", use: "Marks the warrior constellation, guides to Tahiti" },
-];
-
-const constellations = [
-  { 
-    name: "Makaliʻi", 
-    western: "Pleiades", 
-    position: "East", 
-    use: "Marks the Hawaiian New Year, signals planting season",
-    description: "A cluster of seven sister stars, used to determine the start of Makahiki season"
-  },
-  { 
-    name: "Newe", 
-    western: "Southern Cross", 
-    position: "South", 
-    use: "Guides southern navigation to Tahiti and southern Pacific islands",
-    description: "Four bright stars forming a cross, crucial for navigating to southern lands"
-  },
-  { 
-    name: "Nānāhope", 
-    western: "Cassiopeia", 
-    position: "North", 
-    use: "Guides northern navigation, indicates direction to northern latitudes",
-    description: "W-shaped constellation that circles Polaris, helping navigators maintain northern bearings"
-  },
 ];
 
 export default function Wayfinding() {
@@ -152,57 +128,6 @@ export default function Wayfinding() {
                         Navigation Use
                       </p>
                       <p className="text-white/80 text-sm">{star.use}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Constellation Guide */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <Stars className="w-6 h-6 text-[#FFD700]" />
-          Constellation Guide
-        </h2>
-        <div className="space-y-3">
-          {constellations.map((constellation, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
-                      <Stars className="w-6 h-6 text-[#0A1929]" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="mb-3">
-                      <h3 className="text-white font-bold text-lg mb-1">{constellation.name}</h3>
-                      <p className="text-white/60 text-sm">{constellation.western}</p>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4 mb-3">
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Position
-                        </p>
-                        <p className="text-white/80 text-sm">{constellation.position}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Navigation Use
-                        </p>
-                        <p className="text-white/80 text-sm">{constellation.use}</p>
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                      <p className="text-white/90 text-sm leading-relaxed">
-                        {constellation.description}
-                      </p>
                     </div>
                   </div>
                 </div>

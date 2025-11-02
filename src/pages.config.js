@@ -5,6 +5,7 @@ import Wayfinding from './pages/Wayfinding';
 import Planets from './pages/Planets';
 import StarDetail from './pages/StarDetail';
 import SkyMap from './pages/SkyMap';
+import Constellations from './pages/Constellations';
 import Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "Planets": Planets,
     "StarDetail": StarDetail,
     "SkyMap": SkyMap,
+    "Constellations": Constellations,
 }
 
 export const pagesConfig = {

@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Sparkles, Moon, Compass, BookOpen, Globe, Map } from "lucide-react";
+import { Sparkles, Moon, Compass, Globe, Map, Stars } from "lucide-react";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -12,6 +11,7 @@ export default function Layout({ children }) {
     { name: "Sky Map", path: createPageUrl("SkyMap"), icon: Map },
     { name: "Star Guide", path: createPageUrl("Stars"), icon: Sparkles },
     { name: "Planets", path: createPageUrl("Planets"), icon: Globe },
+    { name: "Constellations", path: createPageUrl("Constellations"), icon: Stars },
     { name: "Moon Calendar", path: createPageUrl("Moon"), icon: Moon },
     { name: "Wayfinding", path: createPageUrl("Wayfinding"), icon: Compass },
   ];
