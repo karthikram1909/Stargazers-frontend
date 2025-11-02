@@ -20,7 +20,7 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
     navigation_use: "",
     best_viewing_months: "",
     constellation: "",
-    brightness: 0,
+    brightness: null, // Changed from 0 to null
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
         navigation_use: "",
         best_viewing_months: "",
         constellation: "",
-        brightness: 0,
+        brightness: null, // Changed from 0 to null
       });
     }
   }, [star, open]);
@@ -139,14 +139,18 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
                 id="brightness"
                 type="number"
                 step="0.01"
-                value={formData.brightness}
-                onChange={(e) =>
-                  setFormData({ ...formData, brightness: parseFloat(e.target.value) || 0 })
-                }
+                value={formData.brightness ?? ""} // Added nullish coalescing operator
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ 
+                    ...formData, 
+                    brightness: val === "" ? null : parseFloat(val) // Updated logic for null
+                  });
+                }}
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                placeholder="0.0"
+                placeholder="e.g., -1.46 or 2.5" // Updated placeholder
               />
-              <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius)</p>
+              <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius, +2.5 for dim stars)</p> {/* Updated helper text */}
             </div>
           </div>
 
