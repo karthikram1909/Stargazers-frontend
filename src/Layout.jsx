@@ -62,7 +62,7 @@ export default function Layout({ children }) {
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c48fece3e_KILOHAKU2.png" 
                   alt="Stargazers Anonymous" 
-                  className="w-14 h-14 rounded-full object-cover border-2 border-[#FFD700]"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-[#FFD700]"
                 />
                 <div>
                   <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
