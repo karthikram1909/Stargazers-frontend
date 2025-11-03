@@ -203,7 +203,7 @@ export default function Planets() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#FFA07A] flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
           <Globe className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
@@ -213,7 +213,7 @@ export default function Planets() {
           Planets visible tonight • {visibilityData?.date}
         </p>
         <div className="mt-4">
-          <Badge className="bg-gradient-to-r from-[#FFD700] to-[#FFA07A] text-[#0A1929] text-lg px-4 py-2">
+          <Badge className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white text-lg px-4 py-2">
             {visiblePlanets.length} planets visible tonight
           </Badge>
         </div>
@@ -223,7 +223,7 @@ export default function Planets() {
       {visiblePlanets.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Eye className="w-6 h-6 text-[#FFD700]" />
+            <Eye className="w-6 h-6 text-[#0EA5E9]" />
             Visible Tonight
           </h2>
           <div className="space-y-4">
@@ -237,8 +237,8 @@ export default function Planets() {
                   <CardHeader>
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center flex-shrink-0">
-                          <Globe className="w-7 h-7 text-[#0A1929]" />
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                          <Globe className="w-7 h-7 text-white" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -248,7 +248,7 @@ export default function Planets() {
                             {planetInfo?.pronunciation_audio_url && (
                               <button
                                 onClick={() => playPronunciation(planetInfo.pronunciation_audio_url)}
-                                className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                                className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                                 title="Play pronunciation"
                               >
                                 <Volume2 className="w-5 h-5" />
@@ -257,7 +257,7 @@ export default function Planets() {
                           </div>
                           <p className="text-white/60 mb-2">{planetName}</p>
                           {planetInfo?.meaning && (
-                            <p className="text-[#FFA07A] text-sm italic">
+                            <p className="text-[#60A5FA] text-sm italic">
                               {planetInfo.meaning}
                             </p>
                           )}
@@ -310,7 +310,7 @@ export default function Planets() {
                     )}
 
                     {planetInfo?.mythology && (
-                      <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#1E3A5F]/50 to-[#0A1929]/50 border border-[#FFD700]/20">
+                      <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#1E3A5F]/50 to-[#0A1929]/50 border border-[#60A5FA]/20">
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
                           <Sparkles className="w-3 h-3" />
                           Hawaiian Mythology
@@ -356,7 +356,7 @@ export default function Planets() {
                         {planet.pronunciation_audio_url && (
                           <button
                             onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                            className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                            className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                             title="Play pronunciation"
                           >
                             <Volume2 className="w-4 h-4" />
@@ -366,7 +366,7 @@ export default function Planets() {
                       <p className="text-white/60 text-sm">{planet.english_name}</p>
                     </div>
                     {isVisible ? (
-                      <Eye className="w-5 h-5 text-[#FFD700]" />
+                      <Eye className="w-5 h-5 text-[#0EA5E9]" />
                     ) : (
                       <EyeOff className="w-5 h-5 text-white/30" />
                     )}
@@ -391,7 +391,7 @@ export default function Planets() {
       </div>
 
       {/* Info Note */}
-      <Card className="mt-12 bg-gradient-to-br from-[#FF6B6B]/20 to-[#FFA07A]/20 border-[#FFA07A]/30">
+      <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
         <CardContent className="p-6">
           <p className="text-white/90 italic leading-relaxed">
             Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved 

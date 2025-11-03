@@ -81,8 +81,8 @@ export default function StarDetail() {
       <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
         <CardHeader className="pb-4">
           <div className="flex items-start gap-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center flex-shrink-0 star-twinkle">
-              <Star className="w-10 h-10 text-[#0A1929]" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0 star-twinkle">
+              <Star className="w-10 h-10 text-white" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
@@ -92,7 +92,7 @@ export default function StarDetail() {
                 {star.pronunciation_audio_url && (
                   <button
                     onClick={playPronunciation}
-                    className="text-[#FFD700] hover:text-[#FFA07A] transition-colors p-2 rounded-full hover:bg-white/10"
+                    className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors p-2 rounded-full hover:bg-white/10"
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-6 h-6" />
@@ -102,7 +102,7 @@ export default function StarDetail() {
               <p className="text-white/60 text-xl mb-3">{star.english_name}</p>
               {star.constellation && (
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20">
-                  <Sparkles className="w-4 h-4 text-[#FFD700]" />
+                  <Sparkles className="w-4 h-4 text-[#0EA5E9]" />
                   <span className="text-white/80 text-sm">{star.constellation}</span>
                 </div>
               )}
@@ -113,10 +113,10 @@ export default function StarDetail() {
 
       {/* Meaning */}
       {star.meaning && (
-        <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#FFD700]/30 mb-6">
+        <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30 mb-6">
           <CardHeader>
             <CardTitle className="text-white text-xl flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#FFD700]" />
+              <Sparkles className="w-5 h-5 text-[#0EA5E9]" />
               Meaning & Significance
             </CardTitle>
           </CardHeader>
@@ -133,7 +133,7 @@ export default function StarDetail() {
         <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
           <CardHeader>
             <CardTitle className="text-white text-xl flex items-center gap-2">
-              <Navigation className="w-5 h-5 text-[#FF6B6B]" />
+              <Navigation className="w-5 h-5 text-[#3B82F6]" />
               Traditional Navigation Use
             </CardTitle>
           </CardHeader>
@@ -151,7 +151,7 @@ export default function StarDetail() {
           <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-white text-lg flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#FFA07A]" />
+                <Calendar className="w-5 h-5 text-[#60A5FA]" />
                 Best Viewing Period
               </CardTitle>
             </CardHeader>
@@ -170,7 +170,7 @@ export default function StarDetail() {
           <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-white text-lg flex items-center gap-2">
-                <Eye className="w-5 h-5 text-[#FFD700]" />
+                <Eye className="w-5 h-5 text-[#0EA5E9]" />
                 Apparent Magnitude
               </CardTitle>
             </CardHeader>
@@ -193,10 +193,10 @@ export default function StarDetail() {
       </div>
 
       {/* Additional Info */}
-      <Card className="bg-gradient-to-br from-[#FF6B6B]/10 to-[#FFA07A]/10 border-[#FFA07A]/20">
+      <Card className="bg-gradient-to-br from-[#3B82F6]/10 to-[#60A5FA]/10 border-[#60A5FA]/20">
         <CardContent className="p-6">
           <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-[#FFD700] mt-1 flex-shrink-0" />
+            <Sparkles className="w-5 h-5 text-[#0EA5E9] mt-1 flex-shrink-0" />
             <div>
               <p className="text-white/90 leading-relaxed mb-3">
                 Hawaiian navigators memorized the rising and setting positions of key stars like {star.hawaiian_name}

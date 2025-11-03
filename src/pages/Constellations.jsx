@@ -77,8 +77,8 @@ export default function Constellations() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div className="text-center md:text-left">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center mx-auto md:mx-0 mb-4">
-            <Stars className="w-8 h-8 text-[#0A1929]" />
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
+            <Stars className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
             Constellation Guide
@@ -153,8 +153,8 @@ export default function Constellations() {
                     </div>
                   ) : (
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
-                        <Stars className="w-6 h-6 text-[#0A1929]" />
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                        <Stars className="w-6 h-6 text-white" />
                       </div>
                     </div>
                   )}
@@ -167,7 +167,7 @@ export default function Constellations() {
                         {constellation.pronunciation_audio_url && (
                           <button
                             onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
-                            className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                            className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                             title="Play pronunciation"
                           >
                             <Volume2 className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function Constellations() {
                         {constellation.english_name}
                       </p>
                       {constellation.meaning && (
-                        <p className="text-[#FFA07A] text-sm italic mt-1">
+                        <p className="text-[#60A5FA] text-sm italic mt-1">
                           {constellation.meaning}
                         </p>
                       )}
@@ -256,7 +256,7 @@ export default function Constellations() {
       )}
 
       {/* Cultural Note */}
-      <Card className="mt-12 bg-gradient-to-br from-[#FF6B6B]/20 to-[#FFA07A]/20 border-[#FFA07A]/30">
+      <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
         <CardContent className="p-6">
           <p className="text-white/90 italic leading-relaxed">
             "The stars served as a celestial map, with constellations marking key directions 

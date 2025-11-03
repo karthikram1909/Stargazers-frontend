@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation, Compass, Waves, Wind } from "lucide-react";
@@ -7,19 +8,19 @@ const techniques = [
     icon: Compass,
     title: "Star Compass",
     description: "The star compass (Kāpehuʻike hōkū) divides the horizon into 32 houses, each marking where specific stars rise and set. Navigators memorized the paths of stars throughout the night to maintain direction.",
-    color: "from-[#FFD700] to-[#FFA07A]"
+    color: "from-[#60A5FA] to-[#3B82F6]"
   },
   {
     icon: Waves,
     title: "Wave Patterns",
     description: "Master navigators could read ocean swells and wave patterns to detect land, even hundreds of miles away. Different wave patterns indicated proximity to islands and the direction of distant lands.",
-    color: "from-[#FF6B6B] to-[#FFA07A]"
+    color: "from-[#3B82F6] to-[#60A5FA]"
   },
   {
     icon: Wind,
     title: "Wind & Weather",
     description: "Trade winds, cloud formations, and bird behavior provided crucial navigation clues. Certain clouds forming over islands could be seen from great distances, and seabirds flew in predictable patterns.",
-    color: "from-[#1E3A5F] to-[#FF6B6B]"
+    color: "from-[#1E3A5F] to-[#3B82F6]"
   },
 ];
 
@@ -35,7 +36,7 @@ export default function Wayfinding() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#FFA07A] flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
           <Navigation className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
@@ -108,8 +109,8 @@ export default function Wayfinding() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
-                      <Navigation className="w-6 h-6 text-[#0A1929]" />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                      <Navigation className="w-6 h-6 text-white" />
                     </div>
                   </div>
                   <div className="flex-1 grid md:grid-cols-3 gap-4">
@@ -138,7 +139,7 @@ export default function Wayfinding() {
       </div>
 
       {/* Hōkūleʻa Legacy */}
-      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#FFD700]/30">
+      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30">
         <CardHeader>
           <CardTitle className="text-white text-2xl">
             The Legacy of Hōkūleʻa
@@ -157,7 +158,7 @@ export default function Wayfinding() {
             cultural revival across the Pacific.
           </p>
           <div className="pt-4 border-t border-white/20">
-            <p className="text-[#FFA07A] italic">
+            <p className="text-[#60A5FA] italic">
               "We learn from the past, voyage in the present, and look to guide the future."
             </p>
           </div>

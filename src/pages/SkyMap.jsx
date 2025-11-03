@@ -190,9 +190,9 @@ export default function SkyMap() {
       ctx.fillText(dir, x, y + 5);
     });
 
-    // Draw constellation lines
+    // Draw constellation lines with blue color
     if (showConstellations && skyData?.constellations) {
-      ctx.strokeStyle = 'rgba(255, 160, 122, 0.3)';
+      ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
       ctx.lineWidth = 1.5;
 
       skyData.constellations.forEach(constellation => {
@@ -213,14 +213,12 @@ export default function SkyMap() {
           }
         });
 
-        // Draw Hawaiian constellation names
         if (showHawaiianNames && constellation.hawaiian_name) {
-          // Find center of constellation
           const constellationStars = constellation.star_connections?.flat().filter((v, i, a) => a.indexOf(v) === i)
             .map(starName => skyData.stars.find(s => s.name === starName))
             .filter(s => s);
           
-          if (constellationStars && constellationStars.length > 0) { // Added null/undefined check for constellationStars
+          if (constellationStars && constellationStars.length > 0) {
             const avgX = constellationStars.reduce((sum, s) => {
               const pos = azAltToXY(s.azimuth, s.altitude, width, height);
               return sum + pos.x;
@@ -231,7 +229,7 @@ export default function SkyMap() {
               return sum + pos.y;
             }, 0) / constellationStars.length;
 
-            ctx.fillStyle = 'rgba(255, 160, 122, 0.6)';
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
             ctx.font = 'italic 12px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(constellation.hawaiian_name, avgX, avgY);
@@ -248,38 +246,25 @@ export default function SkyMap() {
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
 
-      // Star glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(255, 215, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)');
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.8)' : 'rgba(255, 255, 255, 0.6)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Star core
-      ctx.fillStyle = isHovered || isSelected ? '#FFD700' : '#FFFFFF';
+      ctx.fillStyle = isHovered || isSelected ? '#60A5FA' : '#FFFFFF';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Labels - Always show Hawaiian names (if available and showHawaiianNames is true)
       if (showHawaiianNames && star.hawaiian_name) {
-        ctx.fillStyle = '#FFA07A';
+        ctx.fillStyle = '#60A5FA';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(star.hawaiian_name, pos.x + size + 4, pos.y + 4);
       }
-
-      // The original code also showed the English name on hover/select.
-      // The outline removed it, so I am removing it to match the outline exactly.
-      // If the intent was to keep it, it would be:
-      // if (isHovered || isSelected) {
-      //   ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      //   ctx.font = '10px sans-serif';
-      //   ctx.textAlign = 'left';
-      //   ctx.fillText(star.name, pos.x + size + 4, pos.y + 10);
-      // }
     });
 
     // Draw planets
@@ -290,37 +275,25 @@ export default function SkyMap() {
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
 
-      // Planet glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2);
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(255, 107, 107, 0.8)' : 'rgba(255, 160, 122, 0.6)');
-      gradient.addColorStop(1, 'rgba(255, 160, 122, 0)');
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.8)' : 'rgba(96, 165, 250, 0.6)');
+      gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 2, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Planet core
-      ctx.fillStyle = isHovered || isSelected ? '#FF6B6B' : '#FFA07A';
+      ctx.fillStyle = isHovered || isSelected ? '#3B82F6' : '#60A5FA';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Labels - Always show Hawaiian names
       if (planet.hawaiian_name) {
-        ctx.fillStyle = '#FF6B6B';
+        ctx.fillStyle = '#3B82F6';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(planet.hawaiian_name, pos.x + size + 4, pos.y + 4);
       }
-      // The original code had an else to show English name if no Hawaiian name.
-      // The outline removed the else, implying only Hawaiian names (if present) are shown for planets now.
-      // If the intent was to keep showing English name when Hawaiian name is not present, it would be:
-      // else {
-      //   ctx.fillStyle = '#FFA07A';
-      //   ctx.font = 'bold 11px sans-serif';
-      //   ctx.textAlign = 'left';
-      //   ctx.fillText(planet.name, pos.x + size + 4, pos.y + 4);
-      // }
     });
   };
 
@@ -416,7 +389,7 @@ export default function SkyMap() {
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center min-h-[600px]">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-[#FFD700] animate-spin mx-auto mb-4" />
+            <Loader2 className="w-12 h-12 text-[#60A5FA] animate-spin mx-auto mb-4" />
             <p className="text-white/70">Mapping the heavens...</p>
           </div>
         </div>
@@ -428,8 +401,8 @@ export default function SkyMap() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center mx-auto mb-4">
-          <Compass className="w-8 h-8 text-[#0A1929]" />
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
+          <Compass className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
           Interactive Sky Map
@@ -437,7 +410,7 @@ export default function SkyMap() {
         <p className="text-white/70 text-lg mb-2">
           {skyData?.location} • {skyData?.date} • {skyData?.time}
         </p>
-        <Badge className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] text-white">
+        <Badge className="bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] text-white">
           {skyData?.stars?.length || 0} stars • {skyData?.planets?.length || 0} planets visible
         </Badge>
       </div>
@@ -453,22 +426,11 @@ export default function SkyMap() {
                   variant={showConstellations ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowConstellations(!showConstellations)}
-                  className={showConstellations ? "bg-gradient-to-r from-[#FFD700] to-[#FFA07A] text-[#0A1929]" : "border-white/20 text-white"}
+                  className={showConstellations ? "bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white" : "border-white/20 text-white"}
                 >
                   {showConstellations ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                   Constellations
                 </Button>
-                {/* The showHawaiianNames button was removed from the outline.
-                <Button
-                  variant={showHawaiianNames ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowHawaiianNames(!showHawaiianNames)}
-                  className={showHawaiianNames ? "bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] text-white" : "border-white/20 text-white"}
-                >
-                  {showHawaiianNames ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
-                  Hawaiian Names
-                </Button>
-                */}
                 <Button
                   variant="outline"
                   size="sm"
@@ -508,7 +470,7 @@ export default function SkyMap() {
                 />
                 <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white text-xs">
                   <p className="flex items-center gap-2 mb-1">
-                    <MapPin className="w-3 h-3 text-[#FFD700]" />
+                    <MapPin className="w-3 h-3 text-[#60A5FA]" />
                     Center = Zenith (overhead)
                   </p>
                   <p>Edge = Horizon</p>
@@ -562,7 +524,7 @@ export default function SkyMap() {
                     </h3>
                     <p className="text-white/60 text-sm">{selectedObject.name}</p>
                   </div>
-                  <Badge className={selectedObject.type === 'planet' ? "bg-[#FF6B6B]" : "bg-[#FFD700] text-[#0A1929]"}>
+                  <Badge className={selectedObject.type === 'planet' ? "bg-[#3B82F6]" : "bg-[#60A5FA] text-white"}>
                     {selectedObject.type}
                   </Badge>
                 </div>
@@ -592,7 +554,7 @@ export default function SkyMap() {
 
                 {getDetailLink(selectedObject) && (
                   <Link to={getDetailLink(selectedObject)}>
-                    <Button className="w-full bg-gradient-to-r from-[#FFD700] to-[#FFA07A] text-[#0A1929]">
+                    <Button className="w-full bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white">
                       View Full Details
                     </Button>
                   </Link>
@@ -611,11 +573,11 @@ export default function SkyMap() {
                   <span className="text-white/80">Stars</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#FFA07A]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
                   <span className="text-white/80">Planets</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-[#FFD700] opacity-30"></div>
+                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-30"></div>
                   <span className="text-white/80">Constellation Lines</span>
                 </div>
               </div>

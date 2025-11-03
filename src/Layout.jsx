@@ -38,9 +38,9 @@ export default function Layout({ children }) {
           :root {
             --ocean-deep: #0A1929;
             --ocean-mid: #1E3A5F;
-            --coral: #FF6B6B;
-            --coral-light: #FFA07A;
-            --gold: #FFD700;
+            --sky-bright: #60A5FA;
+            --sky-light: #3B82F6;
+            --cyan: #06B6D4;
             --sand: #F8F9FA;
           }
           
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c48fece3e_KILOHAKU2.png" 
                   alt="Stargazers Anonymous" 
-                  className="w-11 h-11 rounded-full object-cover border-2 border-[#FFD700]"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-[#60A5FA]"
                 />
                 <div>
                   <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
@@ -82,7 +82,7 @@ export default function Layout({ children }) {
                     to={item.path}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg"
                         : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
                     }`}
                   >

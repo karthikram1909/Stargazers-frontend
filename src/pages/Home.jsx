@@ -109,7 +109,7 @@ export default function Home() {
       <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-white">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
               <Moon className="w-6 h-6 text-[#0A1929]" />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function Home() {
         <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-white text-lg">
-              <Sunset className="w-5 h-5 text-[#FFA07A]" />
+              <Sunset className="w-5 h-5 text-[#60A5FA]" />
               Sunset & Sunrise
             </CardTitle>
           </CardHeader>
@@ -152,7 +152,7 @@ export default function Home() {
         <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-white text-lg">
-              <Star className="w-5 h-5 text-[#FFD700]" />
+              <Star className="w-5 h-5 text-[#0EA5E9]" />
               Visible Tonight
             </CardTitle>
           </CardHeader>
@@ -163,7 +163,7 @@ export default function Home() {
                 {skyData?.visible_planets?.map((planet, index) => (
                   <div
                     key={index}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium"
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-medium"
                   >
                     <div className="font-bold">{planet.hawaiian_name}</div>
                     <div className="text-xs opacity-80">{planet.english_name}</div>
@@ -176,7 +176,7 @@ export default function Home() {
       </div>
 
       {/* Featured Constellation */}
-      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#FFD700]/30 backdrop-blur-sm mb-6">
+      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30 backdrop-blur-sm mb-6">
         <CardHeader>
           <CardTitle className="text-white text-2xl">
             Featured: {skyData?.featured_constellation?.name}
@@ -194,7 +194,7 @@ export default function Home() {
         <Link to={createPageUrl("Stars")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Star className="w-8 h-8 text-[#FFD700] mx-auto mb-3" />
+              <Star className="w-8 h-8 text-[#0EA5E9] mx-auto mb-3" />
               <h3 className="text-white font-semibold mb-2">Star Guide</h3>
               <p className="text-white/60 text-sm">
                 Learn Hawaiian star names
@@ -206,7 +206,7 @@ export default function Home() {
         <Link to={createPageUrl("Moon")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Moon className="w-8 h-8 text-[#FFA07A] mx-auto mb-3" />
+              <Moon className="w-8 h-8 text-[#60A5FA] mx-auto mb-3" />
               <h3 className="text-white font-semibold mb-2">Moon Calendar</h3>
               <p className="text-white/60 text-sm">
                 Hawaiian lunar months

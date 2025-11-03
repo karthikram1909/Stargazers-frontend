@@ -22,18 +22,18 @@ export default function StarCard({ star, onEdit, onDelete }) {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
-                <Star className="w-5 h-5 text-[#0A1929]" />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                <Star className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-white text-lg group-hover:text-[#FFD700] transition-colors">
+                  <CardTitle className="text-white text-lg group-hover:text-[#60A5FA] transition-colors">
                     {star.hawaiian_name}
                   </CardTitle>
                   {star.pronunciation_audio_url && (
                     <button
                       onClick={playPronunciation}
-                      className="text-[#FFD700] hover:text-[#FFA07A] transition-colors"
+                      className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                       title="Play pronunciation"
                     >
                       <Volume2 className="w-4 h-4" />
@@ -42,7 +42,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
                 </div>
                 <p className="text-white/60 text-sm">{star.english_name}</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-[#FFD700] group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-[#60A5FA] group-hover:translate-x-1 transition-all" />
             </div>
           </div>
         </CardHeader>
@@ -63,7 +63,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
 
           {star.navigation_use && (
             <div className="flex gap-2 items-start p-3 rounded-lg bg-white/5 border border-white/10">
-              <Navigation className="w-4 h-4 text-[#FF6B6B] mt-0.5 flex-shrink-0" />
+              <Navigation className="w-4 h-4 text-[#3B82F6] mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                   Navigation Use
@@ -76,6 +76,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
           )}
         </Link>
 
+        
         <div className="flex items-center justify-between pt-2 border-t border-white/10">
           <div className="flex gap-4 flex-1 flex-wrap">
             {star.constellation && (
