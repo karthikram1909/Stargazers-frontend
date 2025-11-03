@@ -23,7 +23,7 @@ export default function Layout({ children }) {
       <div 
         className="fixed inset-0 bg-cover bg-no-repeat"
         style={{
-          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/0bc4a0a14_universe-2581135.jpg)',
+          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png)',
           backgroundPosition: 'center center',
           zIndex: 0
         }}
