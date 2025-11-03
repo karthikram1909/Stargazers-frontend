@@ -175,13 +175,13 @@ export default function Planets() {
 
   const getVisibilityColor = (quality) => {
     const colors = {
-      excellent: "bg-green-500",
-      good: "bg-blue-500",
-      fair: "bg-yellow-500",
-      poor: "bg-orange-500",
-      not_visible: "bg-gray-500"
+      excellent: "bg-indigo-600 text-white",
+      good: "bg-blue-500 text-white",
+      fair: "bg-cyan-500 text-white",
+      poor: "bg-red-500 text-white",
+      not_visible: "bg-gray-500 text-white"
     };
-    return colors[quality] || "bg-gray-500";
+    return colors[quality] || "bg-gray-500 text-white";
   };
 
   if (loading) {
@@ -264,7 +264,7 @@ export default function Planets() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Badge className={`${getVisibilityColor(data.visibility_quality)} text-white`}>
+                        <Badge className={getVisibilityColor(data.visibility_quality)}>
                           {data.visibility_quality}
                         </Badge>
                         <Badge variant="outline" className="border-white/30 text-white">
