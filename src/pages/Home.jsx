@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Moon, Star, Sunrise, Sunset, Navigation } from "lucide-react";
+import { Moon, Star, Sunrise, Sunset, Navigation, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -25,20 +24,35 @@ export default function Home() {
       });
       
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for the date ${dateStr} (October 31, 2025).
+        prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for TODAY's date ${dateStr}.
         
-        IMPORTANT: Only Saturn, Uranus, and Neptune are visible tonight. Do not include Mercury, Venus, Mars, Jupiter, or Pluto in the visible planets list.
+        CRITICAL: Calculate the ACTUAL current moon phase for today's date. Do not use placeholder data.
         
-        CRITICAL: The moon phase tonight is Waxing Gibbous at 90% illumination.
+        For visible planets, determine which ones are ACTUALLY visible tonight based on the current date and their orbital positions.
         
-        Use these exact Hawaiian names for planets:
+        Use these exact Hawaiian names for planets when they are visible:
+        - Mercury: ʻUkulele
+        - Venus: Hōkūloa
+        - Mars: Hōkūʻula
+        - Jupiter: Hōkūleʻa
         - Saturn: Makulu
         - Uranus: Heleʻekela
         - Neptune: Naholoholo
         
-        Return JSON with: current_date, moon_phase (name should be "Waxing Gibbous" and percentage should be 90), visible_planets (array containing objects with both english_name and hawaiian_name for only: Saturn/Makulu, Uranus/Heleʻekela, Neptune/Naholoholo), 
-        featured_constellation (name and brief description), sunset_time (use actual sunset time for Hawaii on October 31, 2025), 
-        sunrise_time (use actual sunrise time for Hawaii on October 31, 2025), best_viewing_hours.`,
+        For the featured constellation:
+        - Include the Hawaiian name if known (e.g., Makaliʻi for Pleiades, Kaiwikuamoʻo for Scorpius, Nānāhope for Cassiopeia, Newe for Southern Cross)
+        - Add Hawaiian mythology, navigation significance, or cultural meaning in the description
+        - Make it relevant to what's visible tonight
+        
+        Return JSON with: 
+        - current_date
+        - moon_phase (with accurate name like "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent", "New Moon" and accurate percentage for TODAY)
+        - visible_planets (array with english_name and hawaiian_name for planets ACTUALLY visible tonight)
+        - featured_constellation (object with name, hawaiian_name if known, and description including Hawaiian cultural/navigation significance)
+        - sunset_time (actual for Hawaii on this date)
+        - sunrise_time (actual for Hawaii on this date)
+        - best_viewing_hours`,
+        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
@@ -64,6 +78,7 @@ export default function Home() {
               type: "object",
               properties: {
                 name: { type: "string" },
+                hawaiian_name: { type: "string" },
                 description: { type: "string" }
               }
             },
@@ -177,12 +192,21 @@ export default function Home() {
       {/* Featured Constellation */}
       <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30 backdrop-blur-sm mb-6">
         <CardHeader>
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-5 h-5 text-[#60A5FA]" />
+            <span className="text-white/70 text-sm uppercase tracking-wide">Featured Constellation</span>
+          </div>
           <CardTitle className="text-white text-2xl">
-            Featured: {skyData?.featured_constellation?.name}
+            {skyData?.featured_constellation?.hawaiian_name && (
+              <div className="mb-1">{skyData.featured_constellation.hawaiian_name}</div>
+            )}
+            <div className={skyData?.featured_constellation?.hawaiian_name ? "text-xl text-white/70" : ""}>
+              {skyData?.featured_constellation?.name}
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-white/80 leading-relaxed">
+          <p className="text-white/80 leading-relaxed text-base">
             {skyData?.featured_constellation?.description}
           </p>
         </CardContent>
