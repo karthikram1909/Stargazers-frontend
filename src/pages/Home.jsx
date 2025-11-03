@@ -27,7 +27,7 @@ export default function Home() {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for the date ${dateStr} (October 31, 2025).
         
-        IMPORTANT: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Do not include Mercury, Venus, Mars, or Jupiter in the visible planets list.
+        IMPORTANT: Only Saturn, Uranus, and Neptune are visible tonight. Do not include Mercury, Venus, Mars, Jupiter, or Pluto in the visible planets list.
         
         CRITICAL: The moon phase tonight is Waxing Gibbous at 90% illumination.
         
@@ -35,9 +35,8 @@ export default function Home() {
         - Saturn: Makulu
         - Uranus: Heleʻekela
         - Neptune: Naholoholo
-        - Pluto: Poʻeleʻele
         
-        Return JSON with: current_date, moon_phase (name should be "Waxing Gibbous" and percentage should be 90), visible_planets (array containing objects with both english_name and hawaiian_name for only: Saturn/Makulu, Uranus/Heleʻekela, Neptune/Naholoholo, Pluto/Poʻeleʻele), 
+        Return JSON with: current_date, moon_phase (name should be "Waxing Gibbous" and percentage should be 90), visible_planets (array containing objects with both english_name and hawaiian_name for only: Saturn/Makulu, Uranus/Heleʻekela, Neptune/Naholoholo), 
         featured_constellation (name and brief description), sunset_time (use actual sunset time for Hawaii on October 31, 2025), 
         sunrise_time (use actual sunrise time for Hawaii on October 31, 2025), best_viewing_hours.`,
         response_json_schema: {

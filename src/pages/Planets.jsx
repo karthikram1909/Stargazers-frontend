@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -10,11 +9,15 @@ export default function Planets() {
   const [visibilityData, setVisibilityData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const { data: planets } = useQuery({
+  const { data: allPlanets } = useQuery({
     queryKey: ['planets'],
     queryFn: () => base44.entities.Planet.list(),
     initialData: [],
   });
+
+  // Separate planets and dwarf planets
+  const planets = allPlanets.filter(p => p.type === 'planet');
+  const dwarfPlanets = allPlanets.filter(p => p.type === 'dwarf_planet');
 
   useEffect(() => {
     fetchVisibility();
@@ -33,9 +36,9 @@ export default function Planets() {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `For tonight ${dateStr} (October 31, 2025) in Hawaii (Mauna Kea: 19.82°N, 155.47°W), provide current visibility information for all planets.
         
-        CRITICAL: Only Saturn, Uranus, Neptune, and Pluto are visible tonight. Mercury, Venus, Mars, and Jupiter are NOT visible.
+        CRITICAL: Only Saturn, Uranus, and Neptune are visible tonight. Mercury, Venus, Mars, and Jupiter are NOT visible.
         
-        For Saturn, Uranus, Neptune, and Pluto - set visible: true with accurate data
+        For Saturn, Uranus, and Neptune - set visible: true with accurate data
         For Mercury, Venus, Mars, and Jupiter - set visible: false, visibility_quality: "not_visible"
         
         For each planet, include: 
@@ -136,18 +139,6 @@ export default function Planets() {
                     rise_time: { type: "string" },
                     set_time: { type: "string" }
                   }
-                },
-                Pluto: {
-                  type: "object",
-                  properties: {
-                    visible: { type: "boolean" },
-                    visibility_quality: { type: "string" },
-                    best_viewing_time: { type: "string" },
-                    magnitude: { type: "number" },
-                    constellation: { type: "string" },
-                    rise_time: { type: "string" },
-                    set_time: { type: "string" }
-                  }
                 }
               }
             }
@@ -170,7 +161,7 @@ export default function Planets() {
   };
 
   const getPlanetInfo = (englishName) => {
-    return planets.find(p => p.english_name === englishName);
+    return allPlanets.find(p => p.english_name === englishName);
   };
 
   const getPlanetImage = (englishName) => {
@@ -182,7 +173,12 @@ export default function Planets() {
       'Jupiter': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/ef7bec44d_IMG_2073.jpg',
       'Saturn': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/64177e76e_IMG_2067.jpeg',
       'Uranus': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e31482dd9_IMG_2071.jpg',
-      'Neptune': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e8f6b52b9_IMG_2069.jpeg'
+      'Neptune': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e8f6b52b9_IMG_2069.jpeg',
+      'Pluto': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d2f1d9f97_IMG_2079.jpeg',
+      'Ceres': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c626118ec_IMG_2078.jpeg',
+      'Makemake': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/1ce246f5e_IMG_2080.jpeg',
+      'Haumea': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/6b56c73fc_IMG_2081.jpeg',
+      'Eris': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f65e6085b_IMG_2082.jpeg'
     };
     
     const planetInfo = getPlanetInfo(englishName);
@@ -354,7 +350,7 @@ export default function Planets() {
       )}
 
       {/* Complete Planet Guide */}
-      <div>
+      <div className="mb-12">
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
           <Globe className="w-6 h-6 text-white/70" />
           Complete Planet Guide
@@ -429,8 +425,83 @@ export default function Planets() {
         </div>
       </div>
 
+      {/* Dwarf Planets Section */}
+      {dwarfPlanets.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-[#60A5FA]" />
+            Dwarf Planets
+          </h2>
+          <p className="text-white/70 mb-6">
+            Small planetary-mass objects that orbit the Sun but haven't cleared their orbital paths
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dwarfPlanets.map((planet) => {
+              const planetImage = getPlanetImage(planet.english_name);
+              
+              return (
+                <Card
+                  key={planet.id}
+                  className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1">
+                        {planetImage ? (
+                          <img 
+                            src={planetImage}
+                            alt={planet.english_name}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                            <Globe className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-white text-lg">
+                              {planet.hawaiian_name}
+                            </CardTitle>
+                            {planet.pronunciation_audio_url && (
+                              <button
+                                onClick={() => playPronunciation(planet.pronunciation_audio_url)}
+                                className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                                title="Play pronunciation"
+                              >
+                                <Volume2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-white/60 text-sm">{planet.english_name}</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
+                        Dwarf
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {planet.meaning && (
+                      <p className="text-white/70 text-sm mb-2">
+                        {planet.meaning}
+                      </p>
+                    )}
+                    {planet.description && (
+                      <p className="text-white/60 text-xs mt-2 leading-relaxed">
+                        {planet.description}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Info Note */}
-      <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
+      <Card className="bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
         <CardContent className="p-6">
           <p className="text-white/90 italic leading-relaxed">
             Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved 
