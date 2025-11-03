@@ -139,15 +139,25 @@ export default function Constellations() {
           {constellations.map((constellation) => (
             <Card
               key={constellation.id}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all"
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
             >
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
-                      <Stars className="w-6 h-6 text-[#0A1929]" />
+                  {constellation.image_url ? (
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={constellation.image_url} 
+                        alt={constellation.hawaiian_name}
+                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
+                      />
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA07A] flex items-center justify-center">
+                        <Stars className="w-6 h-6 text-[#0A1929]" />
+                      </div>
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="mb-3">
                       <div className="flex items-center gap-2 mb-1">
