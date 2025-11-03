@@ -173,6 +173,22 @@ export default function Planets() {
     return planets.find(p => p.english_name === englishName);
   };
 
+  const getPlanetImage = (englishName) => {
+    const imageMap = {
+      'Mercury': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/6b739105e_IMG_2074.jpeg',
+      'Venus': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/34ba1141c_IMG_2072.jpeg',
+      'Earth': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/02ebf2bc1_IMG_2075.jpg',
+      'Mars': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/dfa06f6c7_IMG_2068.jpg',
+      'Jupiter': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/ef7bec44d_IMG_2073.jpg',
+      'Saturn': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/64177e76e_IMG_2067.jpeg',
+      'Uranus': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e31482dd9_IMG_2071.jpg',
+      'Neptune': 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e8f6b52b9_IMG_2069.jpeg'
+    };
+    
+    const planetInfo = getPlanetInfo(englishName);
+    return planetInfo?.image_url || imageMap[englishName];
+  };
+
   const getVisibilityColor = (quality) => {
     const colors = {
       excellent: "bg-indigo-600 text-white",
@@ -229,6 +245,7 @@ export default function Planets() {
           <div className="space-y-4">
             {visiblePlanets.map(([planetName, data]) => {
               const planetInfo = getPlanetInfo(planetName);
+              const planetImage = getPlanetImage(planetName);
               return (
                 <Card
                   key={planetName}
@@ -237,9 +254,17 @@ export default function Planets() {
                   <CardHeader>
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0">
-                          <Globe className="w-7 h-7 text-white" />
-                        </div>
+                        {planetImage ? (
+                          <img 
+                            src={planetImage}
+                            alt={planetName}
+                            className="w-14 h-14 rounded-full object-cover border-2 border-white/20 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                            <Globe className="w-7 h-7 text-white" />
+                          </div>
+                        )}
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <CardTitle className="text-white text-2xl">
@@ -328,7 +353,7 @@ export default function Planets() {
         </div>
       )}
 
-      {/* All Planets Reference */}
+      {/* Complete Planet Guide */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
           <Globe className="w-6 h-6 text-white/70" />
@@ -338,6 +363,7 @@ export default function Planets() {
           {planets.map((planet) => {
             const visibility = visibilityData?.planets?.[planet.english_name];
             const isVisible = visibility?.visible;
+            const planetImage = getPlanetImage(planet.english_name);
             
             return (
               <Card
@@ -347,28 +373,41 @@ export default function Planets() {
                 }`}
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-white text-lg">
-                          {planet.hawaiian_name}
-                        </CardTitle>
-                        {planet.pronunciation_audio_url && (
-                          <button
-                            onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                            className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
-                            title="Play pronunciation"
-                          >
-                            <Volume2 className="w-4 h-4" />
-                          </button>
-                        )}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      {planetImage ? (
+                        <img 
+                          src={planetImage}
+                          alt={planet.english_name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                          <Globe className="w-6 h-6 text-white" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-white text-lg">
+                            {planet.hawaiian_name}
+                          </CardTitle>
+                          {planet.pronunciation_audio_url && (
+                            <button
+                              onClick={() => playPronunciation(planet.pronunciation_audio_url)}
+                              className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                              title="Play pronunciation"
+                            >
+                              <Volume2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-white/60 text-sm">{planet.english_name}</p>
                       </div>
-                      <p className="text-white/60 text-sm">{planet.english_name}</p>
                     </div>
                     {isVisible ? (
-                      <Eye className="w-5 h-5 text-[#0EA5E9]" />
+                      <Eye className="w-5 h-5 text-[#0EA5E9] flex-shrink-0" />
                     ) : (
-                      <EyeOff className="w-5 h-5 text-white/30" />
+                      <EyeOff className="w-5 h-5 text-white/30 flex-shrink-0" />
                     )}
                   </div>
                 </CardHeader>
