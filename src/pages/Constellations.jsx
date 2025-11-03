@@ -92,7 +92,7 @@ export default function Constellations() {
             setSelectedConstellation(null);
             setShowForm(true);
           }}
-          className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] hover:opacity-90"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Constellation
@@ -128,7 +128,7 @@ export default function Constellations() {
             </p>
             <Button
               onClick={() => setShowForm(true)}
-              className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A]"
+              className="bg-gradient-to-r from-blue-500 to-blue-600"
             >
               Add Your First Constellation
             </Button>

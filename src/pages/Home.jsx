@@ -163,7 +163,7 @@ export default function Home() {
                 {skyData?.visible_planets?.map((planet, index) => (
                   <div
                     key={index}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] text-white text-sm font-medium"
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium"
                   >
                     <div className="font-bold">{planet.hawaiian_name}</div>
                     <div className="text-xs opacity-80">{planet.english_name}</div>
@@ -218,7 +218,7 @@ export default function Home() {
         <Link to={createPageUrl("Wayfinding")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Navigation className="w-8 h-8 text-[#FF6B6B] mx-auto mb-3" />
+              <Navigation className="w-8 h-8 text-blue-500 mx-auto mb-3" />
               <h3 className="text-white font-semibold mb-2">Wayfinding</h3>
               <p className="text-white/60 text-sm">
                 Navigation traditions

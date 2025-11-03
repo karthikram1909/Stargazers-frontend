@@ -233,7 +233,7 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
             <Button
               type="submit"
               disabled={isLoading || uploading} // Disable if uploading
-              className="bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] hover:opacity-90"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
             >
               <Save className="w-4 h-4 mr-2" />
               {isLoading ? "Saving..." : (uploading ? "Uploading Audio..." : "Save Star")}
