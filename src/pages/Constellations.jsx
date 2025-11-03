@@ -102,7 +102,7 @@ export default function Constellations() {
       {/* Introduction */}
       <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
         <CardContent className="p-8">
-          <p className="text-white/90 text-lg leading-relaxed">
+          <p className="text-white/90 text-xl leading-relaxed">
             Constellations served as celestial roadmaps for Hawaiian navigators, helping them 
             maintain course across thousands of miles of open ocean. Each constellation had its 
             own name, mythology, and practical navigation use, passed down through generations 
@@ -174,11 +174,11 @@ export default function Constellations() {
                           </button>
                         )}
                       </div>
-                      <p className="text-white/60 text-sm">
+                      <p className="text-white/60 text-base">
                         {constellation.english_name}
                       </p>
                       {constellation.meaning && (
-                        <p className="text-[#60A5FA] text-sm italic mt-1">
+                        <p className="text-[#60A5FA] text-base italic mt-1">
                           {constellation.meaning}
                         </p>
                       )}
@@ -189,7 +189,7 @@ export default function Constellations() {
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                           Stars
                         </p>
-                        <p className="text-white/80 text-sm">
+                        <p className="text-white/80 text-base">
                           {constellation.stars_description}
                         </p>
                       </div>
@@ -201,7 +201,7 @@ export default function Constellations() {
                           <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                             Navigation Use
                           </p>
-                          <p className="text-white/80 text-sm">
+                          <p className="text-white/80 text-base">
                             {constellation.navigation_use}
                           </p>
                         </div>
@@ -211,7 +211,7 @@ export default function Constellations() {
                           <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                             Best Viewing
                           </p>
-                          <p className="text-white/80 text-sm">
+                          <p className="text-white/80 text-base">
                             {constellation.best_viewing_months}
                           </p>
                         </div>
@@ -223,7 +223,7 @@ export default function Constellations() {
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                           Mythology
                         </p>
-                        <p className="text-white/90 text-sm leading-relaxed">
+                        <p className="text-white/90 text-base leading-relaxed">
                           {constellation.mythology}
                         </p>
                       </div>

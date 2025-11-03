@@ -40,7 +40,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
                     </button>
                   )}
                 </div>
-                <p className="text-white/60 text-sm">{star.english_name}</p>
+                <p className="text-white/60 text-base">{star.english_name}</p>
               </div>
               <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-[#60A5FA] group-hover:translate-x-1 transition-all" />
             </div>
@@ -55,7 +55,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
               <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                 Meaning
               </p>
-              <p className="text-white/90 text-sm leading-relaxed line-clamp-2">
+              <p className="text-white/90 text-base leading-relaxed line-clamp-2">
                 {star.meaning}
               </p>
             </div>
@@ -68,7 +68,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
                 <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
                   Navigation Use
                 </p>
-                <p className="text-white/80 text-sm line-clamp-2">
+                <p className="text-white/80 text-base line-clamp-2">
                   {star.navigation_use}
                 </p>
               </div>
@@ -82,7 +82,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             {star.constellation && (
               <div>
                 <span className="text-white/50 text-xs">Constellation</span>
-                <p className="text-white/80 text-sm font-medium">
+                <p className="text-white/80 text-base font-medium">
                   {star.constellation}
                 </p>
               </div>
@@ -91,7 +91,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             {star.brightness !== undefined && star.brightness !== null && (
               <div>
                 <span className="text-white/50 text-xs">Magnitude</span>
-                <p className="text-white/80 text-sm font-medium">
+                <p className="text-white/80 text-base font-medium">
                   {star.brightness.toFixed(2)}
                 </p>
               </div>
@@ -100,7 +100,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             {star.best_viewing_months && (
               <div>
                 <span className="text-white/50 text-xs">Best Viewing</span>
-                <p className="text-white/80 text-sm">
+                <p className="text-white/80 text-base">
                   {star.best_viewing_months}
                 </p>
               </div>
