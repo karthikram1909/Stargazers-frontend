@@ -714,15 +714,15 @@ export default function SkyMap() {
               <h3 className="text-white font-bold mb-3">Hōʻailona (Legend)</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-white flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-white"></div>
                   <span className="text-white/80">Nā Hōkū (Stars)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#60a5fa] flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
                   <span className="text-white/80">Nā Hōkūhele (Planets)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-0.5 bg-gradient-to-r from-[#60a5fa] to-[#a855f7] flex-shrink-0"></div>
+                  <div className="w-8 h-0.5 bg-gradient-to-r from-[#60a5fa] to-[#a855f7]"></div>
                   <span className="text-white/80">Star Lines</span>
                 </div>
               </div>
