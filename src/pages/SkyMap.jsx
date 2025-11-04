@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -63,42 +62,39 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate accurate sky map for ${dateStr} at ${timeStr} in Hawaii (19.82°N, 155.47°W).
+        prompt: `You are an expert astronomer. Generate HIGHLY ACCURATE sky map data for ${dateStr} at ${timeStr} in Hawaii (19.82°N, 155.47°W).
 
-        STARS - Include these EXACT star names (use these EXACT spellings):
-        Sirius, Canopus, Arcturus, Vega, Capella, Rigel, Procyon, Betelgeuse, Altair, Aldebaran, 
-        Spica, Antares, Pollux, Fomalhaut, Deneb, Regulus, Adhara, Castor, Bellatrix, Alnilam, 
-        Mintaka, Alnitak, Saiph, Hadar, Acrux, Shaula, Alkaid, Mizar, Dubhe, Merak
+        CRITICAL REQUIREMENTS:
         
-        For each star provide:
-        - name: EXACT name from above list
-        - hawaiian_name: Hawaiian name if known, else repeat English name  
-        - azimuth: 0-360 (accurate)
-        - altitude: 0-90 (only stars above horizon)
-        - magnitude: actual value
-        - constellation: parent constellation
+        1. STAR DATA - Include 20-30 bright stars (magnitude 3.0 or brighter) that are ACTUALLY visible above the horizon right now:
+           - name: Use EXACT standard star names (Sirius, Vega, Betelgeuse, Rigel, Aldebaran, etc.)
+           - hawaiian_name: Hawaiian name if known, otherwise repeat the English name
+           - azimuth: 0-360 degrees (accurate for this date/time/location)
+           - altitude: Only stars with altitude > 0 (above horizon)
+           - magnitude: Actual brightness value
+           - constellation: Parent constellation
         
-        CONSTELLATION LINES - CRITICAL:
-        Create connections using ONLY the star names from the list above.
-        Example format (use EXACT star names):
+        2. CONSTELLATION LINES - THIS IS CRITICAL:
+           - For each major constellation visible tonight (Orion, Ursa Major, Cassiopeia, etc.)
+           - star_connections MUST use EXACT star names that exist in your stars array
+           - Example: If you include star {"name": "Rigel", ...} in stars array, use "Rigel" exactly in connections
+           - Create 3-5 connections per constellation to show its shape
+           - VERIFY: Every star name in connections must exist in the stars array
+        
+        3. PLANETS - Only include planets actually visible tonight (altitude > 0)
+        
+        EXAMPLE of correct constellation structure:
         {
           "name": "Orion",
           "hawaiian_name": "Kaiwikuamoʻo",
           "star_connections": [
             ["Betelgeuse", "Bellatrix"],
-            ["Betelgeuse", "Alnilam"],
             ["Rigel", "Saiph"],
-            ["Bellatrix", "Mintaka"],
-            ["Mintaka", "Alnilam"],
-            ["Alnilam", "Alnitak"],
-            ["Alnitak", "Saiph"],
-            ["Saiph", "Rigel"]
+            ["Bellatrix", "Mintaka"]
           ]
         }
         
-        Create similar connections for: Ursa Major, Cassiopeia, Scorpius, Taurus, Gemini, Leo
-        
-        PLANETS - Include only visible planets tonight with accurate positions`,
+        Make sure EVERY star name in star_connections appears in your stars array.`,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",
@@ -157,26 +153,11 @@ export default function SkyMap() {
       console.log("=== SKY MAP DATA ===");
       console.log("Stars:", result?.stars?.length);
       console.log("Constellations:", result?.constellations?.length);
-      
-      // Validate constellation lines
-      const starNames = new Set(result?.stars?.map(s => s.name) || []);
-      let totalLines = 0;
-      let validLines = 0;
+      console.log("Star names:", result?.stars?.map(s => s.name));
       
       result?.constellations?.forEach(c => {
-        c.star_connections?.forEach(conn => {
-          if (conn.length >= 2) {
-            totalLines++;
-            if (starNames.has(conn[0]) && starNames.has(conn[1])) {
-              validLines++;
-            } else {
-              console.warn(`Invalid connection in ${c.name}: ${conn[0]} -> ${conn[1]}`);
-            }
-          }
-        });
+        console.log(`${c.name} connections:`, c.star_connections);
       });
-      
-      console.log(`Constellation lines: ${validLines} valid out of ${totalLines} total`);
       
       setSkyData(result);
       setLoading(false);
@@ -248,10 +229,10 @@ export default function SkyMap() {
       ctx.fillText(label, x, y + 7);
     });
 
-    // Draw constellation lines with improved visibility
+    // Draw constellation lines
     if (showConstellations && skyData?.constellations) {
-      ctx.strokeStyle = 'rgba(96, 165, 250, 0.7)';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(96, 165, 250, 0.5)';
+      ctx.lineWidth = 2;
 
       let linesDrawn = 0;
       skyData.constellations.forEach(constellation => {
@@ -260,7 +241,7 @@ export default function SkyMap() {
             const star1 = skyData.stars.find(s => s.name === connection[0]);
             const star2 = skyData.stars.find(s => s.name === connection[1]);
 
-            if (star1 && star2 && star1.altitude > 0 && star2.altitude > 0) { // Only draw lines for stars above horizon
+            if (star1 && star2) {
               const pos1 = azAltToXY(star1.azimuth, star1.altitude, width, height);
               const pos2 = azAltToXY(star2.azimuth, star2.altitude, width, height);
 
@@ -276,7 +257,7 @@ export default function SkyMap() {
         if (showHawaiianNames && constellation.hawaiian_name) {
           const constellationStars = constellation.star_connections?.flat().filter((v, i, a) => a.indexOf(v) === i)
             .map(starName => skyData.stars.find(s => s.name === starName))
-            .filter(s => s && s.altitude > 0); // Only consider visible stars for label positioning
+            .filter(s => s);
           
           if (constellationStars && constellationStars.length > 0) {
             const avgX = constellationStars.reduce((sum, s) => {
@@ -289,8 +270,8 @@ export default function SkyMap() {
               return sum + pos.y;
             }, 0) / constellationStars.length;
 
-            ctx.fillStyle = 'rgba(96, 165, 250, 0.9)';
-            ctx.font = 'italic bold 20px sans-serif'; // Larger, bolder font for constellation names
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.8)';
+            ctx.font = 'italic 16px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(constellation.hawaiian_name, avgX, avgY);
           }
@@ -300,22 +281,20 @@ export default function SkyMap() {
       console.log(`Drew ${linesDrawn} constellation lines`);
     }
 
-    // Draw stars with larger sizes
+    // Draw stars
     skyData?.stars?.forEach(star => {
-      if (star.altitude <= 0) return; // Skip stars below horizon
-      
       const pos = azAltToXY(star.azimuth, star.altitude, width, height);
-      const size = Math.max(5, 14 - star.magnitude * 1.8); // Larger base size and scaling
+      const size = Math.max(3, 10 - star.magnitude * 1.5);
 
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
 
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 4); // Larger glow
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.9)' : 'rgba(255, 255, 255, 0.8)');
+      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.9)' : 'rgba(255, 255, 255, 0.7)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size * 4, 0, 2 * Math.PI);
+      ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
 
       ctx.fillStyle = isHovered || isSelected ? '#60A5FA' : '#FFFFFF';
@@ -323,36 +302,28 @@ export default function SkyMap() {
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Draw star names MUCH LARGER
       if (showHawaiianNames && star.hawaiian_name && star.magnitude < 2.5) {
         ctx.fillStyle = '#60A5FA';
-        ctx.font = 'bold 20px sans-serif';
+        ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'left';
-        
-        // Add text shadow for better readability
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        ctx.shadowBlur = 4;
-        ctx.fillText(star.hawaiian_name, pos.x + size + 10, pos.y + 7);
-        ctx.shadowBlur = 0;
+        ctx.fillText(star.hawaiian_name, pos.x + size + 6, pos.y + 5);
       }
     });
 
-    // Draw planets with larger sizes
+    // Draw planets
     skyData?.planets?.forEach(planet => {
-      if (planet.altitude <= 0) return; // Skip planets below horizon
-      
       const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
-      const size = 12; // Larger planet size
+      const size = 8;
 
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
 
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3); // Larger glow
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.9)' : 'rgba(96, 165, 250, 0.8)');
+      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2.5);
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.9)' : 'rgba(96, 165, 250, 0.7)');
       gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
+      ctx.arc(pos.x, pos.y, size * 2.5, 0, 2 * Math.PI);
       ctx.fill();
 
       ctx.fillStyle = isHovered || isSelected ? '#3B82F6' : '#60A5FA';
@@ -362,12 +333,9 @@ export default function SkyMap() {
 
       if (planet.hawaiian_name) {
         ctx.fillStyle = '#3B82F6';
-        ctx.font = 'bold 20px sans-serif'; // Larger font for planet names
+        ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'left';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'; // Add text shadow
-        ctx.shadowBlur = 4;
-        ctx.fillText(planet.hawaiian_name, pos.x + size + 10, pos.y + 7);
-        ctx.shadowBlur = 0;
+        ctx.fillText(planet.hawaiian_name, pos.x + size + 6, pos.y + 5);
       }
     });
   };
@@ -585,6 +553,7 @@ export default function SkyMap() {
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                 />
+                {/* Zenith indicator */}
                 <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-xs">
                   ↑ Zenith (Overhead)
                 </div>
@@ -710,7 +679,7 @@ export default function SkyMap() {
                   <span className="text-white/80">Planets</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-70"></div>
+                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-50"></div>
                   <span className="text-white/80">Constellation Lines</span>
                 </div>
               </div>

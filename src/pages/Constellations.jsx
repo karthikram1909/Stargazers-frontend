@@ -73,219 +73,207 @@ export default function Constellations() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Page-specific background */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/58a246ad7_constellations.jpg)',
-          zIndex: -2
-        }}
-      />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" style={{ zIndex: -1 }} />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div className="text-center md:text-left">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
-              <Stars className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Constellation Guide
-            </h1>
-            <p className="text-white/70 text-lg">
-              Hawaiian star patterns and their navigation significance
-            </p>
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="text-center md:text-left">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
+            <Stars className="w-8 h-8 text-white" />
           </div>
-          <Button
-            onClick={() => {
-              setSelectedConstellation(null);
-              setShowForm(true);
-            }}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Constellation
-          </Button>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Constellation Guide
+          </h1>
+          <p className="text-white/70 text-lg">
+            Hawaiian star patterns and their navigation significance
+          </p>
         </div>
+        <Button
+          onClick={() => {
+            setSelectedConstellation(null);
+            setShowForm(true);
+          }}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Constellation
+        </Button>
+      </div>
 
-        {/* Introduction */}
-        <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
-          <CardContent className="p-8">
-            <p className="text-white/90 text-xl leading-relaxed">
-              Constellations served as celestial roadmaps for Hawaiian navigators, helping them 
-              maintain course across thousands of miles of open ocean. Each constellation had its 
-              own name, mythology, and practical navigation use, passed down through generations 
-              of wayfinders.
+      {/* Introduction */}
+      <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+        <CardContent className="p-8">
+          <p className="text-white/90 text-xl leading-relaxed">
+            Constellations served as celestial roadmaps for Hawaiian navigators, helping them 
+            maintain course across thousands of miles of open ocean. Each constellation had its 
+            own name, mythology, and practical navigation use, passed down through generations 
+            of wayfinders.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Constellations List */}
+      {isLoading ? (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-48 bg-white/10 rounded-3xl animate-pulse" />
+          ))}
+        </div>
+      ) : constellations.length === 0 ? (
+        <Card className="bg-white/5 border-white/20">
+          <CardContent className="p-12 text-center">
+            <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-xl text-white mb-2">No constellations yet</h3>
+            <p className="text-white/60 mb-6">
+              Start building your Hawaiian constellation guide
             </p>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600"
+            >
+              Add Your First Constellation
+            </Button>
           </CardContent>
         </Card>
-
-        {/* Constellations List */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-48 bg-white/10 rounded-3xl animate-pulse" />
-            ))}
-          </div>
-        ) : constellations.length === 0 ? (
-          <Card className="bg-white/5 border-white/20">
-            <CardContent className="p-12 text-center">
-              <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
-              <h3 className="text-xl text-white mb-2">No constellations yet</h3>
-              <p className="text-white/60 mb-6">
-                Start building your Hawaiian constellation guide
-              </p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-blue-500 to-blue-600"
-              >
-                Add Your First Constellation
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {constellations.map((constellation) => (
-              <Card
-                key={constellation.id}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    {constellation.image_url ? (
-                      <div className="flex-shrink-0">
-                        <img 
-                          src={constellation.image_url} 
-                          alt={constellation.hawaiian_name}
-                          className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
-                        />
+      ) : (
+        <div className="space-y-4">
+          {constellations.map((constellation) => (
+            <Card
+              key={constellation.id}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
+            >
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                  {constellation.image_url ? (
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={constellation.image_url} 
+                        alt={constellation.hawaiian_name}
+                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                        <Stars className="w-6 h-6 text-white" />
                       </div>
-                    ) : (
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                          <Stars className="w-6 h-6 text-white" />
-                        </div>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="mb-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-white font-bold text-lg">
+                          {constellation.hawaiian_name}
+                        </h3>
+                        {constellation.pronunciation_audio_url && (
+                          <button
+                            onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
+                            className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                            title="Play pronunciation"
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-white/60 text-base">
+                        {constellation.english_name}
+                      </p>
+                      {constellation.meaning && (
+                        <p className="text-[#60A5FA] text-base italic mt-1">
+                          {constellation.meaning}
+                        </p>
+                      )}
+                    </div>
+
+                    {constellation.stars_description && (
+                      <div className="mb-3">
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                          Stars
+                        </p>
+                        <p className="text-white/80 text-base">
+                          {constellation.stars_description}
+                        </p>
                       </div>
                     )}
-                    <div className="flex-1">
-                      <div className="mb-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-white font-bold text-lg">
-                            {constellation.hawaiian_name}
-                          </h3>
-                          {constellation.pronunciation_audio_url && (
-                            <button
-                              onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
-                              className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
-                              title="Play pronunciation"
-                            >
-                              <Volume2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-white/60 text-base">
-                          {constellation.english_name}
-                        </p>
-                        {constellation.meaning && (
-                          <p className="text-[#60A5FA] text-base italic mt-1">
-                            {constellation.meaning}
-                          </p>
-                        )}
-                      </div>
 
-                      {constellation.stars_description && (
-                        <div className="mb-3">
+                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+                      {constellation.navigation_use && (
+                        <div>
                           <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                            Stars
+                            Navigation Use
                           </p>
                           <p className="text-white/80 text-base">
-                            {constellation.stars_description}
+                            {constellation.navigation_use}
                           </p>
                         </div>
                       )}
-
-                      <div className="grid md:grid-cols-2 gap-4 mb-3">
-                        {constellation.navigation_use && (
-                          <div>
-                            <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                              Navigation Use
-                            </p>
-                            <p className="text-white/80 text-base">
-                              {constellation.navigation_use}
-                            </p>
-                          </div>
-                        )}
-                        {constellation.best_viewing_months && (
-                          <div>
-                            <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                              Best Viewing
-                            </p>
-                            <p className="text-white/80 text-base">
-                              {constellation.best_viewing_months}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {constellation.mythology && (
-                        <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      {constellation.best_viewing_months && (
+                        <div>
                           <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                            Mythology
+                            Best Viewing
                           </p>
-                          <p className="text-white/90 text-base leading-relaxed">
-                            {constellation.mythology}
+                          <p className="text-white/80 text-base">
+                            {constellation.best_viewing_months}
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="flex md:flex-col gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                        onClick={() => handleEdit(constellation)}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-red-400 hover:bg-white/10"
-                        onClick={() => handleDelete(constellation.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    {constellation.mythology && (
+                      <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                          Mythology
+                        </p>
+                        <p className="text-white/90 text-base leading-relaxed">
+                          {constellation.mythology}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
 
-        {/* Cultural Note */}
-        <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
-          <CardContent className="p-6">
-            <p className="text-white/90 italic leading-relaxed">
-              "The stars served as a celestial map, with constellations marking key directions 
-              and latitudes. Master navigators memorized the rising and setting positions of 
-              entire star groups, creating a mental framework that guided voyages across the Pacific."
-            </p>
-          </CardContent>
-        </Card>
+                  <div className="flex md:flex-col gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white/70 hover:text-white hover:bg-white/10"
+                      onClick={() => handleEdit(constellation)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white/70 hover:text-red-400 hover:bg-white/10"
+                      onClick={() => handleDelete(constellation.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-        {/* Form Dialog */}
-        <ConstellationFormDialog
-          open={showForm}
-          onOpenChange={setShowForm}
-          constellation={selectedConstellation}
-          onSave={handleSave}
-          isLoading={createMutation.isPending || updateMutation.isPending}
-        />
-      </div>
+      {/* Cultural Note */}
+      <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
+        <CardContent className="p-6">
+          <p className="text-white/90 italic leading-relaxed">
+            "The stars served as a celestial map, with constellations marking key directions 
+            and latitudes. Master navigators memorized the rising and setting positions of 
+            entire star groups, creating a mental framework that guided voyages across the Pacific."
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Form Dialog */}
+      <ConstellationFormDialog
+        open={showForm}
+        onOpenChange={setShowForm}
+        constellation={selectedConstellation}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+      />
     </div>
   );
 }

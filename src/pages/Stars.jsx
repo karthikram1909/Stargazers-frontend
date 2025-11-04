@@ -68,85 +68,73 @@ export default function Stars() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Page-specific background */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/cfc1dd147_milky-way-4416194_1920.jpg)',
-          zIndex: -2
-        }}
-      />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" style={{ zIndex: -1 }} />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Nā Hōkū - Star Guide
-            </h1>
-            <p className="text-white/70">
-              Hawaiian names and meanings of celestial bodies
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              setSelectedStar(null);
-              setShowForm(true);
-            }}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Star
-          </Button>
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Nā Hōkū - Star Guide
+          </h1>
+          <p className="text-white/70">
+            Hawaiian names and meanings of celestial bodies
+          </p>
         </div>
-
-        {/* Stars Grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-white/10 rounded-3xl animate-pulse" />
-            ))}
-          </div>
-        ) : stars.length === 0 ? (
-          <Card className="bg-white/5 border-white/20">
-            <CardContent className="p-12 text-center">
-              <Sparkles className="w-16 h-16 text-white/30 mx-auto mb-4" />
-              <h3 className="text-xl text-white mb-2">No stars yet</h3>
-              <p className="text-white/60 mb-6">
-                Start building your Hawaiian star guide
-              </p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-blue-500 to-blue-600"
-              >
-                Add Your First Star
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stars.map((star) => (
-              <StarCard
-                key={star.id}
-                star={star}
-                onEdit={() => handleEdit(star)}
-                onDelete={() => handleDelete(star.id)}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Form Dialog */}
-        <StarFormDialog
-          open={showForm}
-          onOpenChange={setShowForm}
-          star={selectedStar}
-          onSave={handleSave}
-          isLoading={createMutation.isPending || updateMutation.isPending}
-        />
+        <Button
+          onClick={() => {
+            setSelectedStar(null);
+            setShowForm(true);
+          }}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Star
+        </Button>
       </div>
+
+      {/* Stars Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-64 bg-white/10 rounded-3xl animate-pulse" />
+          ))}
+        </div>
+      ) : stars.length === 0 ? (
+        <Card className="bg-white/5 border-white/20">
+          <CardContent className="p-12 text-center">
+            <Sparkles className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-xl text-white mb-2">No stars yet</h3>
+            <p className="text-white/60 mb-6">
+              Start building your Hawaiian star guide
+            </p>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600"
+            >
+              Add Your First Star
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {stars.map((star) => (
+            <StarCard
+              key={star.id}
+              star={star}
+              onEdit={() => handleEdit(star)}
+              onDelete={() => handleDelete(star.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Form Dialog */}
+      <StarFormDialog
+        open={showForm}
+        onOpenChange={setShowForm}
+        star={selectedStar}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+      />
     </div>
   );
 }
