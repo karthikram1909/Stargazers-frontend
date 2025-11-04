@@ -21,19 +21,19 @@ export default function Layout({ children }) {
   const getBackgroundImage = () => {
     const path = location.pathname;
     if (path.includes("Stars") || path.includes("StarDetail")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/24eebd687_starguide.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/56fa859bb_starguide.jpg";
     }
     if (path.includes("Planets")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/571f8877c_planet-4534835_1920.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f801deb47_planet-4534835_1920.jpg";
     }
     if (path.includes("Constellations")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/82488e921_constellations.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/dff8e2292_constellations.jpg";
     }
     if (path.includes("Moon")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e933e77d0_river-7294102_1920.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5a60288ea_river-7294102_1920.jpg";
     }
     if (path.includes("Wayfinding")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3fa94c3c1_wayfaring.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/72fa687e4_wayfaring.jpg";
     }
     // Default background for Home and SkyMap
     return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
