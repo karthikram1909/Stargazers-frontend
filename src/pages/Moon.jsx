@@ -30,93 +30,105 @@ const moonPhases = [
 
 export default function Moon() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
-          <MoonIcon className="w-8 h-8 text-white" />
+    <div className="relative min-h-screen">
+      {/* Page-specific background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f9734b5d7_river-7294102_1920.jpg)',
+          zIndex: -2
+        }}
+      />
+      <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" style={{ zIndex: -1 }} />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
+            <MoonIcon className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Mahina - Hawaiian Lunar Calendar
+          </h1>
+          <p className="text-white/70 text-lg">
+            Ancient timekeeping by the moon
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Mahina - Hawaiian Lunar Calendar
-        </h1>
-        <p className="text-white/70 text-lg">
-          Ancient timekeeping by the moon
-        </p>
-      </div>
 
-      {/* Lunar Months */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Nā Malama - The Months
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {lunarMonths.map((month, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white text-lg">
-                  {month.name}
-                </CardTitle>
-                <p className="text-[#60A5FA] text-sm">{month.meaning}</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/70 text-sm">{month.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Lunar Months */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">
+            Nā Malama - The Months
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {lunarMonths.map((month, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-lg">
+                    {month.name}
+                  </CardTitle>
+                  <p className="text-[#60A5FA] text-sm">{month.meaning}</p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white/70 text-sm">{month.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Moon Phases */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Nā Pō o ka Mahina - Moon Phases
-        </h2>
-        <div className="space-y-4">
-          {moonPhases.map((phase, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">
-                        {phase.day}
-                      </span>
+        {/* Moon Phases */}
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-6">
+            Nā Pō o ka Mahina - Moon Phases
+          </h2>
+          <div className="space-y-4">
+            {moonPhases.map((phase, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">
+                          {phase.day}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-bold text-lg mb-1">
+                        {phase.name}
+                      </h3>
+                      <p className="text-[#60A5FA] text-sm mb-2">
+                        {phase.meaning}
+                      </p>
+                      <p className="text-white/70 text-sm">
+                        {phase.description}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      {phase.name}
-                    </h3>
-                    <p className="text-[#60A5FA] text-sm mb-2">
-                      {phase.meaning}
-                    </p>
-                    <p className="text-white/70 text-sm">
-                      {phase.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Cultural Note */}
-      <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
-        <CardContent className="p-6">
-          <p className="text-white/90 italic leading-relaxed">
-            "The Hawaiian people used the phases of the moon to guide fishing, farming, and cultural practices. 
-            Each night of the lunar month had its own name and significance, creating a detailed calendar 
-            that connected daily life with the rhythms of nature."
-          </p>
-        </CardContent>
-      </Card>
+        {/* Cultural Note */}
+        <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
+          <CardContent className="p-6">
+            <p className="text-white/90 italic leading-relaxed">
+              "The Hawaiian people used the phases of the moon to guide fishing, farming, and cultural practices. 
+              Each night of the lunar month had its own name and significance, creating a detailed calendar 
+              that connected daily life with the rhythms of nature."
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +16,6 @@ export default function Planets() {
     initialData: [],
   });
 
-  // Separate planets and dwarf planets
   const planets = allPlanets.filter(p => p.type === 'planet');
   const dwarfPlanets = allPlanets.filter(p => p.type === 'dwarf_planet');
 
@@ -212,237 +212,172 @@ export default function Planets() {
     : [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
-          <Globe className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Nā Hōkūhele - The Wandering Stars
-        </h1>
-        <p className="text-white/70 text-lg">
-          Planets visible tonight • {visibilityData?.date}
-        </p>
-        <div className="mt-4">
-          <Badge className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white text-lg px-4 py-2">
-            {visiblePlanets.length} planets visible tonight
-          </Badge>
-        </div>
-      </div>
-
-      {/* Tonight's Visible Planets */}
-      {visiblePlanets.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Eye className="w-6 h-6 text-[#0EA5E9]" />
-            Visible Tonight
-          </h2>
-          <div className="space-y-4">
-            {visiblePlanets.map(([planetName, data]) => {
-              const planetInfo = getPlanetInfo(planetName);
-              const planetImage = getPlanetImage(planetName);
-              return (
-                <Card
-                  key={planetName}
-                  className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-                >
-                  <CardHeader>
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        {planetImage ? (
-                          <img 
-                            src={planetImage}
-                            alt={planetName}
-                            className="w-14 h-14 rounded-full object-cover border-2 border-white/20 flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0">
-                            <Globe className="w-7 h-7 text-white" />
-                          </div>
-                        )}
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-white text-2xl">
-                              {planetInfo?.hawaiian_name || planetName}
-                            </CardTitle>
-                            {planetInfo?.pronunciation_audio_url && (
-                              <button
-                                onClick={() => playPronunciation(planetInfo.pronunciation_audio_url)}
-                                className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
-                                title="Play pronunciation"
-                              >
-                                <Volume2 className="w-5 h-5" />
-                              </button>
-                            )}
-                          </div>
-                          <p className="text-white/60 mb-2">{planetName}</p>
-                          {planetInfo?.meaning && (
-                            <p className="text-[#60A5FA] text-sm italic">
-                              {planetInfo.meaning}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Badge className={getVisibilityColor(data.visibility_quality)}>
-                          {data.visibility_quality}
-                        </Badge>
-                        <Badge variant="outline" className="border-white/30 text-white">
-                          Mag {data.magnitude}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Best Viewing
-                        </p>
-                        <p className="text-white font-semibold">
-                          {data.best_viewing_time}
-                        </p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Location
-                        </p>
-                        <p className="text-white font-semibold">
-                          {data.constellation}
-                        </p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Rise/Set
-                        </p>
-                        <p className="text-white font-semibold">
-                          {data.rise_time} - {data.set_time}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {planetInfo?.description && (
-                      <div className="pt-4 border-t border-white/10">
-                        <p className="text-white/80 leading-relaxed">
-                          {planetInfo.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {planetInfo?.mythology && (
-                      <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#1E3A5F]/50 to-[#0A1929]/50 border border-[#60A5FA]/20">
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
-                          <Sparkles className="w-3 h-3" />
-                          Hawaiian Mythology
-                        </p>
-                        <p className="text-white/90 italic leading-relaxed">
-                          {planetInfo.mythology}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+    <div className="relative min-h-screen">
+      {/* Page-specific background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/966098cbd_planet-4534835_1920.jpg)',
+          zIndex: -2
+        }}
+      />
+      <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" style={{ zIndex: -1 }} />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 relative z-0">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
+            <Globe className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Nā Hōkūhele - The Wandering Stars
+          </h1>
+          <p className="text-white/70 text-lg">
+            Planets visible tonight • {visibilityData?.date}
+          </p>
+          <div className="mt-4">
+            <Badge className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white text-lg px-4 py-2">
+              {visiblePlanets.length} planets visible tonight
+            </Badge>
           </div>
         </div>
-      )}
 
-      {/* Complete Planet Guide */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <Globe className="w-6 h-6 text-white/70" />
-          Complete Planet Guide
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {planets.map((planet) => {
-            const visibility = visibilityData?.planets?.[planet.english_name];
-            const isVisible = visibility?.visible;
-            const planetImage = getPlanetImage(planet.english_name);
-            
-            return (
-              <Card
-                key={planet.id}
-                className={`bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm ${
-                  !isVisible ? 'opacity-60' : ''
-                }`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 flex-1">
-                      {planetImage ? (
-                        <img 
-                          src={planetImage}
-                          alt={planet.english_name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                          <Globe className="w-6 h-6 text-white" />
+        {/* Tonight's Visible Planets */}
+        {visiblePlanets.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <Eye className="w-6 h-6 text-[#0EA5E9]" />
+              Visible Tonight
+            </h2>
+            <div className="space-y-4">
+              {visiblePlanets.map(([planetName, data]) => {
+                const planetInfo = getPlanetInfo(planetName);
+                const planetImage = getPlanetImage(planetName);
+                return (
+                  <Card
+                    key={planetName}
+                    className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+                  >
+                    <CardHeader>
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                          {planetImage ? (
+                            <img 
+                              src={planetImage}
+                              alt={planetName}
+                              className="w-14 h-14 rounded-full object-cover border-2 border-white/20 flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                              <Globe className="w-7 h-7 text-white" />
+                            </div>
+                          )}
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <CardTitle className="text-white text-2xl">
+                                {planetInfo?.hawaiian_name || planetName}
+                              </CardTitle>
+                              {planetInfo?.pronunciation_audio_url && (
+                                <button
+                                  onClick={() => playPronunciation(planetInfo.pronunciation_audio_url)}
+                                  className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                                  title="Play pronunciation"
+                                >
+                                  <Volume2 className="w-5 h-5" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-white/60 mb-2">{planetName}</p>
+                            {planetInfo?.meaning && (
+                              <p className="text-[#60A5FA] text-sm italic">
+                                {planetInfo.meaning}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge className={getVisibilityColor(data.visibility_quality)}>
+                            {data.visibility_quality}
+                          </Badge>
+                          <Badge variant="outline" className="border-white/30 text-white">
+                            Mag {data.magnitude}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                          <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                            Best Viewing
+                          </p>
+                          <p className="text-white font-semibold">
+                            {data.best_viewing_time}
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                          <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                            Location
+                          </p>
+                          <p className="text-white font-semibold">
+                            {data.constellation}
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                          <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                            Rise/Set
+                          </p>
+                          <p className="text-white font-semibold">
+                            {data.rise_time} - {data.set_time}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {planetInfo?.description && (
+                        <div className="pt-4 border-t border-white/10">
+                          <p className="text-white/80 leading-relaxed">
+                            {planetInfo.description}
+                          </p>
                         </div>
                       )}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-white text-lg">
-                            {planet.hawaiian_name}
-                          </CardTitle>
-                          {planet.pronunciation_audio_url && (
-                            <button
-                              onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                              className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
-                              title="Play pronunciation"
-                            >
-                              <Volume2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-white/60 text-sm">{planet.english_name}</p>
-                      </div>
-                    </div>
-                    {isVisible ? (
-                      <Eye className="w-5 h-5 text-[#0EA5E9] flex-shrink-0" />
-                    ) : (
-                      <EyeOff className="w-5 h-5 text-white/30 flex-shrink-0" />
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {planet.meaning && (
-                    <p className="text-white/70 text-sm mb-2">
-                      {planet.meaning}
-                    </p>
-                  )}
-                  {!isVisible && visibility && (
-                    <Badge variant="outline" className="border-white/20 text-white/60 mt-2">
-                      Not visible tonight
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Dwarf Planets Section */}
-      {dwarfPlanets.length > 0 && (
+                      {planetInfo?.mythology && (
+                        <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#1E3A5F]/50 to-[#0A1929]/50 border border-[#60A5FA]/20">
+                          <p className="text-white/50 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" />
+                            Hawaiian Mythology
+                          </p>
+                          <p className="text-white/90 italic leading-relaxed">
+                            {planetInfo.mythology}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Complete Planet Guide */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-[#60A5FA]" />
-            Dwarf Planets
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <Globe className="w-6 h-6 text-white/70" />
+            Complete Planet Guide
           </h2>
-          <p className="text-white/70 mb-6">
-            Small planetary-mass objects that orbit the Sun but haven't cleared their orbital paths
-          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dwarfPlanets.map((planet) => {
+            {planets.map((planet) => {
+              const visibility = visibilityData?.planets?.[planet.english_name];
+              const isVisible = visibility?.visible;
               const planetImage = getPlanetImage(planet.english_name);
               
               return (
                 <Card
                   key={planet.id}
-                  className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+                  className={`bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm ${
+                    !isVisible ? 'opacity-60' : ''
+                  }`}
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between gap-3">
@@ -476,9 +411,11 @@ export default function Planets() {
                           <p className="text-white/60 text-sm">{planet.english_name}</p>
                         </div>
                       </div>
-                      <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
-                        Dwarf
-                      </Badge>
+                      {isVisible ? (
+                        <Eye className="w-5 h-5 text-[#0EA5E9] flex-shrink-0" />
+                      ) : (
+                        <EyeOff className="w-5 h-5 text-white/30 flex-shrink-0" />
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -487,10 +424,10 @@ export default function Planets() {
                         {planet.meaning}
                       </p>
                     )}
-                    {planet.description && (
-                      <p className="text-white/60 text-xs mt-2 leading-relaxed">
-                        {planet.description}
-                      </p>
+                    {!isVisible && visibility && (
+                      <Badge variant="outline" className="border-white/20 text-white/60 mt-2">
+                        Not visible tonight
+                      </Badge>
                     )}
                   </CardContent>
                 </Card>
@@ -498,18 +435,93 @@ export default function Planets() {
             })}
           </div>
         </div>
-      )}
 
-      {/* Info Note */}
-      <Card className="bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
-        <CardContent className="p-6">
-          <p className="text-white/90 italic leading-relaxed">
-            Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved 
-            against the fixed backdrop of stars. These celestial wanderers were observed closely and 
-            incorporated into navigation, agriculture, and cultural practices.
-          </p>
-        </CardContent>
-      </Card>
+        {/* Dwarf Planets Section */}
+        {dwarfPlanets.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-[#60A5FA]" />
+              Dwarf Planets
+            </h2>
+            <p className="text-white/70 mb-6">
+              Small planetary-mass objects that orbit the Sun but haven't cleared their orbital paths
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {dwarfPlanets.map((planet) => {
+                const planetImage = getPlanetImage(planet.english_name);
+                
+                return (
+                  <Card
+                    key={planet.id}
+                    className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1">
+                          {planetImage ? (
+                            <img 
+                              src={planetImage}
+                              alt={planet.english_name}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                              <Globe className="w-6 h-6 text-white" />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <CardTitle className="text-white text-lg">
+                                {planet.hawaiian_name}
+                              </CardTitle>
+                              {planet.pronunciation_audio_url && (
+                                <button
+                                  onClick={() => playPronunciation(planet.pronunciation_audio_url)}
+                                  className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                                  title="Play pronunciation"
+                                >
+                                  <Volume2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-white/60 text-sm">{planet.english_name}</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
+                          Dwarf
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {planet.meaning && (
+                        <p className="text-white/70 text-sm mb-2">
+                          {planet.meaning}
+                        </p>
+                      )}
+                      {planet.description && (
+                        <p className="text-white/60 text-xs mt-2 leading-relaxed">
+                          {planet.description}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Info Note */}
+        <Card className="bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
+          <CardContent className="p-6">
+            <p className="text-white/90 italic leading-relaxed">
+              Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved 
+              against the fixed backdrop of stars. These celestial wanderers were observed closely and 
+              incorporated into navigation, agriculture, and cultural practices.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
