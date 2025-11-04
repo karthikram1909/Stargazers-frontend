@@ -64,32 +64,40 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a detailed sky map for tonight ${dateStr} at ${timeStr} local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
+        prompt: `You are an astronomical expert. Generate ACCURATE sky map data for tonight ${dateStr} at ${timeStr} local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
+
+        CRITICAL - USE REAL ASTRONOMICAL DATA:
+        - Use actual astronomical calculations or databases for star positions
+        - Azimuth and altitude must be ACCURATE for the date, time, and location
+        - Only include stars that are ACTUALLY visible (altitude > 0 degrees) at this time
+        - Use precise coordinates, not approximations
         
-        CRITICAL INSTRUCTIONS FOR STAR NAMES:
-        - For EVERY bright star (magnitude 3.0 or brighter), include BOTH hawaiian_name AND name fields
-        - For stars with known Hawaiian names (Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, A'a/Sirius, Kauluakoko/Betelgeuse, etc.), use the Hawaiian name in hawaiian_name field
-        - For stars WITHOUT known Hawaiian names, PUT THE ENGLISH NAME in the hawaiian_name field (so all bright stars are labeled)
-        - The 'name' field should ALWAYS be the standard English star name (e.g., "Sirius", "Betelgeuse", "Vega")
-        - This ensures ALL bright stars get labeled on the map
+        STAR NAMING REQUIREMENTS:
+        - For EVERY bright star (magnitude 3.0 or brighter), include both hawaiian_name AND name
+        - For stars with Hawaiian names: use the Hawaiian name in hawaiian_name field
+        - For stars WITHOUT Hawaiian names: PUT THE ENGLISH NAME in hawaiian_name field
+        - The 'name' field MUST be the standard astronomical star name (e.g., "Sirius", "Betelgeuse", "Vega")
         
-        CRITICAL FOR CONSTELLATION LINES:
-        - In star_connections, use EXACT star names as they appear in the stars array 'name' field
-        - Double-check that every star name in star_connections EXACTLY matches a star name in the stars array
-        - Example: if you have a star with name: "Betelgeuse", then star_connections must use "Betelgeuse" exactly
+        CONSTELLATION LINES - CRITICAL:
+        - Only create star_connections between stars that are ACTUALLY in your stars array
+        - Use EXACT star names from the 'name' field - spelling must match EXACTLY
+        - Verify every single star name in star_connections exists in the stars array
+        - Example: if stars array has {"name": "Betelgeuse", ...}, use "Betelgeuse" exactly in connections
+        - Double-check: every star mentioned in star_connections MUST exist in the stars array
         
-        PLANETS: Only include Saturn, Uranus, Neptune, and Pluto with exact Hawaiian names:
-        - Saturn: Makulu
-        - Uranus: Heleʻekela
-        - Neptune: Naholoholo
-        - Pluto: Poʻeleʻele
+        PLANETS:
+        - Only include Saturn, Uranus, Neptune if they're actually visible
+        - Use these Hawaiian names: Saturn=Makulu, Uranus=Heleʻekala, Neptune=Naholoholo
         
         Return JSON with:
-        1. stars array with: name (English name), hawaiian_name (Hawaiian if known, otherwise use English name), azimuth, altitude, magnitude, constellation
-        2. planets array with: name, hawaiian_name, azimuth, altitude, magnitude
-        3. constellations array (10+) with: name, hawaiian_name (if known), star_connections (array of arrays with EXACT matching star names from stars array)
+        1. stars: array with name (exact English), hawaiian_name, azimuth (0-360), altitude (-90 to 90), magnitude, constellation
+        2. planets: array with name, hawaiian_name, azimuth, altitude, magnitude
+        3. constellations: array with name, hawaiian_name, star_connections (arrays of pairs using EXACT names from stars array)
         
-        Include ALL bright stars magnitude 3.0 or brighter visible from Hawaii at this time.`,
+        VERIFY BEFORE RETURNING:
+        - Check that every star in star_connections exists in stars array
+        - Ensure all stars have altitude > 0 (visible above horizon)
+        - Confirm azimuth/altitude values are astronomically accurate`,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",
@@ -509,6 +517,7 @@ export default function SkyMap() {
                   size="sm"
                   onClick={() => setShowConstellations(!showConstellations)}
                   className={showConstellations ? "bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white" : "border-white/20 text-white"}
+                  title={showConstellations ? "Hide constellation lines" : "Show constellation lines"}
                 >
                   {showConstellations ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                   Constellations
@@ -518,34 +527,40 @@ export default function SkyMap() {
                   size="sm"
                   onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
                   className="border-white/20 text-white"
+                  title="Zoom out"
                 >
-                  <ZoomOut className="w-4 h-4" />
+                  <ZoomOut className="w-4 h-4 mr-1" />
+                  Zoom Out
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
                   className="border-white/20 text-white"
+                  title="Zoom in"
                 >
-                  <ZoomIn className="w-4 h-4" />
+                  <ZoomIn className="w-4 h-4 mr-1" />
+                  Zoom In
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowDebug(!showDebug)}
                   className="border-white/20 text-white"
+                  title="Show debugging information"
                 >
                   <Bug className="w-4 h-4 mr-2" />
-                  Debug
+                  Debug Info
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={fetchSkyData}
                   className="border-white/20 text-white ml-auto"
+                  title="Refresh sky map data"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
+                  Refresh Data
                 </Button>
               </div>
 
@@ -562,21 +577,33 @@ export default function SkyMap() {
                   onTouchMove={handleTouchMove}   // Added touch event listener
                   onTouchEnd={handleTouchEnd}     // Added touch event listener
                 />
-                <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white text-xs">
-                  <p className="flex items-center gap-2 mb-1">
-                    <MapPin className="w-3 h-3 text-[#60A5FA]" />
-                    Center = Zenith (overhead)
-                  </p>
-                  <p>Edge = Horizon</p>
-                  <p className="mt-2">Zoom: {zoomLevel.toFixed(2)}x</p>
-                  <p className="text-white/60 mt-1 text-[10px]">Pinch to zoom on mobile</p> {/* Added mobile zoom instruction */}
+              </div>
+
+              {/* Map Legend - Moved Below Canvas */}
+              <div className="mt-4 p-4 bg-black/30 backdrop-blur-sm rounded-lg text-white text-sm border border-white/10">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#60A5FA]" />
+                    <span className="text-white/80">Center = Zenith</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-[#60A5FA]" />
+                    <span className="text-white/80">Edge = Horizon</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ZoomIn className="w-4 h-4 text-[#60A5FA]" />
+                    <span className="text-white/80">Zoom: {zoomLevel.toFixed(2)}x</span>
+                  </div>
+                  <div className="text-white/60 text-xs flex items-center">
+                    📱 Pinch to zoom on mobile
+                  </div>
                 </div>
               </div>
 
               {/* Debug Panel */}
               {showDebug && skyData && (
-                <div className="mt-4 p-4 bg-black/50 rounded-lg text-white text-xs overflow-auto max-h-96">
-                  <h3 className="font-bold mb-2 text-sm">Debug Information</h3>
+                <div className="mt-4 p-4 bg-black/50 rounded-lg text-white text-xs overflow-auto max-h-96 border border-red-500/30">
+                  <h3 className="font-bold mb-2 text-sm text-red-400">Debug Information</h3>
                   <div className="space-y-2">
                     <div>
                       <p className="text-[#60A5FA] font-semibold">Data Summary:</p>
@@ -586,7 +613,7 @@ export default function SkyMap() {
                     </div>
                     
                     <div>
-                      <p className="text-[#60A5FA] font-semibold mt-3">Constellation Line Issues:</p>
+                      <p className="text-[#60A5FA] font-semibold mt-3">Constellation Line Validation:</p>
                       {skyData.constellations?.map((constellation, idx) => {
                         const starNames = new Set(skyData.stars.map(s => s.name));
                         const missingStars = new Set();
