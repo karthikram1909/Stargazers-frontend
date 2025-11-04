@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -317,21 +318,24 @@ export default function SkyMap() {
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
 
+      // Planet glow - changed to bright blue
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, 'rgba(234, 179, 8, 0.9)');
-      gradient.addColorStop(1, 'rgba(234, 179, 8, 0)');
+      gradient.addColorStop(0, 'rgba(96, 165, 250, 0.9)'); // Bright blue
+      gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
 
-      ctx.fillStyle = isHovered || isSelected ? '#fbbf24' : '#eab308';
+      // Planet core - changed to bright blue
+      ctx.fillStyle = isHovered || isSelected ? '#3b82f6' : '#60a5fa';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
+      // Hawaiian name - changed to bright blue
       if (planet.hawaiian_name) {
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = '#60a5fa'; // Bright blue
         ctx.font = 'bold 15px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(planet.hawaiian_name, pos.x + size + 8, pos.y + 5);
@@ -665,7 +669,7 @@ export default function SkyMap() {
                     </h3>
                     <p className="text-white/60 text-sm">{selectedObject.name}</p>
                   </div>
-                  <Badge className={selectedObject.type === 'planet' ? "bg-[#eab308]" : "bg-gradient-to-r from-[#a855f7] to-[#ec4899] text-white"}>
+                  <Badge className={selectedObject.type === 'planet' ? "bg-[#60a5fa]" : "bg-gradient-to-r from-[#a855f7] to-[#ec4899] text-white"}>
                     {selectedObject.type}
                   </Badge>
                 </div>
@@ -714,7 +718,7 @@ export default function SkyMap() {
                   <span className="text-white/80">Nā Hōkū (Stars)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#eab308]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
                   <span className="text-white/80">Nā Hōkūhele (Planets)</span>
                 </div>
                 <div className="flex items-center gap-2">
