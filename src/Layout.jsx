@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -42,10 +43,13 @@ export default function Layout({ children }) {
     <div className="min-h-screen relative">
       {/* Background Image */}
       <div 
-        className="fixed inset-0 bg-cover bg-no-repeat transition-all duration-500"
+        className="fixed inset-0 transition-all duration-500"
         style={{
           backgroundImage: `url(${getBackgroundImage()})`,
-          backgroundPosition: 'center center',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
           zIndex: 0
         }}
       />
