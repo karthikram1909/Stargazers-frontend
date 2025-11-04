@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -134,13 +134,12 @@ export default function SkyMap() {
   };
 
   const azAltToXY = (azimuth, altitude, canvasWidth, canvasHeight) => {
-    if (altitude < 20) return null; // Don't render stars below 20°
+    if (altitude < 20) return null;
     
     const centerX = canvasWidth / 2 + panOffset.x;
     const centerY = canvasHeight / 2 + panOffset.y;
     const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 80) * zoomLevel;
 
-    // Map altitude 20° to outer edge, 90° to center
     const r = maxRadius * (1 - (altitude - 20) / 70);
     const theta = (azimuth - 90) * (Math.PI / 180);
 
@@ -158,11 +157,10 @@ export default function SkyMap() {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Deep space background with gradient
     const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
-    bgGradient.addColorStop(0, '#1a0b2e'); // Deep purple center
-    bgGradient.addColorStop(0.5, '#16213e'); // Dark blue
-    bgGradient.addColorStop(1, '#0f0920'); // Almost black edges
+    bgGradient.addColorStop(0, '#1a0b2e');
+    bgGradient.addColorStop(0.5, '#16213e');
+    bgGradient.addColorStop(1, '#0f0920');
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
@@ -170,19 +168,17 @@ export default function SkyMap() {
     const centerY = height / 2 + panOffset.y;
     const maxRadius = (Math.min(width, height) / 2 - 80) * zoomLevel;
 
-    // Draw outer planisphere circle with gradient border
     ctx.beginPath();
     ctx.arc(centerX, centerY, maxRadius, 0, 2 * Math.PI);
     const borderGradient = ctx.createLinearGradient(centerX - maxRadius, centerY, centerX + maxRadius, centerY);
-    borderGradient.addColorStop(0, '#a855f7'); // Purple
-    borderGradient.addColorStop(0.5, '#3b82f6'); // Blue
-    borderGradient.addColorStop(1, '#ec4899'); // Pink
+    borderGradient.addColorStop(0, '#a855f7');
+    borderGradient.addColorStop(0.5, '#3b82f6');
+    borderGradient.addColorStop(1, '#ec4899');
     ctx.strokeStyle = borderGradient;
     ctx.lineWidth = 4;
     ctx.stroke();
 
-    // Draw altitude circles
-    ctx.strokeStyle = 'rgba(139, 92, 246, 0.15)'; // Subtle purple
+    ctx.strokeStyle = 'rgba(139, 92, 246, 0.15)';
     ctx.lineWidth = 1;
     [30, 45, 60, 75].forEach((alt) => {
       if (alt >= 20) {
@@ -193,35 +189,31 @@ export default function SkyMap() {
       }
     });
 
-    // Hawaiian cardinal directions outside the circle
-    ctx.fillStyle = '#e879f9'; // Bright pink
+    ctx.fillStyle = '#e879f9';
     ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
     
     const labelDistance = maxRadius + 50;
     const directions = [
-      { text: 'ʻĀkau', angle: 0, label: 'North' },      // North
-      { text: 'Hikina', angle: Math.PI / 2, label: 'East' },    // East
-      { text: 'Hema', angle: Math.PI, label: 'South' },     // South
-      { text: 'Komohana', angle: 3 * Math.PI / 2, label: 'West' } // West
+      { text: 'ʻĀkau', angle: 0, label: 'North' },
+      { text: 'Hikina', angle: Math.PI / 2, label: 'East' },
+      { text: 'Hema', angle: Math.PI, label: 'South' },
+      { text: 'Komohana', angle: 3 * Math.PI / 2, label: 'West' }
     ];
     
     directions.forEach(({ text, angle, label }) => {
       const x = centerX + labelDistance * Math.cos(angle - Math.PI / 2);
       const y = centerY + labelDistance * Math.sin(angle - Math.PI / 2);
       
-      // Draw Hawaiian name
       ctx.fillStyle = '#e879f9';
       ctx.font = 'bold 22px sans-serif';
       ctx.fillText(text, x, y);
       
-      // Draw English label below
       ctx.fillStyle = 'rgba(232, 121, 249, 0.6)';
       ctx.font = '14px sans-serif';
       ctx.fillText(label, x, y + 20);
     });
 
-    // Draw constellation lines
     if (skyData?.constellations) {
       skyData.constellations.forEach(constellation => {
         constellation.star_connections?.forEach(connection => {
@@ -248,7 +240,6 @@ export default function SkyMap() {
           }
         });
 
-        // Draw constellation names
         if (constellation.hawaiian_name) {
           const constellationStars = constellation.star_connections?.flat()
             .filter((v, i, a) => a.indexOf(v) === i)
@@ -270,7 +261,7 @@ export default function SkyMap() {
               avgX /= count;
               avgY /= count;
               
-              ctx.fillStyle = 'rgba(168, 85, 247, 0.8)'; // Purple
+              ctx.fillStyle = 'rgba(168, 85, 247, 0.8)';
               ctx.font = 'italic 16px sans-serif';
               ctx.textAlign = 'center';
               ctx.fillText(constellation.hawaiian_name, avgX, avgY);
@@ -280,7 +271,6 @@ export default function SkyMap() {
       });
     }
 
-    // Draw stars
     skyData?.stars?.forEach(star => {
       if (star.altitude < 20) return;
       
@@ -291,13 +281,12 @@ export default function SkyMap() {
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
 
-      // Star glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 4);
       if (isHovered || isSelected) {
-        gradient.addColorStop(0, 'rgba(236, 72, 153, 1)'); // Pink
+        gradient.addColorStop(0, 'rgba(236, 72, 153, 1)');
         gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
       } else {
-        gradient.addColorStop(0, 'rgba(147, 197, 253, 0.8)'); // Light blue
+        gradient.addColorStop(0, 'rgba(147, 197, 253, 0.9)');
         gradient.addColorStop(1, 'rgba(147, 197, 253, 0)');
       }
       ctx.fillStyle = gradient;
@@ -305,22 +294,19 @@ export default function SkyMap() {
       ctx.arc(pos.x, pos.y, size * 4, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Star core
       ctx.fillStyle = isHovered || isSelected ? '#ec4899' : '#ffffff';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Hawaiian name labels for bright stars
       if (star.hawaiian_name && star.magnitude < 2.5) {
-        ctx.fillStyle = '#93c5fd'; // Light blue
+        ctx.fillStyle = '#93c5fd';
         ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(star.hawaiian_name, pos.x + size + 8, pos.y + 5);
       }
     });
 
-    // Draw planets
     skyData?.planets?.forEach(planet => {
       if (planet.altitude < 20) return;
       
@@ -331,31 +317,27 @@ export default function SkyMap() {
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
 
-      // Planet glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, 'rgba(234, 179, 8, 0.9)'); // Gold
+      gradient.addColorStop(0, 'rgba(234, 179, 8, 0.9)');
       gradient.addColorStop(1, 'rgba(234, 179, 8, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Planet core
       ctx.fillStyle = isHovered || isSelected ? '#fbbf24' : '#eab308';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Hawaiian name
       if (planet.hawaiian_name) {
-        ctx.fillStyle = '#fbbf24'; // Gold
+        ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 15px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(planet.hawaiian_name, pos.x + size + 8, pos.y + 5);
       }
     });
 
-    // Draw zenith marker
     ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
     ctx.font = 'italic 16px sans-serif';
     ctx.textAlign = 'center';
@@ -363,7 +345,6 @@ export default function SkyMap() {
     ctx.fillText('(Zenith)', centerX, centerY + 10);
   };
 
-  // Touch handlers for pinch-to-zoom and pan
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
       const touch1 = e.touches[0];
@@ -423,7 +404,6 @@ export default function SkyMap() {
     isPanningRef.current = false;
   };
 
-  // Mouse handlers for desktop pan
   const handleMouseDown = (e) => {
     touchStartRef.current.panStart = {
       x: e.clientX,
@@ -444,7 +424,6 @@ export default function SkyMap() {
       });
     }
     
-    // Hover detection
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -576,11 +555,25 @@ export default function SkyMap() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Planisphere */}
         <div className="lg:col-span-2">
-          <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
+          <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
+              {/* Info Box Above Canvas */}
+              <div className="mb-4 p-3 rounded-lg bg-[#60A5FA]/20 backdrop-blur-sm border border-[#a855f7]/30">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-[#e879f9] mt-0.5 flex-shrink-0" />
+                  <div className="text-white text-sm">
+                    <p className="text-[#e879f9] font-semibold mb-1">Hawaiian Planisphere Guide</p>
+                    <p className="mb-1">• Center = Luna Lani (Zenith)</p>
+                    <p className="mb-1">• Edge = 20° horizon limit</p>
+                    <p className="mb-1">• Zoom: {zoomLevel.toFixed(2)}x</p>
+                    <p className="text-white/60 text-xs">Pinch/scroll to zoom • Drag to pan</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Controls */}
               <div className="flex flex-wrap gap-3 mb-4 items-center">
-                <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border border-[#a855f7]/30">
                   <Calendar className="w-4 h-4 text-[#a855f7]" />
                   <span className="text-white text-sm font-medium">
                     {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -590,7 +583,7 @@ export default function SkyMap() {
                   variant="outline"
                   size="sm"
                   onClick={() => changeWeek(-1)}
-                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20"
+                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Previous Week
@@ -599,7 +592,7 @@ export default function SkyMap() {
                   variant="outline"
                   size="sm"
                   onClick={() => changeWeek(1)}
-                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20"
+                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
                 >
                   Next Week
                   <ChevronRight className="w-4 h-4 ml-1" />
@@ -608,7 +601,7 @@ export default function SkyMap() {
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedDate(new Date())}
-                  className="border-[#ec4899]/30 text-white hover:bg-[#ec4899]/20"
+                  className="border-[#ec4899]/30 text-white hover:bg-[#ec4899]/20 bg-[#60A5FA]/10"
                 >
                   Tonight
                 </Button>
@@ -617,7 +610,7 @@ export default function SkyMap() {
                     variant="outline"
                     size="sm"
                     onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
-                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20"
+                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20 bg-[#60A5FA]/10"
                   >
                     <ZoomOut className="w-4 h-4" />
                   </Button>
@@ -625,7 +618,7 @@ export default function SkyMap() {
                     variant="outline"
                     size="sm"
                     onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
-                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20"
+                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20 bg-[#60A5FA]/10"
                   >
                     <ZoomIn className="w-4 h-4" />
                   </Button>
@@ -633,7 +626,7 @@ export default function SkyMap() {
                     variant="outline"
                     size="sm"
                     onClick={fetchSkyData}
-                    className="border-white/20 text-white hover:bg-white/10"
+                    className="border-white/20 text-white hover:bg-white/10 bg-[#60A5FA]/10"
                   >
                     <RefreshCw className="w-4 h-4" />
                   </Button>
@@ -641,29 +634,20 @@ export default function SkyMap() {
               </div>
 
               {/* Canvas */}
-              <div className="relative">
-                <canvas
-                  ref={canvasRef}
-                  width={1200}
-                  height={1200}
-                  className="w-full h-auto rounded-xl border-2 border-[#a855f7]/30 cursor-grab active:cursor-grabbing"
-                  onClick={handleCanvasClick}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                />
-                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white text-xs border border-[#a855f7]/30">
-                  <p className="text-[#e879f9] font-semibold mb-1">Hawaiian Planisphere</p>
-                  <p className="mb-1">• Center = Luna Lani (Zenith)</p>
-                  <p className="mb-1">• Edge = 20° horizon limit</p>
-                  <p className="mb-2">• Zoom: {zoomLevel.toFixed(2)}x</p>
-                  <p className="text-white/60 text-[10px]">Pinch/scroll to zoom • Drag to pan</p>
-                </div>
-              </div>
+              <canvas
+                ref={canvasRef}
+                width={1200}
+                height={1200}
+                className="w-full h-auto rounded-xl border-2 border-[#a855f7]/30 cursor-grab active:cursor-grabbing"
+                onClick={handleCanvasClick}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              />
             </CardContent>
           </Card>
         </div>
@@ -672,7 +656,7 @@ export default function SkyMap() {
         <div className="space-y-6">
           {/* Selected Object Info */}
           {selectedObject && (
-            <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
+            <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -711,7 +695,7 @@ export default function SkyMap() {
 
                 {getDetailLink(selectedObject) && (
                   <Link to={getDetailLink(selectedObject)}>
-                    <Button className="w-full bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white">
+                    <Button className="w-full bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white hover:opacity-90">
                       View Full Details
                     </Button>
                   </Link>
@@ -721,7 +705,7 @@ export default function SkyMap() {
           )}
 
           {/* Legend */}
-          <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
+          <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
               <h3 className="text-white font-bold mb-3">Hōʻailona (Legend)</h3>
               <div className="space-y-2 text-sm">
