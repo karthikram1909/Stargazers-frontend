@@ -8,10 +8,23 @@ import { createPageUrl } from "@/utils";
 export default function Home() {
   const [skyData, setSkyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [featuredConstellation, setFeaturedConstellation] = useState(null);
 
   useEffect(() => {
     fetchSkyData();
+    fetchFeaturedConstellation();
   }, []);
+
+  const fetchFeaturedConstellation = async () => {
+    try {
+      const constellations = await base44.entities.Constellation.list();
+      // Find Orion (Ka Heihei o nā Keiki) or get a random constellation
+      const orion = constellations.find(c => c.english_name === 'Orion');
+      setFeaturedConstellation(orion || constellations[0]);
+    } catch (error) {
+      console.error("Error fetching constellation:", error);
+    }
+  };
 
   const fetchSkyData = async () => {
     try {
@@ -39,16 +52,10 @@ export default function Home() {
         - Uranus: Heleʻekela
         - Neptune: Naholoholo
         
-        For the featured constellation:
-        - Include the Hawaiian name if known (e.g., Makaliʻi for Pleiades, Kaiwikuamoʻo for Scorpius, Nānāhope for Cassiopeia, Newe for Southern Cross)
-        - Add Hawaiian mythology, navigation significance, or cultural meaning in the description
-        - Make it relevant to what's visible tonight
-        
         Return JSON with: 
         - current_date
         - moon_phase (with accurate name like "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent", "New Moon" and accurate percentage for TODAY)
         - visible_planets (array with english_name and hawaiian_name for planets ACTUALLY visible tonight)
-        - featured_constellation (object with name, hawaiian_name if known, and description including Hawaiian cultural/navigation significance)
         - sunset_time (actual for Hawaii on this date)
         - sunrise_time (actual for Hawaii on this date)
         - best_viewing_hours`,
@@ -72,14 +79,6 @@ export default function Home() {
                   english_name: { type: "string" },
                   hawaiian_name: { type: "string" }
                 }
-              }
-            },
-            featured_constellation: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                hawaiian_name: { type: "string" },
-                description: { type: "string" }
               }
             },
             sunset_time: { type: "string" },
@@ -190,27 +189,27 @@ export default function Home() {
       </div>
 
       {/* Featured Constellation */}
-      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30 backdrop-blur-sm mb-6">
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-5 h-5 text-[#60A5FA]" />
-            <span className="text-white/70 text-sm uppercase tracking-wide">Featured Constellation</span>
-          </div>
-          <CardTitle className="text-white text-2xl">
-            {skyData?.featured_constellation?.hawaiian_name && (
-              <div className="mb-1">{skyData.featured_constellation.hawaiian_name}</div>
-            )}
-            <div className={skyData?.featured_constellation?.hawaiian_name ? "text-xl text-white/70" : ""}>
-              {skyData?.featured_constellation?.name}
+      {featuredConstellation && (
+        <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30 backdrop-blur-sm mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-5 h-5 text-[#60A5FA]" />
+              <span className="text-white/70 text-sm uppercase tracking-wide">Featured Constellation</span>
             </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-white/80 leading-relaxed text-base">
-            {skyData?.featured_constellation?.description}
-          </p>
-        </CardContent>
-      </Card>
+            <CardTitle className="text-white text-2xl">
+              <div className="mb-1">{featuredConstellation.hawaiian_name}</div>
+              <div className="text-xl text-white/70">
+                {featuredConstellation.english_name}
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-white/80 leading-relaxed text-base">
+              {featuredConstellation.meaning}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
