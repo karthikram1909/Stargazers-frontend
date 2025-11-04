@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
+import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -14,14 +12,13 @@ export default function SkyMap() {
   const canvasRef = useRef(null);
   const [skyData, setSkyData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedObject, setSelectedObject] = useState(null);
-  const [showConstellations, setShowConstellations] = useState(true);
-  const [showHawaiianNames, setShowHawaiianNames] = useState(true); // Retained but its specific use in drawSkyMap changed for labels
   const [hoveredObject, setHoveredObject] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 }); // Added panOffset state
-  const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [] }); // Added touchStartRef ref
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [], panStart: null });
+  const isPanningRef = useRef(false);
 
   const { data: stars } = useQuery({
     queryKey: ['stars'],
@@ -29,66 +26,52 @@ export default function SkyMap() {
     initialData: [],
   });
 
-  const { data: planets } = useQuery({
-    queryKey: ['planets'],
-    queryFn: () => base44.entities.Planet.list(),
-    initialData: [],
-  });
-
   useEffect(() => {
     fetchSkyData();
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (skyData && canvasRef.current) {
-      drawSkyMap();
+      drawPlanisphere();
     }
-  }, [skyData, showConstellations, showHawaiianNames, hoveredObject, zoomLevel, panOffset]); // Added panOffset to dependencies
+  }, [skyData, hoveredObject, zoomLevel, panOffset]);
 
   const fetchSkyData = async () => {
     setLoading(true);
     try {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', {
+      const dateStr = selectedDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
         timeZone: 'Pacific/Honolulu'
       });
-      const timeStr = now.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'Pacific/Honolulu'
-      });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a detailed sky map for tonight ${dateStr} at ${timeStr} local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
+        prompt: `Generate a detailed star map for ${dateStr} at 9:00 PM local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
         
-        CRITICAL INSTRUCTIONS FOR STAR NAMES:
-        - For EVERY bright star (magnitude 3.0 or brighter), include BOTH hawaiian_name AND name fields
-        - For stars with known Hawaiian names (Hōkūleʻa/Arcturus, Hōkūpaʻa/Polaris, A'a/Sirius, Kauluakoko/Betelgeuse, etc.), use the Hawaiian name in hawaiian_name field
-        - For stars WITHOUT known Hawaiian names, PUT THE ENGLISH NAME in the hawaiian_name field (so all bright stars are labeled)
-        - The 'name' field should ALWAYS be the standard English star name (e.g., "Sirius", "Betelgeuse", "Vega")
-        - This ensures ALL bright stars get labeled on the map
+        CRITICAL INSTRUCTIONS:
+        - Include ONLY stars and planets that are 20° or MORE above the horizon
+        - For EVERY bright star (magnitude 3.5 or brighter), include hawaiian_name
+        - For stars WITH Hawaiian names, use them. For stars WITHOUT Hawaiian names, use the English name in the hawaiian_name field
+        - The 'name' field should ALWAYS be the standard English star name
         
-        CRITICAL FOR CONSTELLATION LINES:
-        - In star_connections, use EXACT star names as they appear in the stars array 'name' field
-        - Double-check that every star name in star_connections EXACTLY matches a star name in the stars array
-        - Example: if you have a star with name: "Betelgeuse", then star_connections must use "Betelgeuse" exactly
-        
-        PLANETS: Only include Saturn, Uranus, Neptune, and Pluto with exact Hawaiian names:
+        PLANETS: Only include those visible and 20°+ above horizon with Hawaiian names:
+        - Mercury: ʻUkulele
+        - Venus: Hōkūloa
+        - Mars: Hōkūʻula
+        - Jupiter: Hōkūleʻa
         - Saturn: Makulu
         - Uranus: Heleʻekela
         - Neptune: Naholoholo
-        - Pluto: Poʻeleʻele
+        
+        CONSTELLATION LINES:
+        - Use EXACT star names as they appear in the stars array 'name' field
+        - Only connect stars that are both 20°+ above horizon
         
         Return JSON with:
-        1. stars array with: name (English name), hawaiian_name (Hawaiian if known, otherwise use English name), azimuth, altitude, magnitude, constellation
-        2. planets array with: name, hawaiian_name, azimuth, altitude, magnitude
-        3. constellations array (10+) with: name, hawaiian_name (if known), star_connections (array of arrays with EXACT matching star names from stars array)
-        
-        Include ALL bright stars magnitude 3.0 or brighter visible from Hawaii at this time.`,
+        1. stars array (only altitude >= 20°): name, hawaiian_name, azimuth, altitude, magnitude, constellation
+        2. planets array (only altitude >= 20°): name, hawaiian_name, azimuth, altitude, magnitude
+        3. constellations array with Hawaiian names: name, hawaiian_name, star_connections`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -151,11 +134,14 @@ export default function SkyMap() {
   };
 
   const azAltToXY = (azimuth, altitude, canvasWidth, canvasHeight) => {
-    const centerX = canvasWidth / 2 + panOffset.x; // Adjusted for panOffset
-    const centerY = canvasHeight / 2 + panOffset.y; // Adjusted for panOffset
-    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 60) * zoomLevel; // Changed from 40 to 60
+    if (altitude < 20) return null; // Don't render stars below 20°
+    
+    const centerX = canvasWidth / 2 + panOffset.x;
+    const centerY = canvasHeight / 2 + panOffset.y;
+    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 80) * zoomLevel;
 
-    const r = maxRadius * (1 - altitude / 90);
+    // Map altitude 20° to outer edge, 90° to center
+    const r = maxRadius * (1 - (altitude - 20) / 70);
     const theta = (azimuth - 90) * (Math.PI / 180);
 
     const x = centerX + r * Math.cos(theta);
@@ -164,7 +150,7 @@ export default function SkyMap() {
     return { x, y };
   };
 
-  const drawSkyMap = () => {
+  const drawPlanisphere = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -172,142 +158,212 @@ export default function SkyMap() {
     const width = canvas.width;
     const height = canvas.height;
 
-    ctx.fillStyle = '#0A1929';
+    // Deep space background with gradient
+    const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+    bgGradient.addColorStop(0, '#1a0b2e'); // Deep purple center
+    bgGradient.addColorStop(0.5, '#16213e'); // Dark blue
+    bgGradient.addColorStop(1, '#0f0920'); // Almost black edges
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    const centerX = width / 2 + panOffset.x; // Adjusted for panOffset
-    const centerY = height / 2 + panOffset.y; // Adjusted for panOffset
-    const maxRadius = (Math.min(width, height) / 2 - 60) * zoomLevel; // Changed from 40 to 60
+    const centerX = width / 2 + panOffset.x;
+    const centerY = height / 2 + panOffset.y;
+    const maxRadius = (Math.min(width, height) / 2 - 80) * zoomLevel;
 
-    // Draw horizon circles
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    // Draw outer planisphere circle with gradient border
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, maxRadius, 0, 2 * Math.PI);
+    const borderGradient = ctx.createLinearGradient(centerX - maxRadius, centerY, centerX + maxRadius, centerY);
+    borderGradient.addColorStop(0, '#a855f7'); // Purple
+    borderGradient.addColorStop(0.5, '#3b82f6'); // Blue
+    borderGradient.addColorStop(1, '#ec4899'); // Pink
+    ctx.strokeStyle = borderGradient;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Draw altitude circles
+    ctx.strokeStyle = 'rgba(139, 92, 246, 0.15)'; // Subtle purple
     ctx.lineWidth = 1;
-    [30, 60, 90].forEach((alt) => {
-      const r = maxRadius * (1 - alt / 90);
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
-      ctx.stroke();
+    [30, 45, 60, 75].forEach((alt) => {
+      if (alt >= 20) {
+        const r = maxRadius * (1 - (alt - 20) / 70);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
     });
 
-    // Draw cardinal directions (larger font)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = 'bold 18px sans-serif'; // Changed font size from 14px to 18px
+    // Hawaiian cardinal directions outside the circle
+    ctx.fillStyle = '#e879f9'; // Bright pink
+    ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
-    ['N', 'E', 'S', 'W'].forEach((dir, idx) => {
-      const angle = idx * Math.PI / 2;
-      const x = centerX + (maxRadius + 30) * Math.cos(angle - Math.PI / 2); // Adjusted offset from 20 to 30
-      const y = centerY + (maxRadius + 30) * Math.sin(angle - Math.PI / 2); // Adjusted offset from 20 to 30
-      ctx.fillText(dir, x, y + 6); // Adjusted text Y offset from 5 to 6
+    
+    const labelDistance = maxRadius + 50;
+    const directions = [
+      { text: 'ʻĀkau', angle: 0, label: 'North' },      // North
+      { text: 'Hikina', angle: Math.PI / 2, label: 'East' },    // East
+      { text: 'Hema', angle: Math.PI, label: 'South' },     // South
+      { text: 'Komohana', angle: 3 * Math.PI / 2, label: 'West' } // West
+    ];
+    
+    directions.forEach(({ text, angle, label }) => {
+      const x = centerX + labelDistance * Math.cos(angle - Math.PI / 2);
+      const y = centerY + labelDistance * Math.sin(angle - Math.PI / 2);
+      
+      // Draw Hawaiian name
+      ctx.fillStyle = '#e879f9';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(text, x, y);
+      
+      // Draw English label below
+      ctx.fillStyle = 'rgba(232, 121, 249, 0.6)';
+      ctx.font = '14px sans-serif';
+      ctx.fillText(label, x, y + 20);
     });
 
-    // Draw constellation lines with blue color
-    if (showConstellations && skyData?.constellations) {
-      ctx.strokeStyle = 'rgba(96, 165, 250, 0.4)'; // Changed opacity from 0.3 to 0.4
-      ctx.lineWidth = 2; // Changed line width from 1.5 to 2
-
+    // Draw constellation lines
+    if (skyData?.constellations) {
       skyData.constellations.forEach(constellation => {
         constellation.star_connections?.forEach(connection => {
           if (connection.length >= 2) {
             const star1 = skyData.stars.find(s => s.name === connection[0]);
             const star2 = skyData.stars.find(s => s.name === connection[1]);
 
-            if (star1 && star2) {
+            if (star1 && star2 && star1.altitude >= 20 && star2.altitude >= 20) {
               const pos1 = azAltToXY(star1.azimuth, star1.altitude, width, height);
               const pos2 = azAltToXY(star2.azimuth, star2.altitude, width, height);
 
-              ctx.beginPath();
-              ctx.moveTo(pos1.x, pos1.y);
-              ctx.lineTo(pos2.x, pos2.y);
-              ctx.stroke();
+              if (pos1 && pos2) {
+                const lineGradient = ctx.createLinearGradient(pos1.x, pos1.y, pos2.x, pos2.y);
+                lineGradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
+                lineGradient.addColorStop(1, 'rgba(168, 85, 247, 0.4)');
+                ctx.strokeStyle = lineGradient;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(pos1.x, pos1.y);
+                ctx.lineTo(pos2.x, pos2.y);
+                ctx.stroke();
+              }
             }
           }
         });
 
-        if (showHawaiianNames && constellation.hawaiian_name) {
-          const constellationStars = constellation.star_connections?.flat().filter((v, i, a) => a.indexOf(v) === i)
+        // Draw constellation names
+        if (constellation.hawaiian_name) {
+          const constellationStars = constellation.star_connections?.flat()
+            .filter((v, i, a) => a.indexOf(v) === i)
             .map(starName => skyData.stars.find(s => s.name === starName))
-            .filter(s => s);
+            .filter(s => s && s.altitude >= 20);
           
           if (constellationStars && constellationStars.length > 0) {
-            const avgX = constellationStars.reduce((sum, s) => {
+            let avgX = 0, avgY = 0, count = 0;
+            constellationStars.forEach(s => {
               const pos = azAltToXY(s.azimuth, s.altitude, width, height);
-              return sum + pos.x;
-            }, 0) / constellationStars.length;
+              if (pos) {
+                avgX += pos.x;
+                avgY += pos.y;
+                count++;
+              }
+            });
             
-            const avgY = constellationStars.reduce((sum, s) => {
-              const pos = azAltToXY(s.azimuth, s.altitude, width, height);
-              return sum + pos.y;
-            }, 0) / constellationStars.length;
-
-            ctx.fillStyle = 'rgba(96, 165, 250, 0.7)'; // Changed opacity from 0.6 to 0.7
-            ctx.font = 'italic 16px sans-serif'; // Changed font size from 12px to 16px
-            ctx.textAlign = 'center';
-            ctx.fillText(constellation.hawaiian_name, avgX, avgY);
+            if (count > 0) {
+              avgX /= count;
+              avgY /= count;
+              
+              ctx.fillStyle = 'rgba(168, 85, 247, 0.8)'; // Purple
+              ctx.font = 'italic 16px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillText(constellation.hawaiian_name, avgX, avgY);
+            }
           }
         }
       });
     }
 
-    // Draw stars (larger)
+    // Draw stars
     skyData?.stars?.forEach(star => {
+      if (star.altitude < 20) return;
+      
       const pos = azAltToXY(star.azimuth, star.altitude, width, height);
-      const size = Math.max(3, 10 - star.magnitude * 1.5); // Changed base size from 2 to 3, and max size from 8 to 10
-
+      if (!pos) return;
+      
+      const size = Math.max(3, 12 - star.magnitude * 1.8);
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
 
+      // Star glow
+      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 4);
+      if (isHovered || isSelected) {
+        gradient.addColorStop(0, 'rgba(236, 72, 153, 1)'); // Pink
+        gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+      } else {
+        gradient.addColorStop(0, 'rgba(147, 197, 253, 0.8)'); // Light blue
+        gradient.addColorStop(1, 'rgba(147, 197, 253, 0)');
+      }
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size * 4, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Star core
+      ctx.fillStyle = isHovered || isSelected ? '#ec4899' : '#ffffff';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Hawaiian name labels for bright stars
+      if (star.hawaiian_name && star.magnitude < 2.5) {
+        ctx.fillStyle = '#93c5fd'; // Light blue
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(star.hawaiian_name, pos.x + size + 8, pos.y + 5);
+      }
+    });
+
+    // Draw planets
+    skyData?.planets?.forEach(planet => {
+      if (planet.altitude < 20) return;
+      
+      const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
+      if (!pos) return;
+      
+      const size = 10;
+      const isHovered = hoveredObject?.name === planet.name;
+      const isSelected = selectedObject?.name === planet.name;
+
+      // Planet glow
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.9)' : 'rgba(255, 255, 255, 0.7)'); // Changed opacity
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      gradient.addColorStop(0, 'rgba(234, 179, 8, 0.9)'); // Gold
+      gradient.addColorStop(1, 'rgba(234, 179, 8, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
       ctx.fill();
 
-      ctx.fillStyle = isHovered || isSelected ? '#60A5FA' : '#FFFFFF';
+      // Planet core
+      ctx.fillStyle = isHovered || isSelected ? '#fbbf24' : '#eab308';
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      if (showHawaiianNames && star.hawaiian_name && star.magnitude < 2.5) { // Added star.magnitude condition for labels
-        ctx.fillStyle = '#60A5FA';
-        ctx.font = 'bold 14px sans-serif'; // Changed font size from 11px to 14px
-        ctx.textAlign = 'left';
-        ctx.fillText(star.hawaiian_name, pos.x + size + 6, pos.y + 5); // Adjusted text offset
-      }
-    });
-
-    // Draw planets (larger)
-    skyData?.planets?.forEach(planet => {
-      const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
-      const size = 8; // Changed size from 6 to 8
-
-      const isHovered = hoveredObject?.name === planet.name;
-      const isSelected = selectedObject?.name === planet.name;
-
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2.5); // Adjusted spread
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.9)' : 'rgba(96, 165, 250, 0.7)'); // Changed opacity
-      gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size * 2.5, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.fillStyle = isHovered || isSelected ? '#3B82F6' : '#60A5FA';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
-      ctx.fill();
-
+      // Hawaiian name
       if (planet.hawaiian_name) {
-        ctx.fillStyle = '#3B82F6';
-        ctx.font = 'bold 14px sans-serif'; // Changed font size from 11px to 14px
+        ctx.fillStyle = '#fbbf24'; // Gold
+        ctx.font = 'bold 15px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(planet.hawaiian_name, pos.x + size + 6, pos.y + 5); // Adjusted text offset
+        ctx.fillText(planet.hawaiian_name, pos.x + size + 8, pos.y + 5);
       }
     });
+
+    // Draw zenith marker
+    ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
+    ctx.font = 'italic 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Luna Lani', centerX, centerY - 10);
+    ctx.fillText('(Zenith)', centerX, centerY + 10);
   };
 
-  // Touch event handlers for pinch-to-zoom
+  // Touch handlers for pinch-to-zoom and pan
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
       const touch1 = e.touches[0];
@@ -322,8 +378,18 @@ export default function SkyMap() {
         touches: [
           { x: touch1.clientX, y: touch1.clientY },
           { x: touch2.clientX, y: touch2.clientY }
-        ]
+        ],
+        panStart: null
       };
+      isPanningRef.current = false;
+    } else if (e.touches.length === 1) {
+      touchStartRef.current.panStart = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        offsetX: panOffset.x,
+        offsetY: panOffset.y
+      };
+      isPanningRef.current = true;
     }
   };
 
@@ -340,24 +406,103 @@ export default function SkyMap() {
       const scale = dist / touchStartRef.current.dist;
       const newZoom = Math.max(0.5, Math.min(3, touchStartRef.current.zoom * scale));
       setZoomLevel(newZoom);
+      isPanningRef.current = false;
+    } else if (e.touches.length === 1 && isPanningRef.current && touchStartRef.current.panStart) {
+      e.preventDefault();
+      const deltaX = e.touches[0].clientX - touchStartRef.current.panStart.x;
+      const deltaY = e.touches[0].clientY - touchStartRef.current.panStart.y;
+      setPanOffset({
+        x: touchStartRef.current.panStart.offsetX + deltaX,
+        y: touchStartRef.current.panStart.offsetY + deltaY
+      });
     }
   };
 
   const handleTouchEnd = () => {
-    touchStartRef.current = { dist: 0, zoom: zoomLevel, touches: [] };
+    touchStartRef.current = { dist: 0, zoom: zoomLevel, touches: [], panStart: null };
+    isPanningRef.current = false;
   };
 
-  const handleCanvasClick = (e) => {
+  // Mouse handlers for desktop pan
+  const handleMouseDown = (e) => {
+    touchStartRef.current.panStart = {
+      x: e.clientX,
+      y: e.clientY,
+      offsetX: panOffset.x,
+      offsetY: panOffset.y
+    };
+    isPanningRef.current = true;
+  };
+
+  const handleMouseMove = (e) => {
+    if (isPanningRef.current && touchStartRef.current.panStart) {
+      const deltaX = e.clientX - touchStartRef.current.panStart.x;
+      const deltaY = e.clientY - touchStartRef.current.panStart.y;
+      setPanOffset({
+        x: touchStartRef.current.panStart.offsetX + deltaX,
+        y: touchStartRef.current.panStart.offsetY + deltaY
+      });
+    }
+    
+    // Hover detection
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Check stars
-    const clickedStar = skyData?.stars?.find(star => {
+    const hoveredStar = skyData?.stars?.find(star => {
+      if (star.altitude < 20) return false;
       const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
+      if (!pos) return false;
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased click detection radius from 15 to 20
+      return distance < 20;
+    });
+
+    if (hoveredStar) {
+      setHoveredObject(hoveredStar);
+      canvas.style.cursor = 'pointer';
+      return;
+    }
+
+    const hoveredPlanet = skyData?.planets?.find(planet => {
+      if (planet.altitude < 20) return false;
+      const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
+      if (!pos) return false;
+      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
+      return distance < 20;
+    });
+
+    if (hoveredPlanet) {
+      setHoveredObject(hoveredPlanet);
+      canvas.style.cursor = 'pointer';
+      return;
+    }
+
+    setHoveredObject(null);
+    canvas.style.cursor = isPanningRef.current ? 'grabbing' : 'grab';
+  };
+
+  const handleMouseUp = () => {
+    isPanningRef.current = false;
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = 'grab';
+    }
+  };
+
+  const handleCanvasClick = (e) => {
+    if (Math.abs(e.clientX - (touchStartRef.current.panStart?.x || e.clientX)) > 5) return;
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const clickedStar = skyData?.stars?.find(star => {
+      if (star.altitude < 20) return false;
+      const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
+      if (!pos) return false;
+      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
+      return distance < 20;
     });
 
     if (clickedStar) {
@@ -365,11 +510,12 @@ export default function SkyMap() {
       return;
     }
 
-    // Check planets
     const clickedPlanet = skyData?.planets?.find(planet => {
+      if (planet.altitude < 20) return false;
       const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
+      if (!pos) return false;
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased click detection radius from 15 to 20
+      return distance < 20;
     });
 
     if (clickedPlanet) {
@@ -380,49 +526,11 @@ export default function SkyMap() {
     setSelectedObject(null);
   };
 
-  const handleCanvasMove = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const hoveredStar = skyData?.stars?.find(star => {
-      const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased hover detection radius from 15 to 20
-    });
-
-    if (hoveredStar) {
-      setHoveredObject(hoveredStar);
-      canvas.style.cursor = 'pointer';
-      return;
-    }
-
-    const hoveredPlanet = skyData?.planets?.find(planet => {
-      const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased hover detection radius from 15 to 20
-    });
-
-    if (hoveredPlanet) {
-      setHoveredObject(hoveredPlanet);
-      canvas.style.cursor = 'pointer';
-      return;
-    }
-
-    setHoveredObject(null);
-    canvas.style.cursor = 'default';
+  const changeWeek = (direction) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + (direction * 7));
+    setSelectedDate(newDate);
   };
-
-  const filteredObjects = searchQuery
-    ? [
-        ...(skyData?.stars || []).map(s => ({ ...s, type: 'star' })),
-        ...(skyData?.planets || []).map(p => ({ ...p, type: 'planet' }))
-      ].filter(obj =>
-        obj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        obj.hawaiian_name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
 
   const getDetailLink = (obj) => {
     if (obj.type === 'star') {
@@ -439,8 +547,8 @@ export default function SkyMap() {
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center min-h-[600px]">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-[#60A5FA] animate-spin mx-auto mb-4" />
-            <p className="text-white/70">Mapping the heavens...</p>
+            <Loader2 className="w-12 h-12 text-[#a855f7] animate-spin mx-auto mb-4" />
+            <p className="text-white/70">Mapping ka lani...</p>
           </div>
         </div>
       </div>
@@ -451,84 +559,109 @@ export default function SkyMap() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#a855f7] via-[#3b82f6] to-[#ec4899] flex items-center justify-center mx-auto mb-4">
           <Compass className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
-          Interactive Sky Map
+          Hawaiian Planisphere
         </h1>
         <p className="text-white/70 text-lg mb-2">
-          {skyData?.location} • {skyData?.date} • {skyData?.time}
+          {skyData?.location} • {skyData?.date}
         </p>
-        <Badge className="bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] text-white">
-          {skyData?.stars?.length || 0} stars • {skyData?.planets?.length || 0} planets visible
+        <Badge className="bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white">
+          {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible (20°+)
         </Badge>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Sky Map */}
+        {/* Main Planisphere */}
         <div className="lg:col-span-2">
-          <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+          <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
               {/* Controls */}
-              <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex flex-wrap gap-3 mb-4 items-center">
+                <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                  <Calendar className="w-4 h-4 text-[#a855f7]" />
+                  <span className="text-white text-sm font-medium">
+                    {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </div>
                 <Button
-                  variant={showConstellations ? "default" : "outline"}
+                  variant="outline"
                   size="sm"
-                  onClick={() => setShowConstellations(!showConstellations)}
-                  className={showConstellations ? "bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white" : "border-white/20 text-white"}
+                  onClick={() => changeWeek(-1)}
+                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20"
                 >
-                  {showConstellations ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
-                  Constellations
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Previous Week
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
-                  className="border-white/20 text-white"
+                  onClick={() => changeWeek(1)}
+                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20"
                 >
-                  <ZoomOut className="w-4 h-4" />
+                  Next Week
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
-                  className="border-white/20 text-white"
+                  onClick={() => setSelectedDate(new Date())}
+                  className="border-[#ec4899]/30 text-white hover:bg-[#ec4899]/20"
                 >
-                  <ZoomIn className="w-4 h-4" />
+                  Tonight
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={fetchSkyData}
-                  className="border-white/20 text-white ml-auto"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
+                <div className="ml-auto flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
+                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
+                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={fetchSkyData}
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Canvas */}
               <div className="relative">
                 <canvas
                   ref={canvasRef}
-                  width={1200} // Changed canvas width from 800 to 1200
-                  height={1200} // Changed canvas height from 800 to 1200
-                  className="w-full h-auto rounded-xl border border-white/20 bg-[#0A1929]"
+                  width={1200}
+                  height={1200}
+                  className="w-full h-auto rounded-xl border-2 border-[#a855f7]/30 cursor-grab active:cursor-grabbing"
                   onClick={handleCanvasClick}
-                  onMouseMove={handleCanvasMove}
-                  onTouchStart={handleTouchStart} // Added touch event listener
-                  onTouchMove={handleTouchMove}   // Added touch event listener
-                  onTouchEnd={handleTouchEnd}     // Added touch event listener
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 />
-                <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white text-xs">
-                  <p className="flex items-center gap-2 mb-1">
-                    <MapPin className="w-3 h-3 text-[#60A5FA]" />
-                    Center = Zenith (overhead)
-                  </p>
-                  <p>Edge = Horizon</p>
-                  <p className="mt-2">Zoom: {zoomLevel.toFixed(2)}x</p>
-                  <p className="text-white/60 mt-1 text-[10px]">Pinch to zoom on mobile</p> {/* Added mobile zoom instruction */}
+                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white text-xs border border-[#a855f7]/30">
+                  <p className="text-[#e879f9] font-semibold mb-1">Hawaiian Planisphere</p>
+                  <p className="mb-1">• Center = Luna Lani (Zenith)</p>
+                  <p className="mb-1">• Edge = 20° horizon limit</p>
+                  <p className="mb-2">• Zoom: {zoomLevel.toFixed(2)}x</p>
+                  <p className="text-white/60 text-[10px]">Pinch/scroll to zoom • Drag to pan</p>
                 </div>
               </div>
             </CardContent>
@@ -537,39 +670,9 @@ export default function SkyMap() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Search */}
-          <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search stars or planets..."
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                />
-              </div>
-
-              {searchQuery && filteredObjects.length > 0 && (
-                <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
-                  {filteredObjects.map((obj, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedObject(obj)}
-                      className="w-full text-left p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                    >
-                      <p className="text-white font-medium">{obj.hawaiian_name || obj.name}</p>
-                      <p className="text-white/60 text-sm">{obj.name}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Selected Object Info */}
           {selectedObject && (
-            <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+            <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -578,7 +681,7 @@ export default function SkyMap() {
                     </h3>
                     <p className="text-white/60 text-sm">{selectedObject.name}</p>
                   </div>
-                  <Badge className={selectedObject.type === 'planet' ? "bg-[#3B82F6]" : "bg-[#60A5FA] text-white"}>
+                  <Badge className={selectedObject.type === 'planet' ? "bg-[#eab308]" : "bg-gradient-to-r from-[#a855f7] to-[#ec4899] text-white"}>
                     {selectedObject.type}
                   </Badge>
                 </div>
@@ -592,7 +695,7 @@ export default function SkyMap() {
                   )}
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <p className="text-white/50 text-xs">Azimuth</p>
+                      <p className="text-white/50 text-xs">Direction</p>
                       <p className="text-white">{selectedObject.azimuth.toFixed(1)}°</p>
                     </div>
                     <div>
@@ -601,14 +704,14 @@ export default function SkyMap() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-white/50 text-xs">Magnitude</p>
+                    <p className="text-white/50 text-xs">Brightness</p>
                     <p className="text-white">{selectedObject.magnitude.toFixed(2)}</p>
                   </div>
                 </div>
 
                 {getDetailLink(selectedObject) && (
                   <Link to={getDetailLink(selectedObject)}>
-                    <Button className="w-full bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white">
+                    <Button className="w-full bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white">
                       View Full Details
                     </Button>
                   </Link>
@@ -618,23 +721,32 @@ export default function SkyMap() {
           )}
 
           {/* Legend */}
-          <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+          <Card className="bg-gradient-to-br from-[#1a0b2e]/80 to-[#0f0920]/80 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
-              <h3 className="text-white font-bold mb-3">Legend</h3>
+              <h3 className="text-white font-bold mb-3">Hōʻailona (Legend)</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-white"></div>
-                  <span className="text-white/80">Stars</span>
+                  <span className="text-white/80">Nā Hōkū (Stars)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
-                  <span className="text-white/80">Planets</span>
+                  <div className="w-3 h-3 rounded-full bg-[#eab308]"></div>
+                  <span className="text-white/80">Nā Hōkūhele (Planets)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-40"></div> {/* Changed opacity from 30 to 40 */}
-                  <span className="text-white/80">Constellation Lines</span>
+                  <div className="w-8 h-0.5 bg-gradient-to-r from-[#60a5fa] to-[#a855f7]"></div>
+                  <span className="text-white/80">Star Lines</span>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Info Card */}
+          <Card className="bg-gradient-to-br from-[#a855f7]/20 to-[#ec4899]/20 border-[#a855f7]/30">
+            <CardContent className="p-4">
+              <p className="text-white/90 italic text-sm leading-relaxed">
+                This planisphere shows ka lani (the heavens) as seen from Hawaiʻi. Only stars 20° or higher above the horizon are displayed, matching traditional navigation practices.
+              </p>
             </CardContent>
           </Card>
         </div>
