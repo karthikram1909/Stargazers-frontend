@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -39,26 +38,40 @@ export default function Layout({ children }) {
     return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
   };
 
+  const backgroundImage = getBackgroundImage();
+
   return (
-    <div className="min-h-screen relative">
-      {/* Background Image */}
+    <div className="min-h-screen" style={{ position: 'relative' }}>
+      {/* Background Image - with key to force re-render */}
       <div 
-        className="fixed inset-0 transition-all duration-500"
+        key={backgroundImage}
         style={{
-          backgroundImage: `url(${getBackgroundImage()})`,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url('${backgroundImage}')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          zIndex: 0
+          zIndex: 0,
         }}
       />
       
       {/* Overlay for better text readability */}
-      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" style={{ zIndex: 1 }} />
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.4), rgba(0,0,0,0.7))',
+        zIndex: 1,
+      }} />
       
       {/* Content */}
-      <div className="relative" style={{ zIndex: 2 }}>
+      <div style={{ position: 'relative', zIndex: 2 }}>
         <style>{`
           :root {
             --ocean-deep: #0A1929;
