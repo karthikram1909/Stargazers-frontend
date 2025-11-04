@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -6,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut, Bug } from "lucide-react";
+import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -17,12 +16,11 @@ export default function SkyMap() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedObject, setSelectedObject] = useState(null);
   const [showConstellations, setShowConstellations] = useState(true);
-  const [showHawaiianNames, setShowHawaiianNames] = useState(true); // Retained but its specific use in drawSkyMap changed for labels
+  const [showHawaiianNames, setShowHawaiianNames] = useState(true);
   const [hoveredObject, setHoveredObject] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 }); // Added panOffset state
-  const [showDebug, setShowDebug] = useState(false); // Added showDebug state
-  const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [] }); // Added touchStartRef ref
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [] });
 
   const { data: stars } = useQuery({
     queryKey: ['stars'],
@@ -44,7 +42,7 @@ export default function SkyMap() {
     if (skyData && canvasRef.current) {
       drawSkyMap();
     }
-  }, [skyData, showConstellations, showHawaiianNames, hoveredObject, zoomLevel, panOffset]); // Added panOffset to dependencies
+  }, [skyData, showConstellations, showHawaiianNames, hoveredObject, zoomLevel, panOffset]);
 
   const fetchSkyData = async () => {
     setLoading(true);
@@ -64,40 +62,39 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an astronomical expert. Generate ACCURATE sky map data for tonight ${dateStr} at ${timeStr} local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
+        prompt: `You are an expert astronomer. Generate HIGHLY ACCURATE sky map data for ${dateStr} at ${timeStr} in Hawaii (19.82°N, 155.47°W).
 
-        CRITICAL - USE REAL ASTRONOMICAL DATA:
-        - Use actual astronomical calculations or databases for star positions
-        - Azimuth and altitude must be ACCURATE for the date, time, and location
-        - Only include stars that are ACTUALLY visible (altitude > 0 degrees) at this time
-        - Use precise coordinates, not approximations
+        CRITICAL REQUIREMENTS:
         
-        STAR NAMING REQUIREMENTS:
-        - For EVERY bright star (magnitude 3.0 or brighter), include both hawaiian_name AND name
-        - For stars with Hawaiian names: use the Hawaiian name in hawaiian_name field
-        - For stars WITHOUT Hawaiian names: PUT THE ENGLISH NAME in hawaiian_name field
-        - The 'name' field MUST be the standard astronomical star name (e.g., "Sirius", "Betelgeuse", "Vega")
+        1. STAR DATA - Include 20-30 bright stars (magnitude 3.0 or brighter) that are ACTUALLY visible above the horizon right now:
+           - name: Use EXACT standard star names (Sirius, Vega, Betelgeuse, Rigel, Aldebaran, etc.)
+           - hawaiian_name: Hawaiian name if known, otherwise repeat the English name
+           - azimuth: 0-360 degrees (accurate for this date/time/location)
+           - altitude: Only stars with altitude > 0 (above horizon)
+           - magnitude: Actual brightness value
+           - constellation: Parent constellation
         
-        CONSTELLATION LINES - CRITICAL:
-        - Only create star_connections between stars that are ACTUALLY in your stars array
-        - Use EXACT star names from the 'name' field - spelling must match EXACTLY
-        - Verify every single star name in star_connections exists in the stars array
-        - Example: if stars array has {"name": "Betelgeuse", ...}, use "Betelgeuse" exactly in connections
-        - Double-check: every star mentioned in star_connections MUST exist in the stars array
+        2. CONSTELLATION LINES - THIS IS CRITICAL:
+           - For each major constellation visible tonight (Orion, Ursa Major, Cassiopeia, etc.)
+           - star_connections MUST use EXACT star names that exist in your stars array
+           - Example: If you include star {"name": "Rigel", ...} in stars array, use "Rigel" exactly in connections
+           - Create 3-5 connections per constellation to show its shape
+           - VERIFY: Every star name in connections must exist in the stars array
         
-        PLANETS:
-        - Only include Saturn, Uranus, Neptune if they're actually visible
-        - Use these Hawaiian names: Saturn=Makulu, Uranus=Heleʻekala, Neptune=Naholoholo
+        3. PLANETS - Only include planets actually visible tonight (altitude > 0)
         
-        Return JSON with:
-        1. stars: array with name (exact English), hawaiian_name, azimuth (0-360), altitude (-90 to 90), magnitude, constellation
-        2. planets: array with name, hawaiian_name, azimuth, altitude, magnitude
-        3. constellations: array with name, hawaiian_name, star_connections (arrays of pairs using EXACT names from stars array)
+        EXAMPLE of correct constellation structure:
+        {
+          "name": "Orion",
+          "hawaiian_name": "Kaiwikuamoʻo",
+          "star_connections": [
+            ["Betelgeuse", "Bellatrix"],
+            ["Rigel", "Saiph"],
+            ["Bellatrix", "Mintaka"]
+          ]
+        }
         
-        VERIFY BEFORE RETURNING:
-        - Check that every star in star_connections exists in stars array
-        - Ensure all stars have altitude > 0 (visible above horizon)
-        - Confirm azimuth/altitude values are astronomically accurate`,
+        Make sure EVERY star name in star_connections appears in your stars array.`,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",
@@ -153,34 +150,14 @@ export default function SkyMap() {
         }
       });
       
-      // Debug logging
-      console.log("=== SKY MAP DATA DEBUG ===");
-      console.log("Full LLM Response:", result);
-      console.log("Stars count:", result?.stars?.length);
-      console.log("Planets count:", result?.planets?.length);
-      console.log("Constellations count:", result?.constellations?.length);
+      console.log("=== SKY MAP DATA ===");
+      console.log("Stars:", result?.stars?.length);
+      console.log("Constellations:", result?.constellations?.length);
+      console.log("Star names:", result?.stars?.map(s => s.name));
       
-      // Check star names
-      const starNames = new Set(result?.stars?.map(s => s.name) || []);
-      console.log("Star names in data:", Array.from(starNames));
-      
-      // Check constellation connections
-      result?.constellations?.forEach(constellation => {
-        console.log(`\nConstellation: ${constellation.name}`);
-        constellation.star_connections?.forEach((connection, idx) => {
-          if (connection.length >= 2) {
-            const star1Found = starNames.has(connection[0]);
-            const star2Found = starNames.has(connection[1]);
-            console.log(`  Connection ${idx}: ${connection[0]} -> ${connection[1]}`);
-            if (!star1Found) console.warn(`    ⚠️ Star "${connection[0]}" NOT FOUND in stars array`);
-            if (!star2Found) console.warn(`    ⚠️ Star "${connection[1]}" NOT FOUND in stars array`);
-          }
-        });
+      result?.constellations?.forEach(c => {
+        console.log(`${c.name} connections:`, c.star_connections);
       });
-      
-      // Check for stars above horizon
-      const visibleStars = result?.stars?.filter(s => s.altitude > 0) || [];
-      console.log(`\nVisible stars (altitude > 0): ${visibleStars.length} of ${result?.stars?.length}`);
       
       setSkyData(result);
       setLoading(false);
@@ -191,15 +168,18 @@ export default function SkyMap() {
   };
 
   const azAltToXY = (azimuth, altitude, canvasWidth, canvasHeight) => {
-    const centerX = canvasWidth / 2 + panOffset.x; // Adjusted for panOffset
-    const centerY = canvasHeight / 2 + panOffset.y; // Adjusted for panOffset
-    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 60) * zoomLevel; // Changed from 40 to 60
+    const centerX = canvasWidth / 2 + panOffset.x;
+    const centerY = canvasHeight / 2 + panOffset.y;
+    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 60) * zoomLevel;
 
+    // Map altitude: 90° (zenith) at top, 0° (horizon) at edge
     const r = maxRadius * (1 - altitude / 90);
-    const theta = (azimuth - 90) * (Math.PI / 180);
+    
+    // Rotate so North is at top (azimuth 0° points up)
+    const theta = (azimuth) * (Math.PI / 180);
 
-    const x = centerX + r * Math.cos(theta);
-    const y = centerY + r * Math.sin(theta);
+    const x = centerX + r * Math.sin(theta);
+    const y = centerY - r * Math.cos(theta);
 
     return { x, y };
   };
@@ -215,9 +195,9 @@ export default function SkyMap() {
     ctx.fillStyle = '#0A1929';
     ctx.fillRect(0, 0, width, height);
 
-    const centerX = width / 2 + panOffset.x; // Adjusted for panOffset
-    const centerY = height / 2 + panOffset.y; // Adjusted for panOffset
-    const maxRadius = (Math.min(width, height) / 2 - 60) * zoomLevel; // Changed from 40 to 60
+    const centerX = width / 2 + panOffset.x;
+    const centerY = height / 2 + panOffset.y;
+    const maxRadius = (Math.min(width, height) / 2 - 60) * zoomLevel;
 
     // Draw horizon circles
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
@@ -229,22 +209,32 @@ export default function SkyMap() {
       ctx.stroke();
     });
 
-    // Draw cardinal directions (larger font)
+    // Draw cardinal directions with N at top
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = 'bold 18px sans-serif'; // Changed font size from 14px to 18px
+    ctx.font = 'bold 20px sans-serif';
     ctx.textAlign = 'center';
-    ['N', 'E', 'S', 'W'].forEach((dir, idx) => {
-      const angle = idx * Math.PI / 2;
-      const x = centerX + (maxRadius + 30) * Math.cos(angle - Math.PI / 2); // Adjusted offset from 20 to 30
-      const y = centerY + (maxRadius + 30) * Math.sin(angle - Math.PI / 2); // Adjusted offset from 20 to 30
-      ctx.fillText(dir, x, y + 6); // Adjusted text Y offset from 5 to 6
+    
+    // N at top (0°), E at right (90°), S at bottom (180°), W at left (270°)
+    const directions = [
+      { label: 'N', angle: 0 },
+      { label: 'E', angle: 90 },
+      { label: 'S', angle: 180 },
+      { label: 'W', angle: 270 }
+    ];
+    
+    directions.forEach(({ label, angle }) => {
+      const theta = angle * (Math.PI / 180);
+      const x = centerX + (maxRadius + 35) * Math.sin(theta);
+      const y = centerY - (maxRadius + 35) * Math.cos(theta);
+      ctx.fillText(label, x, y + 7);
     });
 
-    // Draw constellation lines with blue color
+    // Draw constellation lines
     if (showConstellations && skyData?.constellations) {
-      ctx.strokeStyle = 'rgba(96, 165, 250, 0.4)'; // Changed opacity from 0.3 to 0.4
-      ctx.lineWidth = 2; // Changed line width from 1.5 to 2
+      ctx.strokeStyle = 'rgba(96, 165, 250, 0.5)';
+      ctx.lineWidth = 2;
 
+      let linesDrawn = 0;
       skyData.constellations.forEach(constellation => {
         constellation.star_connections?.forEach(connection => {
           if (connection.length >= 2) {
@@ -259,6 +249,7 @@ export default function SkyMap() {
               ctx.moveTo(pos1.x, pos1.y);
               ctx.lineTo(pos2.x, pos2.y);
               ctx.stroke();
+              linesDrawn++;
             }
           }
         });
@@ -279,25 +270,27 @@ export default function SkyMap() {
               return sum + pos.y;
             }, 0) / constellationStars.length;
 
-            ctx.fillStyle = 'rgba(96, 165, 250, 0.7)'; // Changed opacity from 0.6 to 0.7
-            ctx.font = 'italic 16px sans-serif'; // Changed font size from 12px to 16px
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.8)';
+            ctx.font = 'italic 16px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(constellation.hawaiian_name, avgX, avgY);
           }
         }
       });
+      
+      console.log(`Drew ${linesDrawn} constellation lines`);
     }
 
-    // Draw stars (larger)
+    // Draw stars
     skyData?.stars?.forEach(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, width, height);
-      const size = Math.max(3, 10 - star.magnitude * 1.5); // Changed base size from 2 to 3, and max size from 8 to 10
+      const size = Math.max(3, 10 - star.magnitude * 1.5);
 
       const isHovered = hoveredObject?.name === star.name;
       const isSelected = selectedObject?.name === star.name;
 
       const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.9)' : 'rgba(255, 255, 255, 0.7)'); // Changed opacity
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(96, 165, 250, 0.9)' : 'rgba(255, 255, 255, 0.7)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
@@ -309,24 +302,24 @@ export default function SkyMap() {
       ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
       ctx.fill();
 
-      if (showHawaiianNames && star.hawaiian_name && star.magnitude < 2.5) { // Added star.magnitude condition for labels
+      if (showHawaiianNames && star.hawaiian_name && star.magnitude < 2.5) {
         ctx.fillStyle = '#60A5FA';
-        ctx.font = 'bold 14px sans-serif'; // Changed font size from 11px to 14px
+        ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(star.hawaiian_name, pos.x + size + 6, pos.y + 5); // Adjusted text offset
+        ctx.fillText(star.hawaiian_name, pos.x + size + 6, pos.y + 5);
       }
     });
 
-    // Draw planets (larger)
+    // Draw planets
     skyData?.planets?.forEach(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
-      const size = 8; // Changed size from 6 to 8
+      const size = 8;
 
       const isHovered = hoveredObject?.name === planet.name;
       const isSelected = selectedObject?.name === planet.name;
 
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2.5); // Adjusted spread
-      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.9)' : 'rgba(96, 165, 250, 0.7)'); // Changed opacity
+      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2.5);
+      gradient.addColorStop(0, isHovered || isSelected ? 'rgba(59, 130, 246, 0.9)' : 'rgba(96, 165, 250, 0.7)');
       gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
@@ -340,14 +333,13 @@ export default function SkyMap() {
 
       if (planet.hawaiian_name) {
         ctx.fillStyle = '#3B82F6';
-        ctx.font = 'bold 14px sans-serif'; // Changed font size from 11px to 14px
+        ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(planet.hawaiian_name, pos.x + size + 6, pos.y + 5); // Adjusted text offset
+        ctx.fillText(planet.hawaiian_name, pos.x + size + 6, pos.y + 5);
       }
     });
   };
 
-  // Touch event handlers for pinch-to-zoom
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
       const touch1 = e.touches[0];
@@ -393,11 +385,10 @@ export default function SkyMap() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Check stars
     const clickedStar = skyData?.stars?.find(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased click detection radius from 15 to 20
+      return distance < 20;
     });
 
     if (clickedStar) {
@@ -405,11 +396,10 @@ export default function SkyMap() {
       return;
     }
 
-    // Check planets
     const clickedPlanet = skyData?.planets?.find(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased click detection radius from 15 to 20
+      return distance < 20;
     });
 
     if (clickedPlanet) {
@@ -429,7 +419,7 @@ export default function SkyMap() {
     const hoveredStar = skyData?.stars?.find(star => {
       const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased hover detection radius from 15 to 20
+      return distance < 20;
     });
 
     if (hoveredStar) {
@@ -441,7 +431,7 @@ export default function SkyMap() {
     const hoveredPlanet = skyData?.planets?.find(planet => {
       const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
       const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20; // Increased hover detection radius from 15 to 20
+      return distance < 20;
     });
 
     if (hoveredPlanet) {
@@ -516,8 +506,7 @@ export default function SkyMap() {
                   variant={showConstellations ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowConstellations(!showConstellations)}
-                  className={showConstellations ? "bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white" : "border-white/20 text-white"}
-                  title={showConstellations ? "Hide constellation lines" : "Show constellation lines"}
+                  className={showConstellations ? "bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white" : "bg-[#60A5FA]/20 border-[#60A5FA]/40 text-white hover:bg-[#60A5FA]/30"}
                 >
                   {showConstellations ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                   Constellations
@@ -526,41 +515,28 @@ export default function SkyMap() {
                   variant="outline"
                   size="sm"
                   onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
-                  className="border-white/20 text-white"
-                  title="Zoom out"
+                  className="bg-[#60A5FA]/20 border-[#60A5FA]/40 text-white hover:bg-[#60A5FA]/30"
                 >
-                  <ZoomOut className="w-4 h-4 mr-1" />
+                  <ZoomOut className="w-4 h-4 mr-2" />
                   Zoom Out
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
-                  className="border-white/20 text-white"
-                  title="Zoom in"
+                  className="bg-[#60A5FA]/20 border-[#60A5FA]/40 text-white hover:bg-[#60A5FA]/30"
                 >
-                  <ZoomIn className="w-4 h-4 mr-1" />
+                  <ZoomIn className="w-4 h-4 mr-2" />
                   Zoom In
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setShowDebug(!showDebug)}
-                  className="border-white/20 text-white"
-                  title="Show debugging information"
-                >
-                  <Bug className="w-4 h-4 mr-2" />
-                  Debug Info
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
                   onClick={fetchSkyData}
-                  className="border-white/20 text-white ml-auto"
-                  title="Refresh sky map data"
+                  className="bg-[#60A5FA]/20 border-[#60A5FA]/40 text-white hover:bg-[#60A5FA]/30 ml-auto"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh Data
+                  Refresh
                 </Button>
               </div>
 
@@ -568,23 +544,27 @@ export default function SkyMap() {
               <div className="relative">
                 <canvas
                   ref={canvasRef}
-                  width={1200} // Changed canvas width from 800 to 1200
-                  height={1200} // Changed canvas height from 800 to 1200
+                  width={1200}
+                  height={1200}
                   className="w-full h-auto rounded-xl border border-white/20 bg-[#0A1929]"
                   onClick={handleCanvasClick}
                   onMouseMove={handleCanvasMove}
-                  onTouchStart={handleTouchStart} // Added touch event listener
-                  onTouchMove={handleTouchMove}   // Added touch event listener
-                  onTouchEnd={handleTouchEnd}     // Added touch event listener
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 />
+                {/* Zenith indicator */}
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-xs">
+                  ↑ Zenith (Overhead)
+                </div>
               </div>
 
-              {/* Map Legend - Moved Below Canvas */}
+              {/* Map Legend */}
               <div className="mt-4 p-4 bg-black/30 backdrop-blur-sm rounded-lg text-white text-sm border border-white/10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#60A5FA]" />
-                    <span className="text-white/80">Center = Zenith</span>
+                    <span className="text-white/80">North at Top</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Compass className="w-4 h-4 text-[#60A5FA]" />
@@ -599,65 +579,6 @@ export default function SkyMap() {
                   </div>
                 </div>
               </div>
-
-              {/* Debug Panel */}
-              {showDebug && skyData && (
-                <div className="mt-4 p-4 bg-black/50 rounded-lg text-white text-xs overflow-auto max-h-96 border border-red-500/30">
-                  <h3 className="font-bold mb-2 text-sm text-red-400">Debug Information</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-[#60A5FA] font-semibold">Data Summary:</p>
-                      <p>Stars: {skyData.stars?.length || 0}</p>
-                      <p>Planets: {skyData.planets?.length || 0}</p>
-                      <p>Constellations: {skyData.constellations?.length || 0}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-[#60A5FA] font-semibold mt-3">Constellation Line Validation:</p>
-                      {skyData.constellations?.map((constellation, idx) => {
-                        const starNames = new Set(skyData.stars.map(s => s.name));
-                        const missingStars = new Set();
-                        
-                        constellation.star_connections?.forEach(connection => {
-                          if (connection.length >= 2) {
-                            if (!starNames.has(connection[0])) missingStars.add(connection[0]);
-                            if (!starNames.has(connection[1])) missingStars.add(connection[1]);
-                          }
-                        });
-                        
-                        if (missingStars.size > 0) {
-                          return (
-                            <div key={idx} className="text-red-400 ml-2">
-                              <p>❌ {constellation.name}: Missing stars - {[...missingStars].join(', ')}</p>
-                            </div>
-                          );
-                        }
-                        return (
-                          <div key={idx} className="text-green-400 ml-2">
-                            <p>✅ {constellation.name}: All connections valid ({constellation.star_connections?.length || 0} lines)</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div>
-                      <p className="text-[#60A5FA] font-semibold mt-3">Sample Star Data:</p>
-                      <pre className="bg-black/50 p-2 rounded mt-1 overflow-x-auto whitespace-pre-wrap">
-                        {JSON.stringify(skyData.stars?.slice(0, 3), null, 2)}
-                      </pre>
-                    </div>
-
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => console.log("Full Sky Data:", skyData)}
-                      className="mt-3 border-white/20 text-white"
-                    >
-                      Log Full Data to Console
-                    </Button>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
@@ -758,7 +679,7 @@ export default function SkyMap() {
                   <span className="text-white/80">Planets</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-40"></div> {/* Changed opacity from 30 to 40 */}
+                  <div className="w-8 h-0.5 bg-[#60A5FA] opacity-50"></div>
                   <span className="text-white/80">Constellation Lines</span>
                 </div>
               </div>
