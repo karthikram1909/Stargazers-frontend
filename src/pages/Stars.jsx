@@ -1,16 +1,17 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Sparkles, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star, Sparkles, Plus, Search } from "lucide-react";
 import StarCard from "../components/stars/StarCard";
 import StarFormDialog from "../components/stars/StarFormDialog";
 
 export default function Stars() {
   const [selectedStar, setSelectedStar] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const { data: stars, isLoading } = useQuery({
@@ -67,10 +68,21 @@ export default function Stars() {
     }
   };
 
+  // Filter stars based on search query
+  const filteredStars = stars.filter(star => {
+    const query = searchQuery.toLowerCase();
+    return (
+      star.hawaiian_name?.toLowerCase().includes(query) ||
+      star.english_name?.toLowerCase().includes(query) ||
+      star.constellation?.toLowerCase().includes(query) ||
+      star.meaning?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">
             Nā Hōkū - Star Guide
@@ -91,6 +103,20 @@ export default function Stars() {
         </Button>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Search by Hawaiian name, English name, constellation..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
+          />
+        </div>
+      </div>
+
       {/* Stars Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -98,25 +124,31 @@ export default function Stars() {
             <div key={i} className="h-64 bg-white/10 rounded-3xl animate-pulse" />
           ))}
         </div>
-      ) : stars.length === 0 ? (
+      ) : filteredStars.length === 0 ? (
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <Sparkles className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <h3 className="text-xl text-white mb-2">No stars yet</h3>
+            <h3 className="text-xl text-white mb-2">
+              {searchQuery ? "No stars found" : "No stars yet"}
+            </h3>
             <p className="text-white/60 mb-6">
-              Start building your Hawaiian star guide
+              {searchQuery 
+                ? "Try a different search term" 
+                : "Start building your Hawaiian star guide"}
             </p>
-            <Button
-              onClick={() => setShowForm(true)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600"
-            >
-              Add Your First Star
-            </Button>
+            {!searchQuery && (
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600"
+              >
+                Add Your First Star
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stars.map((star) => (
+          {filteredStars.map((star) => (
             <StarCard
               key={star.id}
               star={star}

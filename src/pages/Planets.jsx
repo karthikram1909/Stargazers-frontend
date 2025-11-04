@@ -1,13 +1,16 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Eye, EyeOff, Sparkles, Volume2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Globe, Eye, EyeOff, Sparkles, Volume2, Search } from "lucide-react";
 
 export default function Planets() {
   const [visibilityData, setVisibilityData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: allPlanets } = useQuery({
     queryKey: ['planets'],
@@ -15,7 +18,6 @@ export default function Planets() {
     initialData: [],
   });
 
-  // Separate planets and dwarf planets
   const planets = allPlanets.filter(p => p.type === 'planet');
   const dwarfPlanets = allPlanets.filter(p => p.type === 'dwarf_planet');
 
@@ -196,6 +198,25 @@ export default function Planets() {
     return colors[quality] || "bg-gray-500 text-white";
   };
 
+  // Filter planets based on search
+  const filteredPlanets = planets.filter(planet => {
+    const query = searchQuery.toLowerCase();
+    return (
+      planet.hawaiian_name?.toLowerCase().includes(query) ||
+      planet.english_name?.toLowerCase().includes(query) ||
+      planet.meaning?.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredDwarfPlanets = dwarfPlanets.filter(planet => {
+    const query = searchQuery.toLowerCase();
+    return (
+      planet.hawaiian_name?.toLowerCase().includes(query) ||
+      planet.english_name?.toLowerCase().includes(query) ||
+      planet.meaning?.toLowerCase().includes(query)
+    );
+  });
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -214,20 +235,32 @@ export default function Planets() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
           <Globe className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
           Nā Hōkūhele - The Wandering Stars
         </h1>
-        <p className="text-white/70 text-lg">
+        <p className="text-white/70 text-lg mb-4">
           Planets visible tonight • {visibilityData?.date}
         </p>
-        <div className="mt-4">
-          <Badge className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white text-lg px-4 py-2">
-            {visiblePlanets.length} planets visible tonight
-          </Badge>
+        <Badge className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white text-lg px-4 py-2">
+          {visiblePlanets.length} planets visible tonight
+        </Badge>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Search planets by Hawaiian name, English name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
+          />
         </div>
       </div>
 
@@ -356,7 +389,7 @@ export default function Planets() {
           Complete Planet Guide
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {planets.map((planet) => {
+          {filteredPlanets.map((planet) => {
             const visibility = visibilityData?.planets?.[planet.english_name];
             const isVisible = visibility?.visible;
             const planetImage = getPlanetImage(planet.english_name);
@@ -426,7 +459,7 @@ export default function Planets() {
       </div>
 
       {/* Dwarf Planets Section */}
-      {dwarfPlanets.length > 0 && (
+      {filteredDwarfPlanets.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-[#60A5FA]" />
@@ -436,7 +469,7 @@ export default function Planets() {
             Small planetary-mass objects that orbit the Sun but haven't cleared their orbital paths
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dwarfPlanets.map((planet) => {
+            {filteredDwarfPlanets.map((planet) => {
               const planetImage = getPlanetImage(planet.english_name);
               
               return (

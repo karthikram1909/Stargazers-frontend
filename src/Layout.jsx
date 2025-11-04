@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -10,20 +9,42 @@ export default function Layout({ children }) {
   const navigationItems = [
     { name: "Sky Tonight", path: createPageUrl("Home"), icon: Sparkles },
     { name: "Sky Map", path: createPageUrl("SkyMap"), icon: Map },
-    { name: "Star Guide", path: createPageUrl("Stars"), icon: Stars }, // Changed from Sparkles to Stars icon as per common usage
+    { name: "Star Guide", path: createPageUrl("Stars"), icon: Stars },
     { name: "Planets", path: createPageUrl("Planets"), icon: Globe },
     { name: "Constellations", path: createPageUrl("Constellations"), icon: Stars },
     { name: "Moon Calendar", path: createPageUrl("Moon"), icon: Moon },
     { name: "Wayfinding", path: createPageUrl("Wayfinding"), icon: Compass },
   ];
 
+  // Determine background based on current page
+  const getBackgroundImage = () => {
+    const path = location.pathname;
+    if (path.includes("Stars") || path.includes("StarDetail")) {
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/24eebd687_starguide.jpg";
+    }
+    if (path.includes("Planets")) {
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/571f8877c_planet-4534835_1920.jpg";
+    }
+    if (path.includes("Constellations")) {
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/82488e921_constellations.jpg";
+    }
+    if (path.includes("Moon")) {
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/e933e77d0_river-7294102_1920.jpg";
+    }
+    if (path.includes("Wayfinding")) {
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3fa94c3c1_wayfaring.jpg";
+    }
+    // Default background for Home and SkyMap
+    return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Background Image */}
       <div 
-        className="fixed inset-0 bg-cover bg-no-repeat"
+        className="fixed inset-0 bg-cover bg-no-repeat transition-all duration-500"
         style={{
-          backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png)',
+          backgroundImage: `url(${getBackgroundImage()})`,
           backgroundPosition: 'center center',
           zIndex: 0
         }}
