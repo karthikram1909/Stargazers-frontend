@@ -395,7 +395,7 @@ export default function SkyMap() {
     } else if (e.touches.length === 1 && isPanningRef.current && touchStartRef.current.panStart) {
       e.preventDefault();
       const deltaX = e.touches[0].clientX - touchStartRef.current.panStart.x;
-      const deltaY = e.touches[0].conveniences[0].clientY - touchStartRef.current.panStart.y;
+      const deltaY = e.touches[0].clientY - touchStartRef.current.panStart.y; // Corrected from conveniences[0].clientY
       setPanOffset({
         x: touchStartRef.current.panStart.offsetX + deltaX,
         y: touchStartRef.current.panStart.offsetY + deltaY
