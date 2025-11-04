@@ -1,7 +1,7 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Moon as MoonIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Moon as MoonIcon, Search } from "lucide-react";
 
 const lunarMonths = [
   { name: "Makaliʻi", meaning: "Eyes of the Chief", description: "November-December. A time of cool weather and calm seas." },
@@ -29,10 +29,31 @@ const moonPhases = [
 ];
 
 export default function Moon() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter lunar months and phases based on search
+  const filteredMonths = lunarMonths.filter(month => {
+    const query = searchQuery.toLowerCase();
+    return (
+      month.name.toLowerCase().includes(query) ||
+      month.meaning.toLowerCase().includes(query) ||
+      month.description.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredPhases = moonPhases.filter(phase => {
+    const query = searchQuery.toLowerCase();
+    return (
+      phase.name.toLowerCase().includes(query) ||
+      phase.meaning.toLowerCase().includes(query) ||
+      phase.description.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
           <MoonIcon className="w-8 h-8 text-white" />
         </div>
@@ -44,29 +65,51 @@ export default function Moon() {
         </p>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Search lunar months and phases..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
+          />
+        </div>
+      </div>
+
       {/* Lunar Months */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-white mb-6">
           Nā Malama - The Months
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {lunarMonths.map((month, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-white text-lg">
-                  {month.name}
-                </CardTitle>
-                <p className="text-[#60A5FA] text-sm">{month.meaning}</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/70 text-sm">{month.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {filteredMonths.length === 0 ? (
+          <Card className="bg-white/5 border-white/20">
+            <CardContent className="p-8 text-center">
+              <p className="text-white/60">No lunar months found matching your search.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredMonths.map((month, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-lg">
+                    {month.name}
+                  </CardTitle>
+                  <p className="text-[#60A5FA] text-sm">{month.meaning}</p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white/70 text-sm">{month.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Moon Phases */}
@@ -74,37 +117,45 @@ export default function Moon() {
         <h2 className="text-2xl font-bold text-white mb-6">
           Nā Pō o ka Mahina - Moon Phases
         </h2>
-        <div className="space-y-4">
-          {moonPhases.map((phase, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">
-                        {phase.day}
-                      </span>
+        {filteredPhases.length === 0 ? (
+          <Card className="bg-white/5 border-white/20">
+            <CardContent className="p-8 text-center">
+              <p className="text-white/60">No moon phases found matching your search.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {filteredPhases.map((phase, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">
+                          {phase.day}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-bold text-lg mb-1">
+                        {phase.name}
+                      </h3>
+                      <p className="text-[#60A5FA] text-sm mb-2">
+                        {phase.meaning}
+                      </p>
+                      <p className="text-white/70 text-sm">
+                        {phase.description}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      {phase.name}
-                    </h3>
-                    <p className="text-[#60A5FA] text-sm mb-2">
-                      {phase.meaning}
-                    </p>
-                    <p className="text-white/70 text-sm">
-                      {phase.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Cultural Note */}

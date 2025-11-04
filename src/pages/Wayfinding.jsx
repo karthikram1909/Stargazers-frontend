@@ -1,7 +1,7 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Navigation, Compass, Waves, Wind } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Navigation, Compass, Waves, Wind, Search } from "lucide-react";
 
 const techniques = [
   {
@@ -32,10 +32,31 @@ const keyStars = [
 ];
 
 export default function Wayfinding() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter techniques and key stars based on search
+  const filteredTechniques = techniques.filter(technique => {
+    const query = searchQuery.toLowerCase();
+    return (
+      technique.title.toLowerCase().includes(query) ||
+      technique.description.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredStars = keyStars.filter(star => {
+    const query = searchQuery.toLowerCase();
+    return (
+      star.name.toLowerCase().includes(query) ||
+      star.western.toLowerCase().includes(query) ||
+      star.position.toLowerCase().includes(query) ||
+      star.use.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-[#60A5FA] shadow-xl">
           <img 
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/094ec7b13_wayfairers.jpg"
@@ -49,6 +70,20 @@ export default function Wayfinding() {
         <p className="text-white/70 text-lg">
           The ancient art of navigating by stars, waves, and natural signs
         </p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Search navigation techniques, stars..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
+          />
+        </div>
       </div>
 
       {/* Introduction */}
@@ -72,32 +107,40 @@ export default function Wayfinding() {
         <h2 className="text-2xl font-bold text-white mb-6">
           Navigation Techniques
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {techniques.map((technique, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-            >
-              <CardHeader>
-                <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
-                  <img 
-                    src={technique.image}
-                    alt={technique.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardTitle className="text-white text-xl text-center">
-                  {technique.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/80 leading-relaxed">
-                  {technique.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {filteredTechniques.length === 0 ? (
+          <Card className="bg-white/5 border-white/20">
+            <CardContent className="p-8 text-center">
+              <p className="text-white/60">No techniques found matching your search.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {filteredTechniques.map((technique, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+              >
+                <CardHeader>
+                  <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
+                    <img 
+                      src={technique.image}
+                      alt={technique.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <CardTitle className="text-white text-xl text-center">
+                    {technique.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white/80 leading-relaxed">
+                    {technique.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Key Navigation Stars */}
@@ -105,44 +148,52 @@ export default function Wayfinding() {
         <h2 className="text-2xl font-bold text-white mb-6">
           Key Navigation Stars
         </h2>
-        <div className="space-y-3">
-          {keyStars.map((star, index) => (
-            <Card
-              key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-shrink-0">
-                    <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
-                      alt="Star Compass"
-                      className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
-                    />
+        {filteredStars.length === 0 ? (
+          <Card className="bg-white/5 border-white/20">
+            <CardContent className="p-8 text-center">
+              <p className="text-white/60">No stars found matching your search.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {filteredStars.map((star, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-shrink-0">
+                      <img 
+                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
+                        alt="Star Compass"
+                        className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
+                      />
+                    </div>
+                    <div className="flex-1 grid md:grid-cols-3 gap-4">
+                      <div>
+                        <h3 className="text-white font-bold mb-1">{star.name}</h3>
+                        <p className="text-white/60 text-sm">{star.western}</p>
+                      </div>
+                      <div>
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                          Position
+                        </p>
+                        <p className="text-white/80 text-sm">{star.position}</p>
+                      </div>
+                      <div>
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                          Navigation Use
+                        </p>
+                        <p className="text-white/80 text-sm">{star.use}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 grid md:grid-cols-3 gap-4">
-                    <div>
-                      <h3 className="text-white font-bold mb-1">{star.name}</h3>
-                      <p className="text-white/60 text-sm">{star.western}</p>
-                    </div>
-                    <div>
-                      <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                        Position
-                      </p>
-                      <p className="text-white/80 text-sm">{star.position}</p>
-                    </div>
-                    <div>
-                      <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                        Navigation Use
-                      </p>
-                      <p className="text-white/80 text-sm">{star.use}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Hōkūleʻa Legacy */}

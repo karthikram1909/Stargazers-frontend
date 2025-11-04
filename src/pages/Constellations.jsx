@@ -4,13 +4,15 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Stars, Plus, Trash2, Volume2 } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Added Input component
+import { Stars, Plus, Trash2, Volume2, Search } from "lucide-react"; // Added Search icon
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
 
 export default function Constellations() {
   const queryClient = useQueryClient();
   const [selectedConstellation, setSelectedConstellation] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
@@ -72,10 +74,21 @@ export default function Constellations() {
     }
   };
 
+  // Filter constellations based on search query
+  const filteredConstellations = constellations.filter(constellation => {
+    const query = searchQuery.toLowerCase();
+    return (
+      constellation.hawaiian_name?.toLowerCase().includes(query) ||
+      constellation.english_name?.toLowerCase().includes(query) ||
+      constellation.meaning?.toLowerCase().includes(query) ||
+      constellation.mythology?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"> {/* Adjusted margin-bottom */}
         <div className="text-center md:text-left">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
             <Stars className="w-8 h-8 text-white" />
@@ -99,6 +112,20 @@ export default function Constellations() {
         </Button>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Search by Hawaiian name, English name, mythology..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
+          />
+        </div>
+      </div>
+
       {/* Introduction */}
       <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
         <CardContent className="p-8">
@@ -118,25 +145,31 @@ export default function Constellations() {
             <div key={i} className="h-48 bg-white/10 rounded-3xl animate-pulse" />
           ))}
         </div>
-      ) : constellations.length === 0 ? (
+      ) : filteredConstellations.length === 0 ? ( // Changed to filteredConstellations
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <h3 className="text-xl text-white mb-2">No constellations yet</h3>
+            <h3 className="text-xl text-white mb-2">
+              {searchQuery ? "No constellations found" : "No constellations yet"} {/* Conditional message */}
+            </h3>
             <p className="text-white/60 mb-6">
-              Start building your Hawaiian constellation guide
+              {searchQuery 
+                ? "Try a different search term" 
+                : "Start building your Hawaiian constellation guide"}
             </p>
-            <Button
-              onClick={() => setShowForm(true)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600"
-            >
-              Add Your First Constellation
-            </Button>
+            {!searchQuery && ( // Conditionally render button
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600"
+              >
+                Add Your First Constellation
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {constellations.map((constellation) => (
+          {filteredConstellations.map((constellation) => ( // Changed to filteredConstellations
             <Card
               key={constellation.id}
               className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
