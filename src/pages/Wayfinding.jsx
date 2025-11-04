@@ -1,23 +1,22 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation, Compass, Waves, Wind } from "lucide-react";
 
 const techniques = [
   {
-    icon: Compass,
+    image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/4dfc1e6dd_starcompass.jpg",
     title: "Star Compass",
     description: "The star compass (Kāpehuʻike hōkū) divides the horizon into 32 houses, each marking where specific stars rise and set. Navigators memorized the paths of stars throughout the night to maintain direction.",
     color: "from-[#60A5FA] to-[#3B82F6]"
   },
   {
-    icon: Waves,
+    image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/0cc016fa4_waves.jpg",
     title: "Wave Patterns",
     description: "Master navigators could read ocean swells and wave patterns to detect land, even hundreds of miles away. Different wave patterns indicated proximity to islands and the direction of distant lands.",
     color: "from-[#3B82F6] to-[#60A5FA]"
   },
   {
-    icon: Wind,
+    image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a47ce474a_weather.jpg",
     title: "Wind & Weather",
     description: "Trade winds, cloud formations, and bird behavior provided crucial navigation clues. Certain clouds forming over islands could be seen from great distances, and seabirds flew in predictable patterns.",
     color: "from-[#1E3A5F] to-[#3B82F6]"
@@ -36,8 +35,12 @@ export default function Wayfinding() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto mb-4">
-          <Navigation className="w-8 h-8 text-white" />
+        <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-[#60A5FA] shadow-xl">
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/094ec7b13_wayfairers.jpg"
+            alt="Wayfinders"
+            className="w-full h-full object-cover"
+          />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
           Wayfinding - Traditional Navigation
@@ -69,29 +72,30 @@ export default function Wayfinding() {
           Navigation Techniques
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {techniques.map((technique, index) => {
-            const Icon = technique.icon;
-            return (
-              <Card
-                key={index}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-              >
-                <CardHeader>
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${technique.color} flex items-center justify-center mb-3`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-white text-xl">
-                    {technique.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-white/80 leading-relaxed">
-                    {technique.description}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {techniques.map((technique, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+            >
+              <CardHeader>
+                <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
+                  <img 
+                    src={technique.image}
+                    alt={technique.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardTitle className="text-white text-xl text-center">
+                  {technique.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-white/80 leading-relaxed">
+                  {technique.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
