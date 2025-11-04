@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
+import { Search, Compass, Eye, EyeOff, Loader2, MapPin, RefreshCw, ZoomIn, ZoomOut, Bug } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -21,6 +21,7 @@ export default function SkyMap() {
   const [hoveredObject, setHoveredObject] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 }); // Added panOffset state
+  const [showDebug, setShowDebug] = useState(false); // Added showDebug state
   const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [] }); // Added touchStartRef ref
 
   const { data: stars } = useQuery({
@@ -89,6 +90,7 @@ export default function SkyMap() {
         3. constellations array (10+) with: name, hawaiian_name (if known), star_connections (array of arrays with EXACT matching star names from stars array)
         
         Include ALL bright stars magnitude 3.0 or brighter visible from Hawaii at this time.`,
+        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
@@ -142,6 +144,36 @@ export default function SkyMap() {
           }
         }
       });
+      
+      // Debug logging
+      console.log("=== SKY MAP DATA DEBUG ===");
+      console.log("Full LLM Response:", result);
+      console.log("Stars count:", result?.stars?.length);
+      console.log("Planets count:", result?.planets?.length);
+      console.log("Constellations count:", result?.constellations?.length);
+      
+      // Check star names
+      const starNames = new Set(result?.stars?.map(s => s.name) || []);
+      console.log("Star names in data:", Array.from(starNames));
+      
+      // Check constellation connections
+      result?.constellations?.forEach(constellation => {
+        console.log(`\nConstellation: ${constellation.name}`);
+        constellation.star_connections?.forEach((connection, idx) => {
+          if (connection.length >= 2) {
+            const star1Found = starNames.has(connection[0]);
+            const star2Found = starNames.has(connection[1]);
+            console.log(`  Connection ${idx}: ${connection[0]} -> ${connection[1]}`);
+            if (!star1Found) console.warn(`    ⚠️ Star "${connection[0]}" NOT FOUND in stars array`);
+            if (!star2Found) console.warn(`    ⚠️ Star "${connection[1]}" NOT FOUND in stars array`);
+          }
+        });
+      });
+      
+      // Check for stars above horizon
+      const visibleStars = result?.stars?.filter(s => s.altitude > 0) || [];
+      console.log(`\nVisible stars (altitude > 0): ${visibleStars.length} of ${result?.stars?.length}`);
+      
       setSkyData(result);
       setLoading(false);
     } catch (error) {
@@ -500,6 +532,15 @@ export default function SkyMap() {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => setShowDebug(!showDebug)}
+                  className="border-white/20 text-white"
+                >
+                  <Bug className="w-4 h-4 mr-2" />
+                  Debug
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={fetchSkyData}
                   className="border-white/20 text-white ml-auto"
                 >
@@ -531,6 +572,65 @@ export default function SkyMap() {
                   <p className="text-white/60 mt-1 text-[10px]">Pinch to zoom on mobile</p> {/* Added mobile zoom instruction */}
                 </div>
               </div>
+
+              {/* Debug Panel */}
+              {showDebug && skyData && (
+                <div className="mt-4 p-4 bg-black/50 rounded-lg text-white text-xs overflow-auto max-h-96">
+                  <h3 className="font-bold mb-2 text-sm">Debug Information</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-[#60A5FA] font-semibold">Data Summary:</p>
+                      <p>Stars: {skyData.stars?.length || 0}</p>
+                      <p>Planets: {skyData.planets?.length || 0}</p>
+                      <p>Constellations: {skyData.constellations?.length || 0}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-[#60A5FA] font-semibold mt-3">Constellation Line Issues:</p>
+                      {skyData.constellations?.map((constellation, idx) => {
+                        const starNames = new Set(skyData.stars.map(s => s.name));
+                        const missingStars = new Set();
+                        
+                        constellation.star_connections?.forEach(connection => {
+                          if (connection.length >= 2) {
+                            if (!starNames.has(connection[0])) missingStars.add(connection[0]);
+                            if (!starNames.has(connection[1])) missingStars.add(connection[1]);
+                          }
+                        });
+                        
+                        if (missingStars.size > 0) {
+                          return (
+                            <div key={idx} className="text-red-400 ml-2">
+                              <p>❌ {constellation.name}: Missing stars - {[...missingStars].join(', ')}</p>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={idx} className="text-green-400 ml-2">
+                            <p>✅ {constellation.name}: All connections valid ({constellation.star_connections?.length || 0} lines)</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div>
+                      <p className="text-[#60A5FA] font-semibold mt-3">Sample Star Data:</p>
+                      <pre className="bg-black/50 p-2 rounded mt-1 overflow-x-auto whitespace-pre-wrap">
+                        {JSON.stringify(skyData.stars?.slice(0, 3), null, 2)}
+                      </pre>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => console.log("Full Sky Data:", skyData)}
+                      className="mt-3 border-white/20 text-white"
+                    >
+                      Log Full Data to Console
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
