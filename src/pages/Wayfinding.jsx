@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation, Compass, Waves, Wind } from "lucide-react";
@@ -113,9 +114,11 @@ export default function Wayfinding() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                      <Navigation className="w-6 h-6 text-white" />
-                    </div>
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
+                      alt="Star Compass"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
+                    />
                   </div>
                   <div className="flex-1 grid md:grid-cols-3 gap-4">
                     <div>
