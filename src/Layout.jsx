@@ -41,8 +41,8 @@ export default function Layout({ children }) {
   const backgroundImage = getBackgroundImage();
 
   return (
-    <div className="min-h-screen" style={{ position: 'relative' }}>
-      {/* Background Image - with key to force re-render */}
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* Background Image */}
       <div 
         key={backgroundImage}
         style={{
@@ -51,10 +51,11 @@ export default function Layout({ children }) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `url('${backgroundImage}')`,
+          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
           zIndex: 0,
         }}
       />
