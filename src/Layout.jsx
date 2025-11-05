@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -21,6 +22,15 @@ export default function Layout({ children }) {
     setFontSize(nextSize);
     localStorage.setItem('fontSize', nextSize);
     document.documentElement.setAttribute('data-font-size', nextSize);
+  };
+
+  const getFontSizeLabel = () => {
+    switch(fontSize) {
+      case 'normal': return 'A';
+      case 'large': return 'A+';
+      case 'xlarge': return 'A++';
+      default: return 'A';
+    }
   };
 
   const navigationItems = [
@@ -137,11 +147,11 @@ export default function Layout({ children }) {
               <Button
                 onClick={handleFontSizeChange}
                 variant="ghost"
-                size="icon"
-                className="text-white/70 hover:text-white hover:bg-white/10"
+                className="text-white/70 hover:text-white hover:bg-white/10 flex items-center gap-2 px-3"
                 title="Change text size"
               >
-                <Type className="w-5 h-5" />
+                <span className="text-lg font-bold">{getFontSizeLabel()}</span>
+                <span className="text-xs hidden sm:inline">Text Size</span>
               </Button>
             </div>
             
