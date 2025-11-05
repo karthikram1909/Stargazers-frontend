@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,61 +70,63 @@ const moonPhases = [
   },
 ];
 
-// SVG Moon Phase Component with visible colors
 const MoonPhaseIcon = ({ phase }) => {
   const getMoonSVG = () => {
+    const darkColor = "#1a1a2e";
+    const lightColor = "#f0f0f0";
+    
     switch(phase) {
       case "new":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
           </svg>
         );
       case "waxing-crescent":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill={lightColor}/>
           </svg>
         );
       case "first-quarter":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill={lightColor}/>
           </svg>
         );
       case "full":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
+            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
           </svg>
         );
       case "waning-gibbous":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="#1E3A5F"/>
+            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill={darkColor}/>
           </svg>
         );
       case "last-quarter":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill={lightColor}/>
           </svg>
         );
       case "waning-crescent":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill={lightColor}/>
           </svg>
         );
       default:
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
+            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
           </svg>
         );
     }
@@ -243,7 +244,7 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-2">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-3">
                         <MoonPhaseIcon phase={phase.phase} />
                       </div>
                     </div>
