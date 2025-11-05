@@ -39,58 +39,58 @@ export default function Layout({ children }) {
   const backgroundImage = getBackgroundImage();
 
   return (
-    <>
-      <style>{`
-        :root {
-          --ocean-deep: #0A1929;
-          --ocean-mid: #1E3A5F;
-          --sky-bright: #60A5FA;
-          --sky-light: #3B82F6;
-          --cyan: #06B6D4;
-          --sand: #F8F9FA;
-        }
-        
-        @keyframes twinkle {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
-        }
-        
-        .star-twinkle {
-          animation: twinkle 3s ease-in-out infinite;
-        }
-
-        .page-background {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: url('${backgroundImage}');
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-          z-index: 0;
-        }
-
-        .page-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.15), rgba(0,0,0,0.35));
-          z-index: 1;
-        }
-      `}</style>
-
-      {/* Background */}
-      <div className="page-background" />
+    <div className="min-h-screen relative">
+      {/* Background with inline style */}
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 0
+        }}
+      />
       
       {/* Overlay */}
-      <div className="page-overlay" />
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.15), rgba(0,0,0,0.35))',
+          zIndex: 1
+        }}
+      />
       
       {/* Content */}
       <div className="relative min-h-screen" style={{ zIndex: 2 }}>
+        <style>{`
+          :root {
+            --ocean-deep: #0A1929;
+            --ocean-mid: #1E3A5F;
+            --sky-bright: #60A5FA;
+            --sky-light: #3B82F6;
+            --cyan: #06B6D4;
+            --sand: #F8F9FA;
+          }
+          
+          @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+          
+          .star-twinkle {
+            animation: twinkle 3s ease-in-out infinite;
+          }
+        `}</style>
+
         {/* Navigation */}
         <nav className="border-b border-white/10 backdrop-blur-md bg-black/30 sticky top-0" style={{ zIndex: 50 }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,7 +108,6 @@ export default function Layout({ children }) {
               </div>
             </div>
             
-            {/* Mobile Navigation */}
             <div className="flex gap-1 pb-3 overflow-x-auto no-scrollbar">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
@@ -132,12 +131,10 @@ export default function Layout({ children }) {
           </div>
         </nav>
 
-        {/* Main Content */}
         <main className="relative">
           {children}
         </main>
 
-        {/* Footer */}
         <footer className="border-t border-white/10 mt-20 py-8 backdrop-blur-sm bg-black/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-white/60 text-sm">
@@ -149,6 +146,6 @@ export default function Layout({ children }) {
           </div>
         </footer>
       </div>
-    </>
+    </div>
   );
 }

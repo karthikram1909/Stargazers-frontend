@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,67 +72,28 @@ const moonPhases = [
 ];
 
 const MoonPhaseIcon = ({ phase }) => {
-  const getMoonSVG = () => {
-    switch(phase) {
-      case "new":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
-          </svg>
-        );
-      case "waxing-crescent":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
-            <path d="M 50 10 A 40 40 0 0 1 50 90 A 30 30 0 0 0 50 10" fill="#f7fafc"/>
-          </svg>
-        );
-      case "first-quarter":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
-            <path d="M 50 10 A 40 40 0 0 1 50 90 Z" fill="#f7fafc"/>
-          </svg>
-        );
-      case "full":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.8))' }}>
-            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
-          </svg>
-        );
-      case "waning-gibbous":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
-            <path d="M 50 10 A 40 40 0 0 0 50 90 A 30 30 0 0 1 50 10" fill="#2d3748"/>
-          </svg>
-        );
-      case "last-quarter":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
-            <path d="M 50 10 A 40 40 0 0 0 50 90 Z" fill="#f7fafc"/>
-          </svg>
-        );
-      case "waning-crescent":
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
-            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
-            <path d="M 50 10 A 40 40 0 0 0 50 90 A 30 30 0 0 1 50 10" fill="#f7fafc"/>
-          </svg>
-        );
-      default:
-        return (
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.8))' }}>
-            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
-          </svg>
-        );
-    }
-  };
-
   return (
-    <div className="w-full h-full">
-      {getMoonSVG()}
+    <div className="w-full h-full flex items-center justify-center">
+      <div style={{
+        width: '100%',
+        height: '100%',
+        borderRadius: '50%',
+        background: phase === 'full' ? '#ffffff' : 
+                   phase === 'new' ? '#1a1a2e' :
+                   `radial-gradient(circle at ${
+                     phase === 'waxing-crescent' || phase === 'waxing-gibbous' || phase === 'first-quarter' ? '70%' : '30%'
+                   } 50%, #ffffff 0%, #ffffff ${
+                     (phase.includes('crescent') && (phase === 'waxing-crescent' || phase === 'waning-crescent')) ? '40%' : 
+                     (phase.includes('quarter') && (phase === 'first-quarter' || phase === 'last-quarter')) ? '50%' :
+                     (phase.includes('gibbous') && (phase === 'waxing-gibbous' || phase === 'waning-gibbous')) ? '80%' : '100%'
+                   }%, #1a1a2e ${
+                     (phase.includes('crescent') && (phase === 'waxing-crescent' || phase === 'waning-crescent')) ? '40%' : 
+                     (phase.includes('quarter') && (phase === 'first-quarter' || phase === 'last-quarter')) ? '50%' :
+                     (phase.includes('gibbous') && (phase === 'waxing-gibbous' || phase === 'waning-gibbous')) ? '80%' : '100%'
+                   }%)`,
+        border: '3px solid #ffffff',
+        boxShadow: '0 0 10px rgba(255,255,255,0.5)'
+      }} />
     </div>
   );
 };
