@@ -5,17 +5,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react"; // Added ZoomIn icon
+import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react";
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
-import ImageModal from "../components/ImageModal"; // Added ImageModal import
+import ImageModal from "../components/ImageModal";
 
 export default function Constellations() {
   const queryClient = useQueryClient();
   const [selectedConstellation, setSelectedConstellation] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [imageModalOpen, setImageModalOpen] = useState(false); // New state for image modal
-  const [selectedImage, setSelectedImage] = useState({ url: "", title: "" }); // New state for selected image
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState({ url: "", title: "", starInfo: "" }); // Added starInfo to initial state
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
@@ -77,8 +77,12 @@ export default function Constellations() {
     }
   };
 
-  const handleImageClick = (imageUrl, constellationName) => {
-    setSelectedImage({ url: imageUrl, title: constellationName });
+  const handleImageClick = (imageUrl, constellationName, starsDescription) => {
+    setSelectedImage({
+      url: imageUrl,
+      title: constellationName,
+      starInfo: starsDescription
+    });
     setImageModalOpen(true);
   };
 
@@ -137,9 +141,9 @@ export default function Constellations() {
       <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
         <CardContent className="p-8">
           <p className="text-white/90 text-xl leading-relaxed">
-            Constellations served as celestial roadmaps for Hawaiian navigators, helping them 
-            maintain course across thousands of miles of open ocean. Each constellation had its 
-            own name, mythology, and practical navigation use, passed down through generations 
+            Constellations served as celestial roadmaps for Hawaiian navigators, helping them
+            maintain course across thousands of miles of open ocean. Each constellation had its
+            own name, mythology, and practical navigation use, passed down through generations
             of wayfinders.
           </p>
         </CardContent>
@@ -160,8 +164,8 @@ export default function Constellations() {
               {searchQuery ? "No constellations found" : "No constellations yet"}
             </h3>
             <p className="text-white/60 mb-6">
-              {searchQuery 
-                ? "Try a different search term" 
+              {searchQuery
+                ? "Try a different search term"
                 : "Start building your Hawaiian constellation guide"}
             </p>
             {!searchQuery && (
@@ -184,12 +188,16 @@ export default function Constellations() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {constellation.image_url ? (
-                    <div 
+                    <div
                       className="flex-shrink-0 relative cursor-pointer group"
-                      onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
+                      onClick={() => handleImageClick(
+                        constellation.image_url,
+                        constellation.hawaiian_name,
+                        constellation.stars_description
+                      )}
                     >
-                      <img 
-                        src={constellation.image_url} 
+                      <img
+                        src={constellation.image_url}
                         alt={constellation.hawaiian_name}
                         className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
                       />
@@ -313,8 +321,8 @@ export default function Constellations() {
       <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
         <CardContent className="p-6">
           <p className="text-white/90 italic leading-relaxed">
-            "The stars served as a celestial map, with constellations marking key directions 
-            and latitudes. Master navigators memorized the rising and setting positions of 
+            "The stars served as a celestial map, with constellations marking key directions
+            and latitudes. Master navigators memorized the rising and setting positions of
             entire star groups, creating a mental framework that guided voyages across the Pacific."
           </p>
         </CardContent>
@@ -335,6 +343,7 @@ export default function Constellations() {
         onOpenChange={setImageModalOpen}
         imageUrl={selectedImage.url}
         title={selectedImage.title}
+        starInfo={selectedImage.starInfo} // Passed starInfo prop
       />
     </div>
   );
