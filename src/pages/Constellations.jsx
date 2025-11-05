@@ -184,17 +184,25 @@ export default function Constellations() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {constellation.image_url ? (
-                    <div className="flex-shrink-0 relative group">
+                    <div 
+                      className="flex-shrink-0 relative cursor-pointer group"
+                      onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
+                    >
                       <img 
                         src={constellation.image_url} 
                         alt={constellation.hawaiian_name}
-                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20 cursor-pointer"
-                        onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
+                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg cursor-pointer"
-                        onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
-                      >
-                        <ZoomIn className="w-8 h-8 text-white" />
+                      {/* Always visible zoom badge */}
+                      <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm rounded-full p-2 border border-white/30">
+                        <ZoomIn className="w-4 h-4 text-white" />
+                      </div>
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <div className="text-center">
+                          <ZoomIn className="w-8 h-8 text-white mx-auto mb-1" />
+                          <p className="text-white text-xs font-medium">Tap to enlarge</p>
+                        </div>
                       </div>
                     </div>
                   ) : (
