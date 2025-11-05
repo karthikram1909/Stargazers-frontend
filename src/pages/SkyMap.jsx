@@ -563,7 +563,7 @@ export default function SkyMap() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#a855f7] via-[#3b82f6] to-[#ec4899] flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] flex items-center justify-center mx-auto mb-4">
           <Compass className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
@@ -572,7 +572,7 @@ export default function SkyMap() {
         <p className="text-white/70 text-lg mb-2">
           {skyData?.location} • {skyData?.date}
         </p>
-        <Badge className="bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white">
+        <Badge className="bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white">
           {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible (20°+)
         </Badge>
       </div>
@@ -690,7 +690,7 @@ export default function SkyMap() {
                     </h3>
                     <p className="text-white/60 text-sm">{selectedObject.name}</p>
                   </div>
-                  <Badge className={selectedObject.type === 'planet' ? "bg-[#60a5fa]" : "bg-gradient-to-r from-[#a855f7] to-[#ec4899] text-white"}>
+                  <Badge className={selectedObject.type === 'planet' ? "bg-[#60a5fa]" : "bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white"}>
                     {selectedObject.type}
                   </Badge>
                 </div>
@@ -720,7 +720,7 @@ export default function SkyMap() {
 
                 {getDetailLink(selectedObject) && (
                   <Link to={getDetailLink(selectedObject)}>
-                    <Button className="w-full bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#ec4899] text-white hover:opacity-90">
+                    <Button className="w-full bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white hover:opacity-90">
                       View Full Details
                     </Button>
                   </Link>
