@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Moon, Star, Sunrise, Sunset, Navigation, Sparkles } from "lucide-react";
@@ -176,7 +177,7 @@ export default function Home() {
                 {skyData?.visible_planets?.map((planet, index) => (
                   <div
                     key={index}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-medium"
+                    className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium"
                   >
                     <div className="font-bold">{planet.hawaiian_name}</div>
                     <div className="text-xs opacity-80">{planet.english_name}</div>
