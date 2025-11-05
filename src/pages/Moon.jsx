@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -72,28 +71,114 @@ const moonPhases = [
 ];
 
 const MoonPhaseIcon = ({ phase }) => {
+  const getMoonSVG = () => {
+    const lightColor = "#FFF8DC";
+    const darkColor = "#1a1a2e";
+    const shadowColor = "#2d2d44";
+    
+    switch(phase) {
+      case "new":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <radialGradient id="newMoon" cx="50%" cy="50%">
+                <stop offset="0%" stopColor={darkColor} />
+                <stop offset="100%" stopColor="#0a0a15" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#newMoon)" stroke={shadowColor} strokeWidth="2"/>
+          </svg>
+        );
+      case "waxing-crescent":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <radialGradient id="crescentGlow" cx="70%" cy="50%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={shadowColor} strokeWidth="2"/>
+            <ellipse cx="65" cy="50" rx="20" ry="45" fill="url(#crescentGlow)"/>
+          </svg>
+        );
+      case "first-quarter":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <linearGradient id="quarterGradient" x1="50%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={shadowColor} strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill="url(#quarterGradient)"/>
+          </svg>
+        );
+      case "full":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <radialGradient id="fullMoon" cx="50%" cy="50%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="60%" stopColor="#F5E6C8" />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#fullMoon)" stroke="#F5E6C8" strokeWidth="2" filter="drop-shadow(0 0 8px rgba(255,248,220,0.6))"/>
+          </svg>
+        );
+      case "waning-gibbous":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <radialGradient id="gibbousGlow" cx="30%" cy="50%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#gibbousGlow)" stroke="#E6D8A3" strokeWidth="2"/>
+            <ellipse cx="35" cy="50" rx="20" ry="45" fill={darkColor}/>
+          </svg>
+        );
+      case "last-quarter":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <linearGradient id="lastQuarter" x1="0%" y1="0%" x2="50%" y2="0%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={shadowColor} strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill="url(#lastQuarter)"/>
+          </svg>
+        );
+      case "waning-crescent":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <radialGradient id="waningGlow" cx="30%" cy="50%">
+                <stop offset="0%" stopColor={lightColor} />
+                <stop offset="100%" stopColor="#E6D8A3" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={shadowColor} strokeWidth="2"/>
+            <ellipse cx="35" cy="50" rx="20" ry="45" fill="url(#waningGlow)"/>
+          </svg>
+        );
+      default:
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill={lightColor} stroke="#F5E6C8" strokeWidth="2"/>
+          </svg>
+        );
+    }
+  };
+
   return (
-    <div className="w-full h-full flex items-center justify-center">
-      <div style={{
-        width: '100%',
-        height: '100%',
-        borderRadius: '50%',
-        background: phase === 'full' ? '#ffffff' : 
-                   phase === 'new' ? '#1a1a2e' :
-                   `radial-gradient(circle at ${
-                     phase === 'waxing-crescent' || phase === 'waxing-gibbous' || phase === 'first-quarter' ? '70%' : '30%'
-                   } 50%, #ffffff 0%, #ffffff ${
-                     (phase.includes('crescent') && (phase === 'waxing-crescent' || phase === 'waning-crescent')) ? '40%' : 
-                     (phase.includes('quarter') && (phase === 'first-quarter' || phase === 'last-quarter')) ? '50%' :
-                     (phase.includes('gibbous') && (phase === 'waxing-gibbous' || phase === 'waning-gibbous')) ? '80%' : '100%'
-                   }%, #1a1a2e ${
-                     (phase.includes('crescent') && (phase === 'waxing-crescent' || phase === 'waning-crescent')) ? '40%' : 
-                     (phase.includes('quarter') && (phase === 'first-quarter' || phase === 'last-quarter')) ? '50%' :
-                     (phase.includes('gibbous') && (phase === 'waxing-gibbous' || phase === 'waning-gibbous')) ? '80%' : '100%'
-                   }%)`,
-        border: '3px solid #ffffff',
-        boxShadow: '0 0 10px rgba(255,255,255,0.5)'
-      }} />
+    <div className="w-full h-full">
+      {getMoonSVG()}
     </div>
   );
 };
@@ -203,7 +288,7 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-24 h-24 rounded-full bg-[#1a202c] flex items-center justify-center p-4 border-2 border-white/20">
+                      <div className="w-28 h-28 flex items-center justify-center">
                         <MoonPhaseIcon phase={phase.phase} />
                       </div>
                     </div>
