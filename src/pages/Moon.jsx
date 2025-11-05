@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,68 +71,68 @@ const moonPhases = [
   },
 ];
 
-// SVG Moon Phase Component
+// SVG Moon Phase Component with visible colors
 const MoonPhaseIcon = ({ phase }) => {
   const getMoonSVG = () => {
     switch(phase) {
       case "new":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
           </svg>
         );
       case "waxing-crescent":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill="currentColor"/>
+            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill="#ffffff"/>
           </svg>
         );
       case "first-quarter":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill="currentColor"/>
+            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill="#ffffff"/>
           </svg>
         );
       case "full":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
           </svg>
         );
       case "waning-gibbous":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="currentColor" opacity="0.3"/>
+            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="#1E3A5F"/>
           </svg>
         );
       case "last-quarter":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill="currentColor"/>
+            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill="#ffffff"/>
           </svg>
         );
       case "waning-crescent":
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="currentColor"/>
+            <circle cx="50" cy="50" r="45" fill="#1E3A5F" stroke="#ffffff" strokeWidth="3"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="#ffffff"/>
           </svg>
         );
       default:
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="50" cy="50" r="45" fill="#ffffff" stroke="#ffffff" strokeWidth="3"/>
           </svg>
         );
     }
   };
 
   return (
-    <div className="w-full h-full text-white">
+    <div className="w-full h-full">
       {getMoonSVG()}
     </div>
   );

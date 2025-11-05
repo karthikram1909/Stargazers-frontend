@@ -14,7 +14,6 @@ export default function StarDetail() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    console.log('Star ID from URL:', id);
     setStarId(id);
   }, []);
 
@@ -27,19 +26,12 @@ export default function StarDetail() {
 
   const { data: stars, isLoading } = useQuery({
     queryKey: ['stars'],
-    queryFn: async () => {
-      const data = await base44.entities.Star.list();
-      console.log('All stars loaded:', data);
-      return data;
-    },
+    queryFn: () => base44.entities.Star.list(),
     initialData: [],
   });
 
-  // Find star by matching the ID
-  const star = stars.find(s => s.id === starId);
-  
-  console.log('Looking for star with ID:', starId);
-  console.log('Found star:', star);
+  // Find star - ensure both values are strings for comparison
+  const star = stars.find(s => String(s.id) === String(starId));
 
   if (isLoading) {
     return (
@@ -52,7 +44,7 @@ export default function StarDetail() {
     );
   }
 
-  if (!star) {
+  if (!starId || !star) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Card className="bg-white/5 border-white/20">
@@ -60,7 +52,7 @@ export default function StarDetail() {
             <Star className="w-16 h-16 text-white/30 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">Star not found</h3>
             <p className="text-white/60 mb-4">
-              {starId ? `No star found with ID: ${starId}` : 'No star ID provided in the URL'}
+              {!starId ? 'No star ID provided in the URL' : `Unable to find star with ID: ${starId}`}
             </p>
             <Button
               onClick={() => navigate(createPageUrl("Stars"))}

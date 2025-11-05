@@ -16,7 +16,6 @@ export default function Layout({ children }) {
     { name: "Wayfinding", path: createPageUrl("Wayfinding"), icon: Compass },
   ];
 
-  // Determine background based on current page
   const getBackgroundImage = () => {
     const path = location.pathname;
     if (path.includes("Stars") || path.includes("StarDetail")) {
@@ -41,24 +40,19 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background with CSS - more reliable approach */}
-      <div 
-        className="fixed inset-0 w-full h-full"
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          zIndex: 0
-        }}
+      {/* Background Image using img tag */}
+      <img 
+        src={backgroundImage}
+        alt=""
+        className="fixed top-0 left-0 w-full h-full object-cover"
+        style={{ zIndex: 0 }}
       />
       
       {/* Lighter overlay */}
       <div 
         className="fixed inset-0"
         style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.20), rgba(0,0,0,0.45))',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.15), rgba(0,0,0,0.35))',
           zIndex: 1
         }}
       />
