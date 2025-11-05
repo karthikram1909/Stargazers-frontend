@@ -17,20 +17,20 @@ export default function Layout({ children }) {
   ];
 
   const getBackgroundImage = () => {
-    const path = location.pathname;
-    if (path.includes("Stars") || path.includes("StarDetail")) {
+    const path = location.pathname.toLowerCase();
+    if (path.includes("stars") || path.includes("stardetail")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/1cc3d171f_starguide.jpg";
     }
-    if (path.includes("Planets")) {
+    if (path.includes("planets")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a36debc57_planet-4534835_1920.jpg";
     }
-    if (path.includes("Constellations")) {
+    if (path.includes("constellations")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a96cb709d_constellations.jpg";
     }
-    if (path.includes("Moon")) {
+    if (path.includes("moon")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3c702c4ef_river-7294102_1920.jpg";
     }
-    if (path.includes("Wayfinding")) {
+    if (path.includes("wayfinding")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/2bc3b79ca_wayfaring.jpg";
     }
     return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
