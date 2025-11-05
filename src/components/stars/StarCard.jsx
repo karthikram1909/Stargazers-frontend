@@ -2,12 +2,13 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 export default function StarCard({ star, onEdit, onDelete }) {
+  const navigate = useNavigate();
+
   const playPronunciation = (e) => {
-    e.preventDefault();
     e.stopPropagation();
     if (star.pronunciation_audio_url) {
       const audio = new Audio(star.pronunciation_audio_url);
@@ -15,11 +16,13 @@ export default function StarCard({ star, onEdit, onDelete }) {
     }
   };
 
-  const starDetailUrl = `${createPageUrl("StarDetail")}?id=${star.id}`;
+  const handleCardClick = () => {
+    navigate(`${createPageUrl("StarDetail")}?id=${star.id}`);
+  };
 
   return (
     <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
-      <Link to={starDetailUrl} className="block">
+      <div onClick={handleCardClick} className="cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3 flex-1">
@@ -105,7 +108,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             </div>
           </div>
         </CardContent>
-      </Link>
+      </div>
       
       <CardContent className="pt-0">
         <div className="flex gap-1 justify-end">
@@ -113,7 +116,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             variant="ghost"
             size="icon"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               onEdit();
             }}
             className="text-white/70 hover:text-white hover:bg-white/10"
@@ -124,7 +127,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
             variant="ghost"
             size="icon"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               onDelete();
             }}
             className="text-white/70 hover:text-red-400 hover:bg-white/10"
