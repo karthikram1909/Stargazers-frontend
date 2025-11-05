@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Sparkles, Moon, Compass, Globe, Map, Stars } from "lucide-react";
+import { Sparkles, Moon, Compass, Globe, Map, Stars, Type } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const [fontSize, setFontSize] = useState('normal');
+
+  useEffect(() => {
+    const savedFontSize = localStorage.getItem('fontSize') || 'normal';
+    setFontSize(savedFontSize);
+    document.documentElement.setAttribute('data-font-size', savedFontSize);
+  }, []);
+
+  const handleFontSizeChange = () => {
+    const sizes = ['normal', 'large', 'xlarge'];
+    const currentIndex = sizes.indexOf(fontSize);
+    const nextSize = sizes[(currentIndex + 1) % sizes.length];
+    setFontSize(nextSize);
+    localStorage.setItem('fontSize', nextSize);
+    document.documentElement.setAttribute('data-font-size', nextSize);
+  };
 
   const navigationItems = [
     { name: "Sky Tonight", path: createPageUrl("Home"), icon: Sparkles },
@@ -56,7 +73,7 @@ export default function Layout({ children }) {
         }}
       />
       
-      {/* Overlay - Made darker for better text readability */}
+      {/* Overlay */}
       <div 
         style={{
           position: 'fixed',
@@ -89,6 +106,17 @@ export default function Layout({ children }) {
           .star-twinkle {
             animation: twinkle 3s ease-in-out infinite;
           }
+
+          /* Font Size Controls */
+          html[data-font-size="normal"] {
+            font-size: 16px;
+          }
+          html[data-font-size="large"] {
+            font-size: 18px;
+          }
+          html[data-font-size="xlarge"] {
+            font-size: 20px;
+          }
         `}</style>
 
         {/* Navigation */}
@@ -106,6 +134,15 @@ export default function Layout({ children }) {
                   <p className="text-xs text-white/60">Hawaiian Astronomy</p>
                 </div>
               </div>
+              <Button
+                onClick={handleFontSizeChange}
+                variant="ghost"
+                size="icon"
+                className="text-white/70 hover:text-white hover:bg-white/10"
+                title="Change text size"
+              >
+                <Type className="w-5 h-5" />
+              </Button>
             </div>
             
             <div className="flex gap-1 pb-3 overflow-x-auto no-scrollbar">

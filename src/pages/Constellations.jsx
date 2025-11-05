@@ -4,15 +4,18 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Added Input component
-import { Stars, Plus, Trash2, Volume2, Search } from "lucide-react"; // Added Search icon
+import { Input } from "@/components/ui/input";
+import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react"; // Added ZoomIn icon
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
+import ImageModal from "../components/ImageModal"; // Added ImageModal import
 
 export default function Constellations() {
   const queryClient = useQueryClient();
   const [selectedConstellation, setSelectedConstellation] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
+  const [searchQuery, setSearchQuery] = useState("");
+  const [imageModalOpen, setImageModalOpen] = useState(false); // New state for image modal
+  const [selectedImage, setSelectedImage] = useState({ url: "", title: "" }); // New state for selected image
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
@@ -74,7 +77,11 @@ export default function Constellations() {
     }
   };
 
-  // Filter constellations based on search query
+  const handleImageClick = (imageUrl, constellationName) => {
+    setSelectedImage({ url: imageUrl, title: constellationName });
+    setImageModalOpen(true);
+  };
+
   const filteredConstellations = constellations.filter(constellation => {
     const query = searchQuery.toLowerCase();
     return (
@@ -88,7 +95,7 @@ export default function Constellations() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"> {/* Adjusted margin-bottom */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-center md:text-left">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
             <Stars className="w-8 h-8 text-white" />
@@ -145,19 +152,19 @@ export default function Constellations() {
             <div key={i} className="h-48 bg-white/10 rounded-3xl animate-pulse" />
           ))}
         </div>
-      ) : filteredConstellations.length === 0 ? ( // Changed to filteredConstellations
+      ) : filteredConstellations.length === 0 ? (
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">
-              {searchQuery ? "No constellations found" : "No constellations yet"} {/* Conditional message */}
+              {searchQuery ? "No constellations found" : "No constellations yet"}
             </h3>
             <p className="text-white/60 mb-6">
               {searchQuery 
                 ? "Try a different search term" 
                 : "Start building your Hawaiian constellation guide"}
             </p>
-            {!searchQuery && ( // Conditionally render button
+            {!searchQuery && (
               <Button
                 onClick={() => setShowForm(true)}
                 className="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -169,7 +176,7 @@ export default function Constellations() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredConstellations.map((constellation) => ( // Changed to filteredConstellations
+          {filteredConstellations.map((constellation) => (
             <Card
               key={constellation.id}
               className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
@@ -177,12 +184,18 @@ export default function Constellations() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {constellation.image_url ? (
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 relative group">
                       <img 
                         src={constellation.image_url} 
                         alt={constellation.hawaiian_name}
-                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
+                        className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20 cursor-pointer"
+                        onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
                       />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg cursor-pointer"
+                        onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
+                      >
+                        <ZoomIn className="w-8 h-8 text-white" />
+                      </div>
                     </div>
                   ) : (
                     <div className="flex-shrink-0">
@@ -306,6 +319,14 @@ export default function Constellations() {
         constellation={selectedConstellation}
         onSave={handleSave}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      {/* Image Modal */}
+      <ImageModal
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+        imageUrl={selectedImage.url}
+        title={selectedImage.title}
       />
     </div>
   );
