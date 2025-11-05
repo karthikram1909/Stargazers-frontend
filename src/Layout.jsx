@@ -19,19 +19,19 @@ export default function Layout({ children }) {
   const getBackgroundImage = () => {
     const path = location.pathname;
     if (path.includes("Stars") || path.includes("StarDetail")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/56fa859bb_starguide.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/1cc3d171f_starguide.jpg";
     }
     if (path.includes("Planets")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f801deb47_planet-4534835_1920.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a36debc57_planet-4534835_1920.jpg";
     }
     if (path.includes("Constellations")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/dff8e2292_constellations.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c76bb2f74_starguide.jpg";
     }
     if (path.includes("Moon")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5a60288ea_river-7294102_1920.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3c702c4ef_river-7294102_1920.jpg";
     }
     if (path.includes("Wayfinding")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/72fa687e4_wayfaring.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/2bc3b79ca_wayfaring.jpg";
     }
     return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
   };
