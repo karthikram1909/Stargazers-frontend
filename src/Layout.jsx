@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Sparkles, Moon, Compass, Globe, Map, Stars, Type } from "lucide-react";
+import { Sparkles, Moon, Compass, Globe, Map, Stars, Type, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Layout({ children }) {
@@ -156,6 +156,14 @@ export default function Layout({ children }) {
             </div>
             
             <div className="flex gap-1 pb-3 overflow-x-auto no-scrollbar">
+              {/* Search Button - First */}
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
+              >
+                <Search className="w-3.5 h-3.5" />
+                Search
+              </button>
+              
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
