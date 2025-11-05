@@ -24,14 +24,16 @@ export default function StarDetail() {
     }
   };
 
-  const { data: stars, isLoading } = useQuery({
-    queryKey: ['stars'],
-    queryFn: () => base44.entities.Star.list(),
-    initialData: [],
+  const { data: star, isLoading, error } = useQuery({
+    queryKey: ['star', starId],
+    queryFn: async () => {
+      if (!starId) return null;
+      const stars = await base44.entities.Star.list();
+      const foundStar = stars.find(s => s.id === starId);
+      return foundStar || null;
+    },
+    enabled: !!starId,
   });
-
-  // Find star - ensure both values are strings for comparison
-  const star = stars.find(s => String(s.id) === String(starId));
 
   if (isLoading) {
     return (
