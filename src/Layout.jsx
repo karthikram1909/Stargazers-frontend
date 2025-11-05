@@ -34,9 +34,9 @@ export default function Layout({ children }) {
   };
 
   const navigationItems = [
-    { name: "Sky Tonight", path: createPageUrl("Home"), icon: Sparkles },
+    { name: "Tonight", path: createPageUrl("Home"), icon: Sparkles },
     { name: "Sky Map", path: createPageUrl("SkyMap"), icon: Map },
-    { name: "Star Guide", path: createPageUrl("Stars"), icon: Stars },
+    { name: "Stars", path: createPageUrl("Stars"), icon: Stars },
     { name: "Planets", path: createPageUrl("Planets"), icon: Globe },
     { name: "Constellations", path: createPageUrl("Constellations"), icon: Stars },
     { name: "Moon Calendar", path: createPageUrl("Moon"), icon: Moon },
@@ -163,13 +163,13 @@ export default function Layout({ children }) {
                   <Link
                     key={item.name}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                       isActive
                         ? "bg-gradient-to-b from-blue-500 to-cyan-500 text-white shadow-lg"
                         : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     {item.name}
                   </Link>
                 );
