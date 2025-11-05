@@ -6,12 +6,67 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
+// Accurate moon phase calculation
+const calculateMoonPhase = (date = new Date()) => {
+  // Known new moon date: January 6, 2000 at 18:14 UTC
+  // Using a specific reference point for consistency
+  const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14));
+  const lunarCycle = 29.53058867; // average synodic month length in days
+  
+  // Calculate days since known new moon in UTC
+  const daysSinceNewMoon = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
+  
+  // Calculate current position in lunar cycle (0 to lunarCycle)
+  const currentCycle = daysSinceNewMoon % lunarCycle;
+  
+  // Normalize currentCycle to be positive if negative (e.g., if date is before knownNewMoon)
+  const normalizedCycle = currentCycle < 0 ? currentCycle + lunarCycle : currentCycle;
+
+  // Calculate illumination percentage
+  // This formula gives a rough estimate. A more accurate calculation requires more astronomical data.
+  // Using 1 - cos(angle) / 2 to get a value from 0 to 1, then scale to 100.
+  // The phase angle relates to the position in the cycle.
+  const illumination = Math.round((1 - Math.cos((normalizedCycle / lunarCycle) * 2 * Math.PI)) * 50);
+  
+  // Determine phase name based on cycle position (approximate thresholds)
+  let phaseName;
+  if (normalizedCycle < 1.84566) { // ~0-1.8 days
+    phaseName = "New Moon";
+  } else if (normalizedCycle < 7.38264) { // ~1.8-7.4 days
+    phaseName = "Waxing Crescent";
+  } else if (normalizedCycle < 9.22830) { // ~7.4-9.2 days (First Quarter is around 7.38 days)
+    phaseName = "First Quarter";
+  } else if (normalizedCycle < 14.76528) { // ~9.2-14.7 days
+    phaseName = "Waxing Gibbous";
+  } else if (normalizedCycle < 16.61094) { // ~14.7-16.6 days (Full Moon is around 14.76 days)
+    phaseName = "Full Moon";
+  } else if (normalizedCycle < 22.14792) { // ~16.6-22.1 days
+    phaseName = "Waning Gibbous";
+  } else if (normalizedCycle < 23.99358) { // ~22.1-23.9 days (Last Quarter is around 22.14 days)
+    phaseName = "Last Quarter";
+  } else if (normalizedCycle < 29.53058) { // ~23.9-29.5 days
+    phaseName = "Waning Crescent";
+  } else { // Covers the end of the cycle back to New Moon
+    phaseName = "New Moon";
+  }
+  
+  return {
+    name: phaseName,
+    percentage: illumination
+  };
+};
+
 export default function Home() {
   const [skyData, setSkyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [featuredConstellation, setFeaturedConstellation] = useState(null);
+  const [moonPhase, setMoonPhase] = useState(null); // New state for moon phase
 
   useEffect(() => {
+    // Calculate accurate moon phase locally
+    const phase = calculateMoonPhase();
+    setMoonPhase(phase);
+    
     fetchSkyData();
     fetchFeaturedConstellation();
   }, []);
@@ -40,8 +95,6 @@ export default function Home() {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for TODAY's date ${dateStr}.
         
-        CRITICAL: Calculate the ACTUAL current moon phase for today's date. Do not use placeholder data.
-        
         For visible planets, determine which ones are ACTUALLY visible tonight based on the current date and their orbital positions.
         
         Use these exact Hawaiian names for planets when they are visible:
@@ -55,7 +108,6 @@ export default function Home() {
         
         Return JSON with: 
         - current_date
-        - moon_phase (with accurate name like "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent", "New Moon" and accurate percentage for TODAY)
         - visible_planets (array with english_name and hawaiian_name for planets ACTUALLY visible tonight)
         - sunset_time (actual for Hawaii on this date)
         - sunrise_time (actual for Hawaii on this date)
@@ -65,13 +117,6 @@ export default function Home() {
           type: "object",
           properties: {
             current_date: { type: "string" },
-            moon_phase: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                percentage: { type: "number" }
-              }
-            },
             visible_planets: {
               type: "array",
               items: {
@@ -96,7 +141,7 @@ export default function Home() {
     }
   };
 
-  if (loading) {
+  if (loading || !moonPhase) { // Updated loading condition to wait for moonPhase
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="animate-pulse space-y-6">
@@ -115,11 +160,16 @@ export default function Home() {
           Tonight's Sky
         </h1>
         <p className="text-xl text-white/70">
-          {skyData?.current_date}
+          {skyData?.current_date || new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            timeZone: 'Pacific/Honolulu'
+          })}
         </p>
       </div>
 
-      {/* Moon Phase Card */}
+      {/* Moon Phase Card - Uses locally calculated moonPhase */}
       <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-white">
@@ -127,9 +177,9 @@ export default function Home() {
               <Moon className="w-6 h-6 text-[#0A1929]" />
             </div>
             <div>
-              <div className="text-2xl">{skyData?.moon_phase?.name}</div>
+              <div className="text-2xl">{moonPhase.name}</div>
               <div className="text-sm text-white/60 font-normal">
-                Mahina - {skyData?.moon_phase?.percentage}% illuminated
+                Mahina - {moonPhase.percentage}% illuminated
               </div>
             </div>
           </CardTitle>
