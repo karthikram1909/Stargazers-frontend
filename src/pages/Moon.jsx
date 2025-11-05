@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -169,10 +170,10 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonLight3)"/>
-            <ellipse cx="38" cy="35" rx="4" ry="3" fill="#C0C0C0" opacity="0.4"/>
-            <ellipse cx="30" cy="48" rx="5" ry="4" fill="#B0B0B0" opacity="0.35"/>
-            <ellipse cx="42" cy="60" rx="4" ry="3" fill="#B8B8B8" opacity="0.33"/>
-            <path d="M 50 10 A 40 40 0 0 0 50 90 A 15 40 0 0 1 50 10" fill="url(#moonDark3)"/>
+            <ellipse cx="62" cy="35" rx="4" ry="3" fill="#C0C0C0" opacity="0.4"/>
+            <ellipse cx="70" cy="48" rx="5" ry="4" fill="#B0B0B0" opacity="0.35"/>
+            <ellipse cx="58" cy="60" rx="4" ry="3" fill="#B8B8B8" opacity="0.33"/>
+            <path d="M 50 10 A 40 40 0 0 1 50 90 A 15 40 0 0 0 50 10" fill="url(#moonDark3)"/>
           </svg>
         );
       case "last-quarter":
