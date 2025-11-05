@@ -194,17 +194,14 @@ export default function ConstellationFormDialog({ open, onOpenChange, constellat
             <Label htmlFor="stars_description" className="text-white/90">
               Stars Description
             </Label>
-            <p className="text-white/50 text-xs mb-2">
-              List stars with format: Hawaiian Name | English Name (one per line)
-            </p>
             <Textarea
               id="stars_description"
               value={formData.stars_description}
               onChange={(e) =>
                 setFormData({ ...formData, stars_description: e.target.value })
               }
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 min-h-32"
-              placeholder="Hōkūleʻa | Arcturus\nHōkūpaʻa | Polaris\nNāhiku | Big Dipper"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+              placeholder="Description of the stars that make up this constellation..."
             />
           </div>
 
