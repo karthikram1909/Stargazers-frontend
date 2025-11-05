@@ -22,11 +22,20 @@ const calculateMoonPhase = (date = new Date()) => {
   // Normalize currentCycle to be positive if negative (e.g., if date is before knownNewMoon)
   const normalizedCycle = currentCycle < 0 ? currentCycle + lunarCycle : currentCycle;
 
-  // Calculate illumination percentage
-  // This formula gives a rough estimate. A more accurate calculation requires more astronomical data.
-  // Using 1 - cos(angle) / 2 to get a value from 0 to 1, then scale to 100.
-  // The phase angle relates to the position in the cycle.
-  const illumination = Math.round((1 - Math.cos((normalizedCycle / lunarCycle) * 2 * Math.PI)) * 50);
+  // Calculate illumination percentage - proper formula
+  // Waxing: 0% to 100% (days 0 to 14.76)
+  // Waning: 100% to 0% (days 14.76 to 29.53)
+  let illumination;
+  const halfCycle = lunarCycle / 2;
+  
+  if (normalizedCycle < halfCycle) {
+    // Waxing: increases from 0 to 100%
+    illumination = (normalizedCycle / halfCycle) * 100;
+  } else {
+    // Waning: decreases from 100 to 0%
+    illumination = ((lunarCycle - normalizedCycle) / halfCycle) * 100;
+  }
+  illumination = Math.round(illumination);
   
   // Determine phase name based on cycle position (approximate thresholds)
   let phaseName;
