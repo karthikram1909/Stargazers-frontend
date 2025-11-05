@@ -100,8 +100,8 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonDark1)" />
-            <path d="M 50 10 A 40 40 0 0 1 50 90 A 32 32 0 0 0 50 10" fill="url(#moonLight1)"/>
-            <ellipse cx="62" cy="35" rx="3" ry="2" fill="#C0C0C0" opacity="0.3"/>
+            <path d="M 50 10 A 40 40 0 0 1 50 90 A 25 40 0 0 0 50 10" fill="url(#moonLight1)"/>
+            <ellipse cx="60" cy="35" rx="3" ry="2" fill="#C0C0C0" opacity="0.3"/>
             <ellipse cx="58" cy="55" rx="4" ry="3" fill="#B0B0B0" opacity="0.25"/>
           </svg>
         );
@@ -120,7 +120,7 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonDark2)" />
-            <path d="M 50 10 A 40 40 0 0 1 50 90 Z" fill="url(#moonLight2)"/>
+            <path d="M 50 10 A 40 40 0 0 1 50 90 Q 55 50 50 10" fill="url(#moonLight2)"/>
             <ellipse cx="65" cy="30" rx="4" ry="3" fill="#A9A9A9" opacity="0.4"/>
             <ellipse cx="62" cy="50" rx="5" ry="4" fill="#999999" opacity="0.35"/>
             <ellipse cx="68" cy="65" rx="3" ry="2" fill="#B0B0B0" opacity="0.3"/>
@@ -169,9 +169,10 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonLight3)"/>
-            <path d="M 50 10 A 40 40 0 0 0 50 90 A 32 32 0 0 1 50 10" fill="url(#moonDark3)"/>
             <ellipse cx="38" cy="35" rx="4" ry="3" fill="#C0C0C0" opacity="0.4"/>
-            <ellipse cx="42" cy="55" rx="5" ry="4" fill="#B0B0B0" opacity="0.35"/>
+            <ellipse cx="30" cy="48" rx="5" ry="4" fill="#B0B0B0" opacity="0.35"/>
+            <ellipse cx="42" cy="60" rx="4" ry="3" fill="#B8B8B8" opacity="0.33"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 A 25 40 0 0 1 50 10" fill="url(#moonDark3)"/>
           </svg>
         );
       case "last-quarter":
@@ -189,7 +190,7 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonDark4)" />
-            <path d="M 50 10 A 40 40 0 0 0 50 90 Z" fill="url(#moonLight4)"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 Q 45 50 50 10" fill="url(#moonLight4)"/>
             <ellipse cx="35" cy="30" rx="4" ry="3" fill="#A9A9A9" opacity="0.4"/>
             <ellipse cx="38" cy="50" rx="5" ry="4" fill="#999999" opacity="0.35"/>
             <ellipse cx="32" cy="65" rx="3" ry="2" fill="#B0B0B0" opacity="0.3"/>
@@ -210,8 +211,8 @@ const MoonPhaseIcon = ({ phase }) => {
               </radialGradient>
             </defs>
             <circle cx="50" cy="50" r="40" fill="url(#moonDark5)" />
-            <path d="M 50 10 A 40 40 0 0 0 50 90 A 30 30 0 0 1 50 10" fill="url(#moonLight5)"/>
-            <ellipse cx="38" cy="35" rx="3" ry="2" fill="#C0C0C0" opacity="0.3"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 A 25 40 0 0 1 50 10" fill="url(#moonLight5)"/>
+            <ellipse cx="40" cy="35" rx="3" ry="2" fill="#C0C0C0" opacity="0.3"/>
             <ellipse cx="42" cy="55" rx="4" ry="3" fill="#B0B0B0" opacity="0.25"/>
           </svg>
         );
