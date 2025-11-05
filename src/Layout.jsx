@@ -46,7 +46,7 @@ export default function Layout({ children }) {
       // Ensure the clicked element is not inside the search container or the search button itself
       if (searchOpen && !e.target.closest('.search-container')) {
         setSearchOpen(false);
-        setSearchQuery(""); // Clear search query when closing
+        // Removed setSearchQuery(""); as per outline - it will clear on ESC, but not on outside click
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -261,10 +261,13 @@ export default function Layout({ children }) {
                 
                 {/* Search Dropdown */}
                 {searchOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-[90vw] max-w-2xl bg-black/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-50">
+                  <div 
+                    className="absolute top-full left-0 mt-2 w-[90vw] max-w-2xl bg-black/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden"
+                    style={{ zIndex: 9999 }}
+                  >
                     <div className="p-4 border-b border-white/10">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50 pointer-events-none" />
                         <Input
                           type="text"
                           placeholder="Search stars, planets, constellations..."
@@ -275,7 +278,10 @@ export default function Layout({ children }) {
                         />
                         {searchQuery && (
                           <button
-                            onClick={() => setSearchQuery("")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSearchQuery("");
+                            }}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white"
                           >
                             <X className="w-5 h-5" />
@@ -303,8 +309,11 @@ export default function Layout({ children }) {
                               <div className="space-y-1">
                                 {filteredStars.map((star) => (
                                   <button
-                                    key={`star-${star.id}`} // Added unique key prefix
-                                    onClick={() => handleNavigateToStar(star)}
+                                    key={star.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNavigateToStar(star);
+                                    }}
                                     className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors"
                                   >
                                     <div className="flex items-center gap-3">
@@ -325,7 +334,10 @@ export default function Layout({ children }) {
                                 return (s.hawaiian_name?.toLowerCase().includes(q) || s.english_name?.toLowerCase().includes(q) || s.meaning?.toLowerCase().includes(q) || s.constellation?.toLowerCase().includes(q));
                               }).length > 5 && (
                                 <button
-                                  onClick={() => handleNavigateToPage("Stars")}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleNavigateToPage("Stars");
+                                  }}
                                   className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
                                 >
                                   View all stars →
@@ -341,8 +353,11 @@ export default function Layout({ children }) {
                               <div className="space-y-1">
                                 {filteredPlanets.map((planet) => (
                                   <button
-                                    key={`planet-${planet.id}`} // Added unique key prefix
-                                    onClick={() => handleNavigateToPage("Planets")}
+                                    key={planet.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNavigateToPage("Planets");
+                                    }}
                                     className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors"
                                   >
                                     <div className="flex items-center gap-3">
@@ -363,7 +378,10 @@ export default function Layout({ children }) {
                                 return (p.hawaiian_name?.toLowerCase().includes(q) || p.english_name?.toLowerCase().includes(q) || p.meaning?.toLowerCase().includes(q));
                               }).length > 5 && (
                                 <button
-                                  onClick={() => handleNavigateToPage("Planets")}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleNavigateToPage("Planets");
+                                  }}
                                   className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
                                 >
                                   View all planets →
@@ -379,8 +397,11 @@ export default function Layout({ children }) {
                               <div className="space-y-1">
                                 {filteredConstellations.map((constellation) => (
                                   <button
-                                    key={`constellation-${constellation.id}`} // Added unique key prefix
-                                    onClick={() => handleNavigateToPage("Constellations")}
+                                    key={constellation.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNavigateToPage("Constellations");
+                                    }}
                                     className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors"
                                   >
                                     <div className="flex items-center gap-3">
@@ -401,7 +422,10 @@ export default function Layout({ children }) {
                                 return (c.hawaiian_name?.toLowerCase().includes(q) || c.english_name?.toLowerCase().includes(q) || c.meaning?.toLowerCase().includes(q));
                               }).length > 5 && (
                                 <button
-                                  onClick={() => handleNavigateToPage("Constellations")}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleNavigateToPage("Constellations");
+                                  }}
                                   className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
                                 >
                                   View all constellations →
