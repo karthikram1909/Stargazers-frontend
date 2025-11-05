@@ -2,12 +2,8 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 
 export default function StarCard({ star, onEdit, onDelete }) {
-  const navigate = useNavigate();
-
   const playPronunciation = (e) => {
     e.stopPropagation();
     if (star.pronunciation_audio_url) {
@@ -17,7 +13,9 @@ export default function StarCard({ star, onEdit, onDelete }) {
   };
 
   const handleCardClick = () => {
-    navigate(`${createPageUrl("StarDetail")}?id=${star.id}`);
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.split('/').slice(0, -1).join('/');
+    window.location.href = `${basePath}/stardetail?id=${star.id}`;
   };
 
   return (
