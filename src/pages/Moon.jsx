@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,13 +20,55 @@ const lunarMonths = [
 ];
 
 const moonPhases = [
-  { day: "1-3", name: "Hilo", meaning: "New Moon", description: "Time for new beginnings and planning." },
-  { day: "4-7", name: "Hoaka", meaning: "Crescent", description: "Time to plant and start projects." },
-  { day: "8-11", name: "Māhealani", meaning: "Full Moon Near", description: "Preparation and growth." },
-  { day: "12-15", name: "Poepoe", meaning: "Round", description: "Full moon - time for gathering and celebration." },
-  { day: "16-19", name: "Olekūkahi", meaning: "Waning", description: "Time to harvest and complete projects." },
-  { day: "20-24", name: "Kaloa", meaning: "Long", description: "Rest and reflection period." },
-  { day: "25-30", name: "Muku", meaning: "Cut Off", description: "Dark moon - time for rest and introspection." },
+  { 
+    day: "1-3", 
+    name: "Hilo", 
+    meaning: "New Moon", 
+    description: "Time for new beginnings and planning.",
+    emoji: "🌑"
+  },
+  { 
+    day: "4-7", 
+    name: "Hoaka", 
+    meaning: "Crescent", 
+    description: "Time to plant and start projects.",
+    emoji: "🌒"
+  },
+  { 
+    day: "8-11", 
+    name: "Māhealani", 
+    meaning: "Full Moon Near", 
+    description: "Preparation and growth.",
+    emoji: "🌓"
+  },
+  { 
+    day: "12-15", 
+    name: "Poepoe", 
+    meaning: "Round", 
+    description: "Full moon - time for gathering and celebration.",
+    emoji: "🌕"
+  },
+  { 
+    day: "16-19", 
+    name: "Olekūkahi", 
+    meaning: "Waning", 
+    description: "Time to harvest and complete projects.",
+    emoji: "🌖"
+  },
+  { 
+    day: "20-24", 
+    name: "Kaloa", 
+    meaning: "Long", 
+    description: "Rest and reflection period.",
+    emoji: "🌗"
+  },
+  { 
+    day: "25-30", 
+    name: "Muku", 
+    meaning: "Cut Off", 
+    description: "Dark moon - time for rest and introspection.",
+    emoji: "🌘"
+  },
 ];
 
 export default function Moon() {
@@ -46,7 +89,9 @@ export default function Moon() {
     return (
       phase.name.toLowerCase().includes(query) ||
       phase.meaning.toLowerCase().includes(query) ||
-      phase.description.toLowerCase().includes(query)
+      phase.description.toLowerCase().includes(query) ||
+      phase.emoji.toLowerCase().includes(query) || // Include emoji in search
+      phase.day.toLowerCase().includes(query) // Include day in search
     );
   });
 
@@ -133,16 +178,17 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">
-                          {phase.day}
-                        </span>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center text-3xl">
+                        {phase.emoji}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-bold text-lg mb-1">
-                        {phase.name}
-                      </h3>
+                      <div className="flex items-baseline gap-3 mb-1">
+                        <h3 className="text-white font-bold text-lg">
+                          {phase.name}
+                        </h3>
+                        <span className="text-white/50 text-sm">Days {phase.day}</span>
+                      </div>
                       <p className="text-[#60A5FA] text-sm mb-2">
                         {phase.meaning}
                       </p>

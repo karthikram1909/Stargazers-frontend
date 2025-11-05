@@ -18,9 +18,9 @@ export default function StarDetail() {
     setStarId(id);
   }, []);
 
-  const playPronunciation = () => {
-    if (star?.pronunciation_audio_url) {
-      const audio = new Audio(star.pronunciation_audio_url);
+  const playPronunciation = (audioUrl) => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
       audio.play();
     }
   };
@@ -31,7 +31,7 @@ export default function StarDetail() {
     initialData: [],
   });
 
-  const star = stars.find(s => s.id === starId);
+  const star = starId ? stars.find(s => s.id === starId) : null;
 
   if (isLoading) {
     return (
@@ -44,13 +44,14 @@ export default function StarDetail() {
     );
   }
 
-  if (!star) {
+  if (!starId || !star) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <Star className="w-16 h-16 text-white/30 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">Star not found</h3>
+            <p className="text-white/60 mb-4">The star you're looking for doesn't exist or hasn't been loaded yet.</p>
             <Button
               onClick={() => navigate(createPageUrl("Stars"))}
               variant="outline"
@@ -91,7 +92,7 @@ export default function StarDetail() {
                 </CardTitle>
                 {star.pronunciation_audio_url && (
                   <button
-                    onClick={playPronunciation}
+                    onClick={() => playPronunciation(star.pronunciation_audio_url)}
                     className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors p-2 rounded-full hover:bg-white/10"
                     title="Play pronunciation"
                   >

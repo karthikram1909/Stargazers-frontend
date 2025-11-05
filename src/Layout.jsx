@@ -41,38 +41,21 @@ export default function Layout({ children }) {
   const backgroundImage = getBackgroundImage();
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="min-h-screen relative">
       {/* Background Image */}
       <div 
-        key={backgroundImage}
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
+          backgroundImage: `url("${backgroundImage}")`,
           zIndex: 0,
         }}
       />
       
-      {/* Overlay for better text readability */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.4), rgba(0,0,0,0.7))',
-        zIndex: 1,
-      }} />
+      {/* Lighter overlay for better text readability */}
+      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/50" style={{ zIndex: 1 }} />
       
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2 }}>
+      <div className="relative" style={{ zIndex: 2 }}>
         <style>{`
           :root {
             --ocean-deep: #0A1929;
