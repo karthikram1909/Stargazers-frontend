@@ -56,7 +56,7 @@ export default function Layout({ children }) {
         }}
       />
       
-      {/* Overlay */}
+      {/* Overlay - Made darker for better text readability */}
       <div 
         style={{
           position: 'fixed',
@@ -64,7 +64,7 @@ export default function Layout({ children }) {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.15), rgba(0,0,0,0.35))',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.5), rgba(0,0,0,0.65))',
           zIndex: 1
         }}
       />
