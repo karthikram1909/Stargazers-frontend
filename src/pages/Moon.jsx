@@ -72,61 +72,58 @@ const moonPhases = [
 
 const MoonPhaseIcon = ({ phase }) => {
   const getMoonSVG = () => {
-    const darkColor = "#1a1a2e";
-    const lightColor = "#f0f0f0";
-    
     switch(phase) {
       case "new":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
           </svg>
         );
       case "waxing-crescent":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill={lightColor}/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
+            <path d="M 50 10 A 40 40 0 0 1 50 90 A 30 30 0 0 0 50 10" fill="#f7fafc"/>
           </svg>
         );
       case "first-quarter":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
-            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill={lightColor}/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
+            <path d="M 50 10 A 40 40 0 0 1 50 90 Z" fill="#f7fafc"/>
           </svg>
         );
       case "full":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.8))' }}>
+            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
           </svg>
         );
       case "waning-gibbous":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill={darkColor}/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 A 30 30 0 0 1 50 10" fill="#2d3748"/>
           </svg>
         );
       case "last-quarter":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill={lightColor}/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 Z" fill="#f7fafc"/>
           </svg>
         );
       case "waning-crescent":
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={darkColor} stroke={lightColor} strokeWidth="4"/>
-            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill={lightColor}/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.5))' }}>
+            <circle cx="50" cy="50" r="40" fill="#2d3748" stroke="#f7fafc" strokeWidth="3"/>
+            <path d="M 50 10 A 40 40 0 0 0 50 90 A 30 30 0 0 1 50 10" fill="#f7fafc"/>
           </svg>
         );
       default:
         return (
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="45" fill={lightColor} stroke={lightColor} strokeWidth="4"/>
+          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.8))' }}>
+            <circle cx="50" cy="50" r="40" fill="#f7fafc" stroke="#f7fafc" strokeWidth="3"/>
           </svg>
         );
     }
@@ -244,7 +241,7 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-3">
+                      <div className="w-24 h-24 rounded-full bg-[#1a202c] flex items-center justify-center p-4 border-2 border-white/20">
                         <MoonPhaseIcon phase={phase.phase} />
                       </div>
                     </div>

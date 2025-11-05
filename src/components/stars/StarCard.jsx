@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,9 +15,11 @@ export default function StarCard({ star, onEdit, onDelete }) {
     }
   };
 
+  const detailUrl = `${createPageUrl("StarDetail")}?id=${star.id}`;
+
   return (
     <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
-      <Link to={`${createPageUrl("StarDetail")}?id=${star.id}`}>
+      <Link to={detailUrl}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3 flex-1">
@@ -49,7 +50,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
       </Link>
       
       <CardContent className="space-y-4">
-        <Link to={`${createPageUrl("StarDetail")}?id=${star.id}`}>
+        <Link to={detailUrl}>
           {star.meaning && (
             <div>
               <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
