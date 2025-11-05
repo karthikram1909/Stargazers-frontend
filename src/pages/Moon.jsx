@@ -24,51 +24,118 @@ const moonPhases = [
     name: "Hilo", 
     meaning: "New Moon", 
     description: "Time for new beginnings and planning.",
-    image: "https://www.svgrepo.com/show/9666/new-moon.svg"
+    phase: "new"
   },
   { 
     day: "4-7", 
     name: "Hoaka", 
     meaning: "Crescent", 
     description: "Time to plant and start projects.",
-    image: "https://www.svgrepo.com/show/9667/waxing-crescent-moon.svg"
+    phase: "waxing-crescent"
   },
   { 
     day: "8-11", 
     name: "Māhealani", 
     meaning: "Full Moon Near", 
     description: "Preparation and growth.",
-    image: "https://www.svgrepo.com/show/9669/first-quarter-moon.svg"
+    phase: "first-quarter"
   },
   { 
     day: "12-15", 
     name: "Poepoe", 
     meaning: "Round", 
     description: "Full moon - time for gathering and celebration.",
-    image: "https://www.svgrepo.com/show/9671/full-moon.svg"
+    phase: "full"
   },
   { 
     day: "16-19", 
     name: "Olekūkahi", 
     meaning: "Waning", 
     description: "Time to harvest and complete projects.",
-    image: "https://www.svgrepo.com/show/9672/waning-gibbous-moon.svg"
+    phase: "waning-gibbous"
   },
   { 
     day: "20-24", 
     name: "Kaloa", 
     meaning: "Long", 
     description: "Rest and reflection period.",
-    image: "https://www.svgrepo.com/show/9673/last-quarter-moon.svg"
+    phase: "last-quarter"
   },
   { 
     day: "25-30", 
     name: "Muku", 
     meaning: "Cut Off", 
     description: "Dark moon - time for rest and introspection.",
-    image: "https://www.svgrepo.com/show/9674/waning-crescent-moon.svg"
+    phase: "waning-crescent"
   },
 ];
+
+// SVG Moon Phase Component
+const MoonPhaseIcon = ({ phase }) => {
+  const getMoonSVG = () => {
+    switch(phase) {
+      case "new":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        );
+      case "waxing-crescent":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 A 35 35 0 0 0 50 5" fill="currentColor"/>
+          </svg>
+        );
+      case "first-quarter":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 1 50 95 Z" fill="currentColor"/>
+          </svg>
+        );
+      case "full":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        );
+      case "waning-gibbous":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="currentColor" opacity="0.3"/>
+          </svg>
+        );
+      case "last-quarter":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 Z" fill="currentColor"/>
+          </svg>
+        );
+      case "waning-crescent":
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="2"/>
+            <path d="M 50 5 A 45 45 0 0 0 50 95 A 35 35 0 0 1 50 5" fill="currentColor"/>
+          </svg>
+        );
+      default:
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="45" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        );
+    }
+  };
+
+  return (
+    <div className="w-full h-full text-white">
+      {getMoonSVG()}
+    </div>
+  );
+};
 
 export default function Moon() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -175,12 +242,8 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-3">
-                        <img 
-                          src={phase.image} 
-                          alt={phase.name}
-                          className="w-full h-full object-contain filter invert"
-                        />
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-2">
+                        <MoonPhaseIcon phase={phase.phase} />
                       </div>
                     </div>
                     <div className="flex-1">

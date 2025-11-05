@@ -34,7 +34,6 @@ export default function Layout({ children }) {
     if (path.includes("Wayfinding")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/72fa687e4_wayfaring.jpg";
     }
-    // Default background for Home and SkyMap
     return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
   };
 
@@ -42,19 +41,30 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Image - Using img tag for better compatibility */}
-      <img 
-        src={backgroundImage}
-        alt="Background"
-        className="fixed inset-0 w-full h-full object-cover"
-        style={{ zIndex: 0 }}
+      {/* Background with CSS - more reliable approach */}
+      <div 
+        className="fixed inset-0 w-full h-full"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          zIndex: 0
+        }}
       />
       
-      {/* Lighter overlay for better text readability */}
-      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/50" style={{ zIndex: 1 }} />
+      {/* Lighter overlay */}
+      <div 
+        className="fixed inset-0"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.20), rgba(0,0,0,0.45))',
+          zIndex: 1
+        }}
+      />
       
       {/* Content */}
-      <div className="relative" style={{ zIndex: 2 }}>
+      <div className="relative min-h-screen" style={{ zIndex: 2 }}>
         <style>{`
           :root {
             --ocean-deep: #0A1929;
@@ -76,7 +86,7 @@ export default function Layout({ children }) {
         `}</style>
 
         {/* Navigation */}
-        <nav className="border-b border-white/10 backdrop-blur-md bg-black/30 sticky top-0 z-50">
+        <nav className="border-b border-white/10 backdrop-blur-md bg-black/30 sticky top-0" style={{ zIndex: 50 }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-3">
