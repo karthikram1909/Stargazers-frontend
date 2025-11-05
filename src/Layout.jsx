@@ -118,7 +118,7 @@ export default function Layout({ children }) {
                     to={item.path}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg"
+                        ? "bg-gradient-to-b from-blue-500 to-cyan-500 text-white shadow-lg"
                         : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
                     }`}
                   >
