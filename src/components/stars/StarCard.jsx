@@ -13,9 +13,9 @@ export default function StarCard({ star, onEdit, onDelete }) {
   };
 
   const handleCardClick = () => {
-    const currentPath = window.location.pathname;
-    const basePath = currentPath.split('/').slice(0, -1).join('/');
-    window.location.href = `${basePath}/stardetail?id=${star.id}`;
+    const newPath = window.location.pathname.replace(/\/[^/]+$/, '/stardetail');
+    const newUrl = `${window.location.origin}${newPath}?id=${star.id}`;
+    window.location.href = newUrl;
   };
 
   return (
