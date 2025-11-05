@@ -569,12 +569,12 @@ export default function SkyMap() {
         <h1 className="text-4xl font-bold text-white mb-2">
           Hawaiian Planisphere
         </h1>
-        <p className="text-white/70 text-lg mb-2">
+        <p className="text-white/70 text-lg mb-4">
           {skyData?.location} • {skyData?.date}
         </p>
-        <Badge className="bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white">
+        <div className="inline-block px-8 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
           {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible (20°+)
-        </Badge>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
