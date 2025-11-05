@@ -11,6 +11,7 @@ import { createPageUrl } from "@/utils";
 
 export default function SkyMap() {
   const canvasRef = useRef(null);
+  const backgroundImageRef = useRef(null);
   const [skyData, setSkyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -18,6 +19,7 @@ export default function SkyMap() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [], panStart: null });
   const isPanningRef = useRef(false);
 
@@ -28,14 +30,24 @@ export default function SkyMap() {
   });
 
   useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/924e825bf_star-card-3591581_640.jpg";
+    img.onload = () => {
+      backgroundImageRef.current = img;
+      setBackgroundLoaded(true);
+    };
+  }, []);
+
+  useEffect(() => {
     fetchSkyData();
   }, [selectedDate]);
 
   useEffect(() => {
-    if (skyData && canvasRef.current) {
+    if (skyData && canvasRef.current && backgroundLoaded) {
       drawPlanisphere();
     }
-  }, [skyData, hoveredObject, zoomLevel, panOffset]);
+  }, [skyData, hoveredObject, zoomLevel, panOffset, backgroundLoaded]);
 
   const fetchSkyData = async () => {
     setLoading(true);
@@ -158,12 +170,21 @@ export default function SkyMap() {
     const width = canvas.width;
     const height = canvas.height;
 
-    const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
-    bgGradient.addColorStop(0, '#1a0b2e');
-    bgGradient.addColorStop(0.5, '#16213e');
-    bgGradient.addColorStop(1, '#0f0920');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, width, height);
+    // Draw background image if loaded
+    if (backgroundImageRef.current) {
+      ctx.save();
+      ctx.globalAlpha = 0.6; // Make it slightly transparent so overlays are visible
+      ctx.drawImage(backgroundImageRef.current, 0, 0, width, height);
+      ctx.restore();
+    } else {
+      // Fallback gradient if image not loaded
+      const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+      bgGradient.addColorStop(0, '#1a0b2e');
+      bgGradient.addColorStop(0.5, '#16213e');
+      bgGradient.addColorStop(1, '#0f0920');
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, width, height);
+    }
 
     const centerX = width / 2 + panOffset.x;
     const centerY = height / 2 + panOffset.y;
