@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +14,7 @@ export default function StarDetail() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
+    console.log('Star ID from URL:', id);
     setStarId(id);
   }, []);
 
@@ -27,11 +27,19 @@ export default function StarDetail() {
 
   const { data: stars, isLoading } = useQuery({
     queryKey: ['stars'],
-    queryFn: () => base44.entities.Star.list(),
+    queryFn: async () => {
+      const data = await base44.entities.Star.list();
+      console.log('All stars loaded:', data);
+      return data;
+    },
     initialData: [],
   });
 
-  const star = starId ? stars.find(s => s.id === starId) : null;
+  // Find star by matching the ID
+  const star = stars.find(s => s.id === starId);
+  
+  console.log('Looking for star with ID:', starId);
+  console.log('Found star:', star);
 
   if (isLoading) {
     return (
@@ -44,18 +52,20 @@ export default function StarDetail() {
     );
   }
 
-  if (!starId || !star) {
+  if (!star) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <Star className="w-16 h-16 text-white/30 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">Star not found</h3>
-            <p className="text-white/60 mb-4">The star you're looking for doesn't exist or hasn't been loaded yet.</p>
+            <p className="text-white/60 mb-4">
+              {starId ? `No star found with ID: ${starId}` : 'No star ID provided in the URL'}
+            </p>
             <Button
               onClick={() => navigate(createPageUrl("Stars"))}
               variant="outline"
-              className="mt-4 border-white/20 text-white"
+              className="mt-4 border-white/20 text-white hover:bg-white/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Star Guide

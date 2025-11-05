@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,56 +24,55 @@ const moonPhases = [
     name: "Hilo", 
     meaning: "New Moon", 
     description: "Time for new beginnings and planning.",
-    emoji: "🌑"
+    image: "https://www.svgrepo.com/show/9666/new-moon.svg"
   },
   { 
     day: "4-7", 
     name: "Hoaka", 
     meaning: "Crescent", 
     description: "Time to plant and start projects.",
-    emoji: "🌒"
+    image: "https://www.svgrepo.com/show/9667/waxing-crescent-moon.svg"
   },
   { 
     day: "8-11", 
     name: "Māhealani", 
     meaning: "Full Moon Near", 
     description: "Preparation and growth.",
-    emoji: "🌓"
+    image: "https://www.svgrepo.com/show/9669/first-quarter-moon.svg"
   },
   { 
     day: "12-15", 
     name: "Poepoe", 
     meaning: "Round", 
     description: "Full moon - time for gathering and celebration.",
-    emoji: "🌕"
+    image: "https://www.svgrepo.com/show/9671/full-moon.svg"
   },
   { 
     day: "16-19", 
     name: "Olekūkahi", 
     meaning: "Waning", 
     description: "Time to harvest and complete projects.",
-    emoji: "🌖"
+    image: "https://www.svgrepo.com/show/9672/waning-gibbous-moon.svg"
   },
   { 
     day: "20-24", 
     name: "Kaloa", 
     meaning: "Long", 
     description: "Rest and reflection period.",
-    emoji: "🌗"
+    image: "https://www.svgrepo.com/show/9673/last-quarter-moon.svg"
   },
   { 
     day: "25-30", 
     name: "Muku", 
     meaning: "Cut Off", 
     description: "Dark moon - time for rest and introspection.",
-    emoji: "🌘"
+    image: "https://www.svgrepo.com/show/9674/waning-crescent-moon.svg"
   },
 ];
 
 export default function Moon() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter lunar months and phases based on search
   const filteredMonths = lunarMonths.filter(month => {
     const query = searchQuery.toLowerCase();
     return (
@@ -90,8 +88,7 @@ export default function Moon() {
       phase.name.toLowerCase().includes(query) ||
       phase.meaning.toLowerCase().includes(query) ||
       phase.description.toLowerCase().includes(query) ||
-      phase.emoji.toLowerCase().includes(query) || // Include emoji in search
-      phase.day.toLowerCase().includes(query) // Include day in search
+      phase.day.toLowerCase().includes(query)
     );
   });
 
@@ -178,8 +175,12 @@ export default function Moon() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center text-3xl">
-                        {phase.emoji}
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center p-3">
+                        <img 
+                          src={phase.image} 
+                          alt={phase.name}
+                          className="w-full h-full object-contain filter invert"
+                        />
                       </div>
                     </div>
                     <div className="flex-1">

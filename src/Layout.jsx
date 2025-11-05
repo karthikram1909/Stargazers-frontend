@@ -42,13 +42,12 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Image */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url("${backgroundImage}")`,
-          zIndex: 0,
-        }}
+      {/* Background Image - Using img tag for better compatibility */}
+      <img 
+        src={backgroundImage}
+        alt="Background"
+        className="fixed inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0 }}
       />
       
       {/* Lighter overlay for better text readability */}
