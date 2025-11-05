@@ -137,11 +137,11 @@ export default function Layout({ children }) {
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c48fece3e_KILOHAKU2.png" 
                   alt="Stargazers Anonymous" 
-                  className="w-11 h-11 rounded-full object-cover border-2 border-[#60A5FA]"
+                  className="w-14 h-14 rounded-full object-cover border-2 border-[#60A5FA]"
                 />
                 <div>
-                  <h1 className="text-xl font-bold text-white">Stargazers Anonymous Kilo Hōkū</h1>
-                  <p className="text-xs text-white/60">Hawaiian Astronomy</p>
+                  <h1 className="text-xl font-bold text-white">Stargazers Anonymous</h1>
+                  <p className="text-sm text-white/80">Kilo Hōkū • Hawaiian Astronomy</p>
                 </div>
               </div>
               <Button
