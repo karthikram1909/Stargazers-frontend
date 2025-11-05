@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -25,7 +26,7 @@ export default function Layout({ children }) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a36debc57_planet-4534835_1920.jpg";
     }
     if (path.includes("Constellations")) {
-      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c76bb2f74_starguide.jpg";
+      return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a96cb709d_constellations.jpg";
     }
     if (path.includes("Moon")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/3c702c4ef_river-7294102_1920.jpg";
