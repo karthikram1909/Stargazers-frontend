@@ -257,8 +257,7 @@ export default function SkyMap() {
               <div className="text-center mt-4">
                 <Button
                   onClick={() => setRotationAngle(0)}
-                  variant="outline"
-                  className="border-[#60a5fa]/30 text-white hover:bg-[#60a5fa]/20"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg font-semibold"
                 >
                   <RotateCw className="w-4 h-4 mr-2" />
                   Reset Position
