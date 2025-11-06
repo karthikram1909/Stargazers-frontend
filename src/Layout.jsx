@@ -176,7 +176,7 @@ export default function Layout({ children }) {
         }}
       />
       
-      {/* Overlay */}
+      {/* Overlay - Lightened so couple is visible */}
       <div 
         style={{
           position: 'fixed',
@@ -184,7 +184,7 @@ export default function Layout({ children }) {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.5), rgba(0,0,0,0.65))',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.25), rgba(0,0,0,0.35))',
           zIndex: 1
         }}
       />
