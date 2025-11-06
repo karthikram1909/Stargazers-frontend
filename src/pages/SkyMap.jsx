@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, RotateCw } from "lucide-react";
@@ -7,10 +8,14 @@ export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartAngle, setDragStartAngle] = useState(0);
+  const planisphereRef = useRef(null);
 
   const handleMouseDown = (e) => {
+    // Ensure the ref is attached to the DOM element
+    if (!planisphereRef.current) return;
+
     setIsDragging(true);
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
@@ -18,8 +23,10 @@ export default function SkyMap() {
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    const rect = e.currentTarget.getBoundingClientRect();
+    // Ensure the ref is attached to the DOM element
+    if (!isDragging || !planisphereRef.current) return;
+
+    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
@@ -31,10 +38,12 @@ export default function SkyMap() {
   };
 
   const handleTouchStart = (e) => {
-    if (e.touches.length !== 1) return;
+    // Ensure the ref is attached to the DOM element and only one touch
+    if (e.touches.length !== 1 || !planisphereRef.current) return;
+
     const touch = e.touches[0];
     setIsDragging(true);
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
@@ -42,10 +51,12 @@ export default function SkyMap() {
   };
 
   const handleTouchMove = (e) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    e.preventDefault();
+    // Ensure the ref is attached to the DOM element, dragging, and only one touch
+    if (!isDragging || e.touches.length !== 1 || !planisphereRef.current) return;
+
+    e.preventDefault(); // Prevent scrolling
     const touch = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
@@ -58,11 +69,13 @@ export default function SkyMap() {
 
   React.useEffect(() => {
     if (isDragging) {
+      // Add event listeners to the document for global tracking
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
       document.addEventListener('touchend', handleTouchEnd);
       
+      // Cleanup function to remove event listeners
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -70,12 +83,12 @@ export default function SkyMap() {
         document.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [isDragging, dragStartAngle, rotationAngle]);
+  }, [isDragging, dragStartAngle, rotationAngle]); // Dependencies for useEffect
 
   // Calculate current date and time based on rotation
-  const normalizedAngle = ((rotationAngle % 360) + 360) % 360;
-  const monthIndex = Math.floor((normalizedAngle / 30) % 12);
-  const hour = Math.floor((normalizedAngle / 15) % 24);
+  const normalizedAngle = ((rotationAngle % 360) + 360) % 360; // Normalize angle to 0-359.99
+  const monthIndex = Math.floor((normalizedAngle / 30) % 12); // Each month approx 30 degrees
+  const hour = Math.floor((normalizedAngle / 15) % 24); // Each hour approx 15 degrees
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   return (
@@ -112,6 +125,7 @@ export default function SkyMap() {
 
               {/* Planisphere Container */}
               <div 
+                ref={planisphereRef} // Attach the ref here
                 className="relative w-full aspect-square max-w-2xl mx-auto cursor-grab active:cursor-grabbing"
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
@@ -184,7 +198,8 @@ export default function SkyMap() {
                     {/* Outer date ring */}
                     <circle cx="200" cy="200" r="195" fill="none" stroke="white" strokeWidth="2"/>
                     {months.map((month, i) => {
-                      const angle = (i * 30 - 90) * (Math.PI / 180);
+                      // Calculate position for month labels
+                      const angle = (i * 30 - 90) * (Math.PI / 180); // -90 to start at 12 o'clock (Jan)
                       const x = 200 + 185 * Math.cos(angle);
                       const y = 200 + 185 * Math.sin(angle);
                       return (
@@ -197,7 +212,7 @@ export default function SkyMap() {
                           fill="white" 
                           fontSize="12"
                           fontWeight="bold"
-                          transform={`rotate(${i * 30}, ${x}, ${y})`}
+                          transform={`rotate(${i * 30}, ${x}, ${y})`} // Rotate text for better readability
                         >
                           {month}
                         </text>
@@ -207,10 +222,11 @@ export default function SkyMap() {
                     {/* Inner time ring */}
                     <circle cx="200" cy="200" r="175" fill="none" stroke="white" strokeWidth="1" opacity="0.6"/>
                     {Array.from({length: 24}, (_, i) => {
-                      const angle = (i * 15 - 90) * (Math.PI / 180);
+                      // Calculate position for hour labels
+                      const angle = (i * 15 - 90) * (Math.PI / 180); // -90 to start at 12 o'clock (0 hour)
                       const x = 200 + 170 * Math.cos(angle);
                       const y = 200 + 170 * Math.sin(angle);
-                      return i % 2 === 0 ? (
+                      return i % 2 === 0 ? ( // Only show even hours for less clutter
                         <text 
                           key={i} 
                           x={x} 
