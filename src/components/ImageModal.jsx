@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ImageModal({ open, onOpenChange, imageUrl, title }) {
+  if (!imageUrl && !open) return null;
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-white/20">
@@ -19,12 +21,14 @@ export default function ImageModal({ open, onOpenChange, imageUrl, title }) {
               <h3 className="text-white font-semibold">{title}</h3>
             </div>
           )}
-          <img
-            src={imageUrl}
-            alt={title || "Full size image"}
-            className="max-w-full max-h-[90vh] object-contain rounded-lg"
-            onClick={() => onOpenChange(false)}
-          />
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={title || "Full size image"}
+              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              onClick={() => onOpenChange(false)}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>
