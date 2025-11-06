@@ -5,23 +5,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react"; // Added ZoomIn icon
+import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react";
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
-import ImageModal from "../components/ImageModal"; // Added ImageModal import
+import ImageModal from "../components/ImageModal";
 
 export default function Constellations() {
   const queryClient = useQueryClient();
   const [selectedConstellation, setSelectedConstellation] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [imageModalOpen, setImageModalOpen] = useState(false); // New state for image modal
-  const [selectedImage, setSelectedImage] = useState({ url: "", title: "" }); // New state for selected image
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
     queryFn: async () => {
       const data = await base44.entities.Constellation.list();
-      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+      // Flatten the data structure
+      const flattened = data.map(item => ({
+        id: item.id,
+        ...item.data
+      }));
+      return flattened.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
     },
     initialData: [],
   });
@@ -193,11 +198,9 @@ export default function Constellations() {
                         alt={constellation.hawaiian_name}
                         className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
                       />
-                      {/* Always visible zoom badge */}
                       <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm rounded-full p-2 border border-white/30">
                         <ZoomIn className="w-4 h-4 text-white" />
                       </div>
-                      {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
                         <div className="text-center">
                           <ZoomIn className="w-8 h-8 text-white mx-auto mb-1" />
