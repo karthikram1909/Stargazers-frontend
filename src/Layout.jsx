@@ -76,10 +76,10 @@ export default function Layout({ children }) {
 
   const getFontSizeLabel = () => {
     switch(fontSize) {
-      case 'normal': return 'A';
-      case 'large': return 'A+';
-      case 'xlarge': return 'A++';
-      default: return 'A';
+      case 'normal': return 'Normal';
+      case 'large': return 'Large';
+      case 'xlarge': return 'X-Large';
+      default: return 'Normal';
     }
   };
 
@@ -239,12 +239,11 @@ export default function Layout({ children }) {
               </div>
               <Button
                 onClick={handleFontSizeChange}
-                variant="ghost"
-                className="text-white/70 hover:text-white hover:bg-white/10 flex items-center gap-2 px-3"
+                className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white hover:opacity-90 px-4 py-2"
                 title="Change text size"
               >
-                <span className="text-lg font-bold">{getFontSizeLabel()}</span>
-                <span className="text-xs hidden sm:inline">Text Size</span>
+                <Type className="w-4 h-4 mr-2" />
+                <span className="font-semibold">Type Size: {getFontSizeLabel()}</span>
               </Button>
             </div>
             
