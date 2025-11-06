@@ -43,13 +43,16 @@ export default function Layout({ children }) {
   // Close search when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // Ensure the clicked element is not inside the search container or the search button itself
-      if (searchOpen && !e.target.closest('.search-container')) {
+      const searchContainer = document.querySelector('.search-container');
+      if (searchOpen && searchContainer && !searchContainer.contains(e.target)) {
         setSearchOpen(false);
-        // Removed setSearchQuery(""); as per outline - it will clear on ESC, but not on outside click
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    
+    if (searchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [searchOpen]);
 
@@ -61,7 +64,11 @@ export default function Layout({ children }) {
         setSearchQuery("");
       }
     };
-    document.addEventListener('keydown', handleEsc);
+    
+    if (searchOpen) {
+      document.addEventListener('keydown', handleEsc);
+    }
+    
     return () => document.removeEventListener('keydown', handleEsc);
   }, [searchOpen]);
 
@@ -85,8 +92,9 @@ export default function Layout({ children }) {
 
   // Search filtering
   const filteredStars = stars.filter(star => {
+    if (!searchQuery || searchQuery.length === 0) return false;
     const query = searchQuery.toLowerCase();
-    return searchQuery.length > 0 && (
+    return (
       star.hawaiian_name?.toLowerCase().includes(query) ||
       star.english_name?.toLowerCase().includes(query) ||
       star.meaning?.toLowerCase().includes(query) ||
@@ -95,8 +103,9 @@ export default function Layout({ children }) {
   }).slice(0, 5);
 
   const filteredPlanets = planets.filter(planet => {
+    if (!searchQuery || searchQuery.length === 0) return false;
     const query = searchQuery.toLowerCase();
-    return searchQuery.length > 0 && (
+    return (
       planet.hawaiian_name?.toLowerCase().includes(query) ||
       planet.english_name?.toLowerCase().includes(query) ||
       planet.meaning?.toLowerCase().includes(query)
@@ -104,8 +113,9 @@ export default function Layout({ children }) {
   }).slice(0, 5);
 
   const filteredConstellations = constellations.filter(constellation => {
+    if (!searchQuery || searchQuery.length === 0) return false;
     const query = searchQuery.toLowerCase();
-    return searchQuery.length > 0 && (
+    return (
       constellation.hawaiian_name?.toLowerCase().includes(query) ||
       constellation.english_name?.toLowerCase().includes(query) ||
       constellation.meaning?.toLowerCase().includes(query)
@@ -250,7 +260,10 @@ export default function Layout({ children }) {
               {/* Search Button with Dropdown */}
               <div className="relative search-container">
                 <button
-                  onClick={() => setSearchOpen(!searchOpen)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSearchOpen(!searchOpen);
+                  }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
                 >
                   <Search className="w-3.5 h-3.5" />
@@ -260,8 +273,9 @@ export default function Layout({ children }) {
                 {/* Search Dropdown */}
                 {searchOpen && (
                   <div 
-                    className="absolute top-full left-0 mt-2 w-[90vw] max-w-2xl bg-black/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden"
+                    className="fixed left-4 right-4 top-32 sm:absolute sm:left-0 sm:right-auto sm:top-full mt-2 w-auto sm:w-[90vw] sm:max-w-2xl bg-black/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden"
                     style={{ zIndex: 9999 }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div className="p-4 border-b border-white/10">
                       <div className="relative">
@@ -296,7 +310,7 @@ export default function Layout({ children }) {
                         </div>
                       ) : !hasResults ? (
                         <div className="p-8 text-center">
-                          <p className="text-white/60">No results found</p>
+                          <p className="text-white/60">No results found for "{searchQuery}"</p>
                         </div>
                       ) : (
                         <div className="p-4 space-y-6">
@@ -326,21 +340,6 @@ export default function Layout({ children }) {
                                   </button>
                                 ))}
                               </div>
-                              {/* Check total results to show "View all" */}
-                              {stars.filter(s => {
-                                const q = searchQuery.toLowerCase();
-                                return (s.hawaiian_name?.toLowerCase().includes(q) || s.english_name?.toLowerCase().includes(q) || s.meaning?.toLowerCase().includes(q) || s.constellation?.toLowerCase().includes(q));
-                              }).length > 5 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleNavigateToPage("Stars");
-                                  }}
-                                  className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
-                                >
-                                  View all stars →
-                                </button>
-                              )}
                             </div>
                           )}
 
@@ -370,21 +369,6 @@ export default function Layout({ children }) {
                                   </button>
                                 ))}
                               </div>
-                              {/* Check total results to show "View all" */}
-                              {planets.filter(p => {
-                                const q = searchQuery.toLowerCase();
-                                return (p.hawaiian_name?.toLowerCase().includes(q) || p.english_name?.toLowerCase().includes(q) || p.meaning?.toLowerCase().includes(q));
-                              }).length > 5 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleNavigateToPage("Planets");
-                                  }}
-                                  className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
-                                >
-                                  View all planets →
-                                </button>
-                              )}
                             </div>
                           )}
 
@@ -414,21 +398,6 @@ export default function Layout({ children }) {
                                   </button>
                                 ))}
                               </div>
-                              {/* Check total results to show "View all" */}
-                              {constellations.filter(c => {
-                                const q = searchQuery.toLowerCase();
-                                return (c.hawaiian_name?.toLowerCase().includes(q) || c.english_name?.toLowerCase().includes(q) || c.meaning?.toLowerCase().includes(q));
-                              }).length > 5 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleNavigateToPage("Constellations");
-                                  }}
-                                  className="w-full text-center py-2 text-[#60A5FA] hover:text-white text-sm mt-2"
-                                >
-                                  View all constellations →
-                                </button>
-                              )}
                             </div>
                           )}
                         </div>
