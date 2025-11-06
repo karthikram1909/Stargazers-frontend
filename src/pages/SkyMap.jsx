@@ -9,7 +9,7 @@ export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartAngle, setDragStartAngle] = useState(0);
-  const [starChartImage, setStarChartImage] = useState("https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a96cb709d_constellations.jpg");
+  const [starChartImage, setStarChartImage] = useState("https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/b0b1ed8a5_Screenshot2025-11-06at123426PM.png");
   const [uploading, setUploading] = useState(false);
   const planisphereRef = useRef(null);
 
