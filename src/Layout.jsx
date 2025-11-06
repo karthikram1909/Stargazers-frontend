@@ -243,7 +243,7 @@ export default function Layout({ children }) {
                 title="Change text size"
               >
                 <Type className="w-4 h-4 mr-2" />
-                <span className="font-semibold">Type Size: {getFontSizeLabel()}</span>
+                <span className="font-semibold">Size: {getFontSizeLabel()}</span>
               </Button>
             </div>
             
