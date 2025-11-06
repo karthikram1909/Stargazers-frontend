@@ -63,76 +63,181 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate COMPREHENSIVE and ACCURATE astronomical data for a Hawaiian sky planisphere.
+        prompt: `You are an astronomical data generator. Generate precise sky data for Hawaiian planisphere.
 
-CRITICAL REQUIREMENTS:
-Location: ${location.name} (${location.lat}°N, ${location.lon}°W)
-Date: ${dateStr}
-Time: ${selectedTime} local Hawaii time
+LOCATION: Mauna Kea, Hawaii (19.82°N, 155.47°W)
+DATE: ${dateStr}
+TIME: ${selectedTime} local Hawaii time
 
-YOU MUST GENERATE AT LEAST 50+ STARS AND ALL VISIBLE PLANETS.
+CRITICAL INSTRUCTIONS:
+1. You MUST include AT LEAST 60 stars
+2. You MUST include constellation line connections
+3. Use ONLY stars that are included in your stars array for constellation connections
+4. All stars must have altitude >= 20° (visible above horizon)
 
-STAR DATA REQUIREMENTS (magnitude <= 10.0, altitude >= 20°):
-- Generate AT LEAST 50 stars that meet the criteria
-- Include ALL bright stars (mag < 3) visible from this location
-- Include medium brightness stars (mag 3-6)
-- Include dimmer stars up to magnitude 10
-- For each star provide:
-  * Accurate English name (e.g., "Sirius", "Vega", "Betelgeuse")
-  * Hawaiian name if known, otherwise use English name
-  * PRECISE azimuth (0-360°) based on star's actual position
-  * PRECISE altitude (20-90°) based on actual celestial mechanics
-  * Accurate visual magnitude
-  * Correct constellation name
-  * Right ascension (hours)
-  * Declination (degrees)
+REQUIRED STARS TO INCLUDE (calculate accurate positions for date/time):
+These are the BRIGHTEST stars typically visible from Hawaii - you MUST include all of these:
 
-Known Hawaiian star names to use when applicable:
-- Hōkūleʻa (Arcturus)
-- Hōkūpaʻa (Polaris) 
-- Hinaiaeleele (Castor)
-- ʻAʻā (Sirius)
-- Kauluakoko (Vega)
-- For other stars, use their English names
+MAGNITUDE -1 to 0 (Extremely Bright):
+- Sirius (Canis Major) - Hawaiian: ʻAʻā
+- Arcturus (Boötes) - Hawaiian: Hōkūleʻa  
+- Vega (Lyra) - Hawaiian: Kauluakoko
+- Capella (Auriga)
+- Rigel (Orion)
+- Betelgeuse (Orion)
+- Altair (Aquila)
+- Aldebaran (Taurus)
+- Antares (Scorpius)
+- Spica (Virgo)
+- Pollux (Gemini)
+- Fomalhaut (Piscis Austrinus)
+- Deneb (Cygnus)
+- Regulus (Leo)
 
-PLANET DATA (all planets actually visible tonight):
-Calculate which planets are ACTUALLY above 20° altitude at this time.
-Use these Hawaiian names:
+MAGNITUDE 1-2 (Very Bright):
+- Castor (Gemini) - Hawaiian: Hinaiaeleele
+- Bellatrix (Orion)
+- Elnath (Taurus)
+- Alnilam (Orion)
+- Alnitak (Orion)
+- Saiph (Orion)
+- Mintaka (Orion)
+- Rigel Kentaurus (Centaurus)
+- Hadar (Centaurus)
+- Acrux (Crux)
+- Mimosa (Crux)
+- Shaula (Scorpius)
+- Sargas (Scorpius)
+- Kaus Australis (Sagittarius)
+- Nunki (Sagittarius)
+- Peacock (Pavo)
+- Alphard (Hydra)
+- Rasalhague (Ophiuchus)
+- Alkaid (Ursa Major)
+- Mizar (Ursa Major)
+- Alioth (Ursa Major)
+- Dubhe (Ursa Major)
+- Merak (Ursa Major)
+- Phecda (Ursa Major)
+- Megrez (Ursa Major)
+
+MAGNITUDE 2-3 (Bright):
+- Kochab (Ursa Minor)
+- Polaris (Ursa Minor) - Hawaiian: Hōkūpaʻa
+- Alpheratz (Andromeda)
+- Mirach (Andromeda)
+- Almach (Andromeda)
+- Hamal (Aries)
+- Algol (Perseus)
+- Mirfak (Perseus)
+- Alcyone (Pleiades/Taurus)
+- Atlas (Pleiades/Taurus)
+- Alhena (Gemini)
+- Canopus (Carina)
+- Gacrux (Crux)
+- Adhara (Canis Major)
+- Wezen (Canis Major)
+- Mirzam (Canis Major)
+- Procyon (Canis Minor)
+- Suhail (Vela)
+- Avior (Carina)
+- Menkalinan (Auriga)
+- Schedar (Cassiopeia)
+- Caph (Cassiopeia)
+- Ruchbah (Cassiopeia)
+- Segin (Cassiopeia)
+- Achird (Cassiopeia)
+
+PLANET DATA:
+Calculate which planets are visible tonight. Use Hawaiian names:
 - Mercury: ʻUkulele
-- Venus: Hōkūloa  
+- Venus: Hōkūloa
 - Mars: Hōkūʻula
 - Jupiter: Kaʻāwela
 - Saturn: Makulu
 - Uranus: Heleʻekala
 - Neptune: Naholoholo
 
-For each visible planet include:
-- Accurate azimuth and altitude
-- Visual magnitude
-- Distance in AU
+CONSTELLATION LINE CONNECTIONS - CRITICAL REQUIREMENTS:
+You MUST include these major constellations with ACCURATE connections.
+ONLY connect stars that YOU HAVE INCLUDED in your stars array above.
+Each connection is a pair [Star1, Star2] connecting two stars.
 
-CONSTELLATION LINES (CRITICAL - MUST INCLUDE):
-You MUST generate constellation line connections for major constellations.
-For EACH major constellation visible (Orion, Ursa Major, Cassiopeia, etc.):
-1. List the specific ENGLISH star names that form the constellation
-2. Create star_connections array with pairs of stars to connect
-3. ONLY connect stars that are BOTH in your stars array
-4. Example format:
-   {
-     "name": "Orion",
-     "hawaiian_name": "Ka Heihei o nā Keiki",
-     "star_connections": [
-       ["Betelgeuse", "Bellatrix"],
-       ["Bellatrix", "Alnitak"],
-       ["Alnitak", "Alnilam"],
-       ["Alnilam", "Mintaka"],
-       ["Rigel", "Saiph"]
-     ]
-   }
+1. ORION (Ka Heihei o nā Keiki):
+   Connections: [["Betelgeuse","Bellatrix"],["Bellatrix","Mintaka"],["Mintaka","Alnilam"],["Alnilam","Alnitak"],["Alnitak","Saiph"],["Saiph","Rigel"],["Rigel","Betelgeuse"],["Bellatrix","Alnitak"],["Mintaka","Betelgeuse"]]
 
-INCLUDE AT LEAST 10 MAJOR CONSTELLATIONS with complete line connections.
+2. URSA MAJOR (The Big Dipper):
+   Connections: [["Dubhe","Merak"],["Merak","Phecda"],["Phecda","Megrez"],["Megrez","Alioth"],["Alioth","Mizar"],["Mizar","Alkaid"],["Megrez","Dubhe"]]
 
-Generate realistic, scientifically accurate astronomical data:`,
+3. CASSIOPEIA:
+   Connections: [["Schedar","Caph"],["Caph","Ruchbah"],["Ruchbah","Segin"],["Segin","Achird"]]
+
+4. SCORPIUS (Ka Makau Nui o Māui):
+   Connections: [["Antares","Shaula"],["Antares","Sargas"],["Shaula","Sargas"]]
+
+5. LEO:
+   Connections: [["Regulus","Algieba"],["Regulus","Denebola"]]
+
+6. GEMINI:
+   Connections: [["Castor","Pollux"],["Castor","Alhena"],["Pollux","Alhena"]]
+
+7. TAURUS (Ka Makau Nui):
+   Connections: [["Aldebaran","Elnath"],["Aldebaran","Alcyone"]]
+
+8. PERSEUS:
+   Connections: [["Mirfak","Algol"]]
+
+9. ANDROMEDA:
+   Connections: [["Alpheratz","Mirach"],["Mirach","Almach"]]
+
+10. CRUX (Southern Cross):
+    Connections: [["Acrux","Gacrux"],["Mimosa","Gacrux"],["Acrux","Mimosa"]]
+
+OUTPUT FORMAT:
+Return valid JSON with exactly this structure. NO extra text, NO markdown, PURE JSON ONLY:
+
+{
+  "date": "${dateStr}",
+  "time": "${selectedTime}",
+  "location": "Mauna Kea, Hawaii",
+  "observer_latitude": 19.82,
+  "observer_longitude": -155.47,
+  "local_sidereal_time": [calculate actual LST],
+  "stars": [
+    {
+      "name": "Sirius",
+      "hawaiian_name": "ʻAʻā",
+      "azimuth": [0-360 degrees - accurate for date/time/location],
+      "altitude": [20-90 degrees - accurate for date/time/location],
+      "magnitude": -1.46,
+      "constellation": "Canis Major",
+      "right_ascension": [hours],
+      "declination": [degrees]
+    },
+    ... [59+ more stars]
+  ],
+  "planets": [
+    ... planets actually visible tonight with accurate data
+  ],
+  "constellations": [
+    {
+      "name": "Orion",
+      "hawaiian_name": "Ka Heihei o nā Keiki",
+      "star_connections": [["Betelgeuse","Bellatrix"],["Bellatrix","Mintaka"],...]
+    },
+    ... [9+ more constellations]
+  ]
+}
+
+VALIDATION CHECKLIST before you return:
+✓ At least 60 stars in the stars array
+✓ Each star has altitude >= 20 degrees
+✓ At least 10 constellations with star_connections
+✓ Every star name in star_connections exists in the stars array
+✓ All azimuth values are 0-360
+✓ All altitude values are 20-90
+✓ Accurate Hawaiian names for bright stars
+✓ Valid JSON format`,
         response_json_schema: {
           type: "object",
           properties: {
