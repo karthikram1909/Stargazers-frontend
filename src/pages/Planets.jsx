@@ -226,12 +226,12 @@ export default function Planets() {
                             <img 
                               src={planet.image_url} 
                               alt={planet.hawaiian_name}
-                              className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
+                              className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-2 border-white/20 shadow-lg"
                             />
                             <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm rounded-full p-2 border border-white/30">
                               <ZoomIn className="w-4 h-4 text-white" />
                             </div>
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
                               <div className="text-center">
                                 <ZoomIn className="w-8 h-8 text-white mx-auto mb-1" />
                                 <p className="text-white text-xs font-medium">Tap to enlarge</p>
@@ -345,12 +345,12 @@ export default function Planets() {
                             <img 
                               src={planet.image_url} 
                               alt={planet.hawaiian_name}
-                              className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
+                              className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-2 border-white/20 shadow-lg"
                             />
                             <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm rounded-full p-2 border border-white/30">
                               <ZoomIn className="w-4 h-4 text-white" />
                             </div>
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
                               <div className="text-center">
                                 <ZoomIn className="w-8 h-8 text-white mx-auto mb-1" />
                                 <p className="text-white text-xs font-medium">Tap to enlarge</p>
