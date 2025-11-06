@@ -1,24 +1,73 @@
 import React, { useState, useRef, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Info, RotateCw } from "lucide-react";
+import { Info, RotateCw, Loader2 } from "lucide-react";
 
 export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [starChartUrl, setStarChartUrl] = useState(null);
+  const [overlayUrl, setOverlayUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
   const overlayRef = useRef(null);
   const dragStartRef = useRef({ angle: 0, x: 0, y: 0 });
 
+  // Generate planisphere images on mount
+  useEffect(() => {
+    generatePlanisphereImages();
+  }, []);
+
+  const generatePlanisphereImages = async () => {
+    setLoading(true);
+    try {
+      // Generate base star chart for Hawaiian latitude (20°N)
+      const starChartPrompt = `Create a detailed circular star chart for Hawaiian latitude (20°N) showing:
+      - All visible stars and constellations from Hawaii
+      - The celestial equator
+      - Concentric circles every 10 degrees from horizon (0°) to zenith (90°)
+      - Cardinal directions marked (N, S, E, W)
+      - Hawaiian constellation patterns prominently displayed
+      - Dark blue/black background with white/yellow stars
+      - Professional astronomical chart style
+      - Circular format, suitable for a planisphere base map
+      - Stars sized by brightness/magnitude
+      - Clear, high contrast for visibility`;
+
+      const starChart = await base44.integrations.Core.GenerateImage({
+        prompt: starChartPrompt
+      });
+      setStarChartUrl(starChart.url);
+
+      // Generate rotating overlay with date/time markings
+      const overlayPrompt = `Create a circular planisphere overlay/transparency with:
+      - Outer ring with 12 months marked (JAN, FEB, MAR, etc.) evenly spaced
+      - Inner ring with 24-hour time markings (00:00 to 23:00) in 1-hour increments
+      - A large transparent "window" cut-out showing approximately 60% of the circle
+      - The window should be kidney-shaped or oval, showing the visible sky portion
+      - Window edges clearly defined with thin lines
+      - Semi-transparent gray/blue overlay outside the window
+      - Minimal design, clean lines
+      - Professional astronomical instrument style
+      - White text on dark semi-transparent background
+      - Circular format matching the star chart`;
+
+      const overlay = await base44.integrations.Core.GenerateImage({
+        prompt: overlayPrompt
+      });
+      setOverlayUrl(overlay.url);
+
+    } catch (error) {
+      console.error("Error generating planisphere:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Calculate which date/time is currently aligned based on rotation
   const getCurrentDateTime = () => {
-    // Normalize angle to 0-360
     const normalizedAngle = ((rotationAngle % 360) + 360) % 360;
-    
-    // Simple calculation - each 15 degrees represents 1 hour
-    // 0° = midnight, 90° = 6am, 180° = noon, 270° = 6pm
     const hour = Math.floor((normalizedAngle / 15) % 24);
-    
-    // For demo purposes - in reality this would map to actual date positions
     const monthIndex = Math.floor((normalizedAngle / 30) % 12);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
@@ -126,269 +175,180 @@ export default function SkyMap() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-2">
-          Interactive Hawaiian Planisphere
+          Hawaiian Sky Planisphere
         </h1>
         <p className="text-white/70 text-lg mb-4">
-          Drag the wheel to see the night sky for different dates and times
+          Interactive star wheel showing Hawaiian constellations
         </p>
-        <div className="inline-block px-6 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
-          {dateTime.month} • {dateTime.time}
-        </div>
+        {!loading && starChartUrl && (
+          <div className="inline-block px-6 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
+            {dateTime.month} • {dateTime.time}
+          </div>
+        )}
       </div>
 
-      {/* Important Notice */}
-      <Card className="mb-8 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/30 backdrop-blur-sm">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-3">
-            <Info className="w-6 h-6 text-amber-400 mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="text-amber-200 font-bold text-lg mb-2">Image Assets Needed</h3>
-              <p className="text-white/90 mb-3">
-                To complete this planisphere, you need two images created for Hawaiian latitudes (~20°N):
-              </p>
-              <ol className="list-decimal list-inside space-y-2 text-white/90 ml-4">
-                <li>
-                  <strong>Base Sky Map:</strong> A circular star chart showing stars and constellations visible from 20° above the horizon to the zenith (90°). This should be a fixed image.
-                </li>
-                <li>
-                  <strong>Rotating Overlay:</strong> A circular disc with months around the outer edge and times marked, with a transparent "window" cut out to reveal the visible portion of the sky map.
-                </li>
-              </ol>
-              <p className="text-white/80 mt-3 text-sm">
-                These images can be created using astronomical software (like Stellarium) or by scanning/digitizing a physical planisphere for Hawaiian latitudes.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Planisphere */}
-        <div className="lg:col-span-2">
-          <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
-            <CardContent className="p-6">
-              {/* Instructions */}
-              <div className="mb-4 p-4 rounded-lg bg-[#60A5FA]/10 backdrop-blur-sm border border-[#a855f7]/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <RotateCw className="w-5 h-5 text-[#60a5fa]" />
-                  <p className="text-white font-semibold">How to Use</p>
-                </div>
-                <p className="text-white/80 text-sm">
-                  Click and drag the outer wheel (or use your finger on mobile) to rotate it. 
-                  As you rotate, the window reveals different parts of the sky map, showing what's 
-                  visible at that date and time - just like a paper planisphere!
+      {loading ? (
+        <Card className="mb-8 bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
+          <CardContent className="p-12 text-center">
+            <Loader2 className="w-16 h-16 text-[#60a5fa] mx-auto mb-4 animate-spin" />
+            <h3 className="text-white font-bold text-xl mb-2">
+              Generating Your Hawaiian Planisphere
+            </h3>
+            <p className="text-white/80 mb-4">
+              Creating custom star charts for Hawaiian latitudes...
+            </p>
+            <p className="text-white/60 text-sm">
+              This may take 10-20 seconds
+            </p>
+          </CardContent>
+        </Card>
+      ) : !starChartUrl || !overlayUrl ? (
+        <Card className="mb-8 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/30 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-3">
+              <Info className="w-6 h-6 text-amber-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-amber-200 font-bold text-lg mb-2">Failed to Generate Images</h3>
+                <p className="text-white/90 mb-3">
+                  There was an issue generating the planisphere images. Please try refreshing the page.
                 </p>
+                <Button
+                  onClick={generatePlanisphereImages}
+                  className="bg-amber-500 hover:bg-amber-600"
+                >
+                  Try Again
+                </Button>
               </div>
-
-              {/* Planisphere Container */}
-              <div className="relative w-full aspect-square max-w-2xl mx-auto">
-                {/* Base Sky Map Layer - PLACEHOLDER */}
-                <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40">
-                  <div className="w-full h-full bg-gradient-to-br from-[#0A1929] via-[#1a1f3a] to-[#0f1729] relative">
-                    {/* Placeholder stars pattern */}
-                    <div className="absolute inset-0 opacity-60">
-                      {[...Array(100)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="absolute bg-white rounded-full"
-                          style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            width: `${Math.random() * 3 + 1}px`,
-                            height: `${Math.random() * 3 + 1}px`,
-                            animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`,
-                            animationDelay: `${Math.random() * 2}s`
-                          }}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Placeholder constellation lines */}
-                    <svg className="absolute inset-0 w-full h-full opacity-40">
-                      <line x1="30%" y1="30%" x2="40%" y2="25%" stroke="#60a5fa" strokeWidth="2" />
-                      <line x1="40%" y1="25%" x2="45%" y2="35%" stroke="#60a5fa" strokeWidth="2" />
-                      <line x1="60%" y1="60%" x2="70%" y2="65%" stroke="#a855f7" strokeWidth="2" />
-                      <line x1="70%" y1="65%" x2="75%" y2="55%" stroke="#a855f7" strokeWidth="2" />
-                    </svg>
-
-                    {/* Center label */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <p className="text-[#e879f9] text-sm font-semibold">Luna Lani</p>
-                        <p className="text-white/60 text-xs">(Zenith)</p>
-                      </div>
-                    </div>
-
-                    {/* Instructions overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center bg-black/60 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20 max-w-xs">
-                        <Info className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                        <p className="text-white text-sm font-semibold mb-1">
-                          Replace with actual sky map
-                        </p>
-                        <p className="text-white/70 text-xs">
-                          Upload your Hawaiian planisphere base image here
-                        </p>
-                      </div>
-                    </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Planisphere */}
+          <div className="lg:col-span-2">
+            <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
+              <CardContent className="p-6">
+                {/* Instructions */}
+                <div className="mb-4 p-4 rounded-lg bg-[#60A5FA]/10 backdrop-blur-sm border border-[#a855f7]/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <RotateCw className="w-5 h-5 text-[#60a5fa]" />
+                    <p className="text-white font-semibold">How to Use</p>
                   </div>
+                  <p className="text-white/80 text-sm">
+                    Drag the outer wheel to rotate it. The visible portion shows which stars and 
+                    Hawaiian constellations are visible at that date and time from Hawaii.
+                  </p>
                 </div>
 
-                {/* Rotating Overlay Layer - PLACEHOLDER */}
-                <div
-                  ref={overlayRef}
-                  className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none select-none"
-                  style={{
-                    transform: `rotate(${rotationAngle}deg)`,
-                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-                  }}
-                  onMouseDown={handleMouseDown}
-                  onTouchStart={handleTouchStart}
-                >
-                  {/* Outer ring with months */}
-                  <div className="absolute inset-0 rounded-full">
-                    <svg className="w-full h-full" viewBox="0 0 400 400">
-                      {/* Outer circle */}
-                      <circle
-                        cx="200"
-                        cy="200"
-                        r="195"
-                        fill="none"
-                        stroke="rgba(96, 165, 250, 0.6)"
-                        strokeWidth="3"
-                      />
-                      
-                      {/* Month markers */}
-                      {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'].map((month, i) => {
-                        const angle = (i * 30 - 90) * (Math.PI / 180);
-                        const x = 200 + Math.cos(angle) * 175;
-                        const y = 200 + Math.sin(angle) * 175;
-                        const textAngle = i * 30;
-                        
-                        return (
-                          <text
-                            key={month}
-                            x={x}
-                            y={y}
-                            fill="white"
-                            fontSize="12"
-                            fontWeight="bold"
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            transform={`rotate(${textAngle}, ${x}, ${y})`}
-                          >
-                            {month}
-                          </text>
-                        );
-                      })}
+                {/* Planisphere Container */}
+                <div className="relative w-full aspect-square max-w-2xl mx-auto">
+                  {/* Base Sky Map Layer */}
+                  <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40">
+                    <img 
+                      src={starChartUrl}
+                      alt="Hawaiian Star Chart"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                      {/* "Window" cutout - semi-transparent overlay with clear section */}
-                      <defs>
-                        <mask id="windowMask">
-                          <rect width="400" height="400" fill="white" />
-                          {/* Clear window area */}
-                          <path
-                            d="M 200 200 L 200 50 A 150 150 0 0 1 330 200 Z"
-                            fill="black"
-                          />
-                        </mask>
-                      </defs>
-                      
-                      {/* Semi-transparent overlay with mask */}
-                      <circle
-                        cx="200"
-                        cy="200"
-                        r="190"
-                        fill="rgba(30, 58, 95, 0.85)"
-                        mask="url(#windowMask)"
-                      />
-
-                      {/* Window border */}
-                      <path
-                        d="M 200 200 L 200 50 A 150 150 0 0 1 330 200 Z"
-                        fill="none"
-                        stroke="rgba(232, 121, 249, 0.8)"
-                        strokeWidth="2"
-                      />
-                    </svg>
-
+                  {/* Rotating Overlay Layer */}
+                  <div
+                    ref={overlayRef}
+                    className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none select-none"
+                    style={{
+                      transform: `rotate(${rotationAngle}deg)`,
+                      transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+                    }}
+                    onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
+                  >
+                    <img 
+                      src={overlayUrl}
+                      alt="Planisphere Overlay"
+                      className="w-full h-full object-cover rounded-full"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                    
                     {/* Rotation indicator */}
                     <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-[#e879f9] w-1 h-6 rounded-full" />
                   </div>
                 </div>
-              </div>
 
-              {/* Reset Button */}
-              <div className="text-center mt-4">
-                <Button
-                  onClick={() => setRotationAngle(0)}
-                  variant="outline"
-                  className="border-[#60a5fa]/30 text-white hover:bg-[#60a5fa]/20"
-                >
-                  <RotateCw className="w-4 h-4 mr-2" />
-                  Reset Position
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                {/* Reset Button */}
+                <div className="text-center mt-4">
+                  <Button
+                    onClick={() => setRotationAngle(0)}
+                    variant="outline"
+                    className="border-[#60a5fa]/30 text-white hover:bg-[#60a5fa]/20"
+                  >
+                    <RotateCw className="w-4 h-4 mr-2" />
+                    Reset Position
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Current View Info */}
+            <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-3">Currently Viewing</h3>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/50 text-xs">Month</p>
+                    <p className="text-white text-2xl font-bold">{dateTime.month}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/50 text-xs">Time</p>
+                    <p className="text-white text-2xl font-bold">{dateTime.time}</p>
+                  </div>
+                  <div className="pt-3 border-t border-white/10">
+                    <p className="text-white/50 text-xs mb-1">Rotation</p>
+                    <p className="text-white">{Math.round(rotationAngle)}°</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* How It Works */}
+            <Card className="bg-gradient-to-br from-[#a855f7]/20 to-[#ec4899]/20 border-[#a855f7]/30">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-3">How It Works</h3>
+                <div className="space-y-2 text-white/80 text-sm">
+                  <p>
+                    This digital planisphere shows the Hawaiian night sky at any date and time.
+                  </p>
+                  <p>
+                    The base map shows all visible stars and Hawaiian constellation patterns from 
+                    Hawaii's latitude (20°N).
+                  </p>
+                  <p>
+                    Rotate the outer wheel to align your desired date and time - the visible 
+                    portion reveals which stars are above the horizon.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Hawaiian Constellations */}
+            <Card className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/30">
+              <CardContent className="p-4">
+                <h3 className="text-emerald-200 font-bold mb-3">Hawaiian Constellations</h3>
+                <p className="text-white/90 text-sm mb-3">
+                  This planisphere features traditional Hawaiian star patterns used by ancient 
+                  navigators to cross the Pacific Ocean.
+                </p>
+                <p className="text-white/70 text-sm">
+                  Look for familiar patterns like Ka Heihei o nā Keiki (Orion) and other 
+                  constellations important to Hawaiian wayfinding.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Current View Info */}
-          <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <h3 className="text-white font-bold mb-3">Currently Viewing</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-white/50 text-xs">Month</p>
-                  <p className="text-white text-2xl font-bold">{dateTime.month}</p>
-                </div>
-                <div>
-                  <p className="text-white/50 text-xs">Time</p>
-                  <p className="text-white text-2xl font-bold">{dateTime.time}</p>
-                </div>
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-white/50 text-xs mb-1">Rotation</p>
-                  <p className="text-white">{Math.round(rotationAngle)}°</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* How It Works */}
-          <Card className="bg-gradient-to-br from-[#a855f7]/20 to-[#ec4899]/20 border-[#a855f7]/30">
-            <CardContent className="p-4">
-              <h3 className="text-white font-bold mb-3">How It Works</h3>
-              <div className="space-y-2 text-white/80 text-sm">
-                <p>
-                  This digital planisphere mimics the traditional paper star wheel used by navigators.
-                </p>
-                <p>
-                  The outer wheel shows dates and times. Rotate it to align with your desired viewing time, 
-                  and the window reveals which stars and constellations are visible in the Hawaiian sky.
-                </p>
-                <p className="text-[#60a5fa] italic pt-2">
-                  Once you provide the actual planisphere images, this will show real star positions!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Next Steps */}
-          <Card className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/30">
-            <CardContent className="p-4">
-              <h3 className="text-emerald-200 font-bold mb-3">Next Steps</h3>
-              <ol className="list-decimal list-inside space-y-2 text-white/90 text-sm">
-                <li>Create or obtain a planisphere for 20°N latitude</li>
-                <li>Separate it into base map and rotating overlay images</li>
-                <li>Upload the images to replace the placeholders</li>
-                <li>Fine-tune the date/time calculations</li>
-              </ol>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
