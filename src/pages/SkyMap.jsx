@@ -1,858 +1,390 @@
-
-import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight, Info, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { Info, RotateCw } from "lucide-react";
 
 export default function SkyMap() {
-  const canvasRef = useRef(null);
-  const backgroundImageRef = useRef(null);
-  const [skyData, setSkyData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedObject, setSelectedObject] = useState(null);
-  const [hoveredObject, setHoveredObject] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState("21:00");
-  const [location, setLocation] = useState({ lat: 19.82, lon: -155.47, name: "Mauna Kea, Hawaii" });
-  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
-  const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [], panStart: null });
-  const isPanningRef = useRef(false);
+  const [rotationAngle, setRotationAngle] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const overlayRef = useRef(null);
+  const dragStartRef = useRef({ angle: 0, x: 0, y: 0 });
 
-  const { data: stars } = useQuery({
-    queryKey: ['stars'],
-    queryFn: () => base44.entities.Star.list(),
-    initialData: [],
-  });
-
-  useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/924e825bf_star-card-3591581_640.jpg";
-    img.onload = () => {
-      backgroundImageRef.current = img;
-      setBackgroundLoaded(true);
+  // Calculate which date/time is currently aligned based on rotation
+  const getCurrentDateTime = () => {
+    // Normalize angle to 0-360
+    const normalizedAngle = ((rotationAngle % 360) + 360) % 360;
+    
+    // Simple calculation - each 15 degrees represents 1 hour
+    // 0° = midnight, 90° = 6am, 180° = noon, 270° = 6pm
+    const hour = Math.floor((normalizedAngle / 15) % 24);
+    
+    // For demo purposes - in reality this would map to actual date positions
+    const monthIndex = Math.floor((normalizedAngle / 30) % 12);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    return {
+      month: months[monthIndex],
+      time: `${hour.toString().padStart(2, '0')}:00`
     };
-  }, []);
-
-  useEffect(() => {
-    fetchSkyData();
-  }, [selectedDate, selectedTime, location]);
-
-  useEffect(() => {
-    if (skyData && canvasRef.current && backgroundLoaded) {
-      drawPlanisphere();
-    }
-  }, [skyData, hoveredObject, zoomLevel, panOffset, backgroundLoaded]);
-
-  const fetchSkyData = async () => {
-    setLoading(true);
-    try {
-      const dateStr = selectedDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: 'Pacific/Honolulu'
-      });
-
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate COMPREHENSIVE and ACCURATE astronomical data for a Hawaiian sky planisphere.
-
-CRITICAL REQUIREMENTS:
-Location: ${location.name} (${location.lat}°N, ${location.lon}°W)
-Date: ${dateStr}
-Time: ${selectedTime} local Hawaii time
-
-YOU MUST GENERATE AT LEAST 50+ STARS AND ALL VISIBLE PLANETS.
-
-STAR DATA REQUIREMENTS (magnitude <= 10.0, altitude >= 20°):
-- Generate AT LEAST 50 stars that meet the criteria
-- Include ALL bright stars (mag < 3) visible from this location
-- Include medium brightness stars (mag 3-6)
-- Include dimmer stars up to magnitude 10
-- For each star provide:
-  * Accurate English name (e.g., "Sirius", "Vega", "Betelgeuse")
-  * Hawaiian name if known, otherwise use English name
-  * PRECISE azimuth (0-360°) based on star's actual position
-  * PRECISE altitude (20-90°) based on actual celestial mechanics
-  * Accurate visual magnitude
-  * Correct constellation name
-  * Right ascension (hours)
-  * Declination (degrees)
-
-Known Hawaiian star names to use when applicable:
-- Hōkūleʻa (Arcturus)
-- Hōkūpaʻa (Polaris) 
-- Hinaiaeleele (Castor)
-- ʻAʻā (Sirius)
-- Kauluakoko (Vega)
-- For other stars, use their English names
-
-PLANET DATA (all planets actually visible tonight):
-Calculate which planets are ACTUALLY above 20° altitude at this time.
-Use these Hawaiian names:
-- Mercury: ʻUkulele
-- Venus: Hōkūloa  
-- Mars: Hōkūʻula
-- Jupiter: Kaʻāwela
-- Saturn: Makulu
-- Uranus: Heleʻekala
-- Neptune: Naholoholo
-
-For each visible planet include:
-- Accurate azimuth and altitude
-- Visual magnitude
-- Distance in AU
-
-CONSTELLATION LINES (CRITICAL - MUST INCLUDE):
-You MUST generate constellation line connections for major constellations.
-For EACH major constellation visible (Orion, Ursa Major, Cassiopeia, etc.):
-1. List the specific ENGLISH star names that form the constellation
-2. Create star_connections array with pairs of stars to connect
-3. ONLY connect stars that are BOTH in your stars array
-4. Example format:
-   {
-     "name": "Orion",
-     "hawaiian_name": "Ka Heihei o nā Keiki",
-     "star_connections": [
-       ["Betelgeuse", "Bellatrix"],
-       ["Bellatrix", "Alnitak"],
-       ["Alnitak", "Alnilam"],
-       ["Alnilam", "Mintaka"],
-       ["Rigel", "Saiph"]
-     ]
-   }
-
-INCLUDE AT LEAST 10 MAJOR CONSTELLATIONS with complete line connections.
-
-Generate realistic, scientifically accurate astronomical data:`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            date: { type: "string" },
-            time: { type: "string" },
-            location: { type: "string" },
-            observer_latitude: { type: "number" },
-            observer_longitude: { type: "number" },
-            local_sidereal_time: { type: "number" },
-            stars: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  hawaiian_name: { type: "string" },
-                  azimuth: { type: "number" },
-                  altitude: { type: "number" },
-                  magnitude: { type: "number" },
-                  constellation: { type: "string" },
-                  right_ascension: { type: "number" },
-                  declination: { type: "number" }
-                }
-              }
-            },
-            planets: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  hawaiian_name: { type: "string" },
-                  azimuth: { type: "number" },
-                  altitude: { type: "number" },
-                  magnitude: { type: "number" },
-                  distance_au: { type: "number" }
-                }
-              }
-            },
-            constellations: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  hawaiian_name: { type: "string" },
-                  star_connections: {
-                    type: "array",
-                    items: {
-                      type: "array",
-                      items: { type: "string" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
-      setSkyData(result);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching sky data:", error);
-      setLoading(false);
-    }
   };
 
-  const azAltToXY = (azimuth, altitude, canvasWidth, canvasHeight) => {
-    if (altitude < 20) return null;
+  const getAngleFromCenter = (clientX, clientY, centerX, centerY) => {
+    const dx = clientX - centerX;
+    const dy = clientY - centerY;
+    return Math.atan2(dy, dx) * (180 / Math.PI);
+  };
+
+  const handleStart = (clientX, clientY) => {
+    if (!overlayRef.current) return;
     
-    const centerX = canvasWidth / 2 + panOffset.x;
-    const centerY = canvasHeight / 2 + panOffset.y;
-    const maxRadius = (Math.min(canvasWidth, canvasHeight) / 2 - 80) * zoomLevel;
-
-    const r = maxRadius * (1 - (altitude - 20) / 70);
-    const theta = (azimuth - 90) * (Math.PI / 180);
-
-    const x = centerX + r * Math.cos(theta);
-    const y = centerY + r * Math.sin(theta);
-
-    return { x, y };
-  };
-
-  const drawPlanisphere = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-
-    // Draw background image if loaded
-    if (backgroundImageRef.current) {
-      ctx.save();
-      ctx.globalAlpha = 0.6; // Make it slightly transparent so overlays are visible
-      ctx.drawImage(backgroundImageRef.current, 0, 0, width, height);
-      ctx.restore();
-    } else {
-      // Fallback gradient if image not loaded
-      const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
-      bgGradient.addColorStop(0, '#1a0b2e');
-      bgGradient.addColorStop(0.5, '#16213e');
-      bgGradient.addColorStop(1, '#0f0920');
-      ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, width, height);
-    }
-
-    const centerX = width / 2 + panOffset.x;
-    const centerY = height / 2 + panOffset.y;
-    const maxRadius = (Math.min(width, height) / 2 - 80) * zoomLevel;
-
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, maxRadius, 0, 2 * Math.PI);
-    const borderGradient = ctx.createLinearGradient(centerX - maxRadius, centerY, centerX + maxRadius, centerY);
-    borderGradient.addColorStop(0, '#a855f7');
-    borderGradient.addColorStop(0.5, '#3b82f6');
-    borderGradient.addColorStop(1, '#ec4899');
-    ctx.strokeStyle = borderGradient;
-    ctx.lineWidth = 4;
-    ctx.stroke();
-
-    ctx.strokeStyle = 'rgba(139, 92, 246, 0.15)';
-    ctx.lineWidth = 1;
-    [30, 45, 60, 75].forEach((alt) => {
-      if (alt >= 20) {
-        const r = maxRadius * (1 - (alt - 20) / 70);
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-    });
-
-    ctx.fillStyle = '#e879f9';
-    ctx.font = 'bold 22px sans-serif';
-    ctx.textAlign = 'center';
+    const rect = overlayRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
     
-    const labelDistance = maxRadius + 50;
-    const directions = [
-      { text: 'ʻĀkau', angle: 0, label: 'North' },
-      { text: 'Hikina', angle: Math.PI / 2, label: 'East' },
-      { text: 'Hema', angle: Math.PI, label: 'South' },
-      { text: 'Komohana', angle: 3 * Math.PI / 2, label: 'West' }
-    ];
+    const angle = getAngleFromCenter(clientX, clientY, centerX, centerY);
     
-    directions.forEach(({ text, angle, label }) => {
-      const x = centerX + labelDistance * Math.cos(angle - Math.PI / 2);
-      const y = centerY + labelDistance * Math.sin(angle - Math.PI / 2);
-      
-      ctx.fillStyle = '#e879f9';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillText(text, x, y);
-      
-      ctx.fillStyle = 'rgba(232, 121, 249, 0.6)';
-      ctx.font = '14px sans-serif';
-      ctx.fillText(label, x, y + 20);
-    });
-
-    if (skyData?.constellations) {
-      skyData.constellations.forEach(constellation => {
-        constellation.star_connections?.forEach(connection => {
-          if (connection.length >= 2) {
-            const star1 = skyData.stars.find(s => s.name === connection[0]);
-            const star2 = skyData.stars.find(s => s.name === connection[1]);
-
-            if (star1 && star2 && star1.altitude >= 20 && star2.altitude >= 20) {
-              const pos1 = azAltToXY(star1.azimuth, star1.altitude, width, height);
-              const pos2 = azAltToXY(star2.azimuth, star2.altitude, width, height);
-
-              if (pos1 && pos2) {
-                const lineGradient = ctx.createLinearGradient(pos1.x, pos1.y, pos2.x, pos2.y);
-                lineGradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
-                lineGradient.addColorStop(1, 'rgba(168, 85, 247, 0.4)');
-                ctx.strokeStyle = lineGradient;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(pos1.x, pos1.y);
-                ctx.lineTo(pos2.x, pos2.y);
-                ctx.stroke();
-              }
-            }
-          }
-        });
-
-        if (constellation.hawaiian_name) {
-          const constellationStars = constellation.star_connections?.flat()
-            .filter((v, i, a) => a.indexOf(v) === i)
-            .map(starName => skyData.stars.find(s => s.name === starName))
-            .filter(s => s && s.altitude >= 20);
-          
-          if (constellationStars && constellationStars.length > 0) {
-            let avgX = 0, avgY = 0, count = 0;
-            constellationStars.forEach(s => {
-              const pos = azAltToXY(s.azimuth, s.altitude, width, height);
-              if (pos) {
-                avgX += pos.x;
-                avgY += pos.y;
-                count++;
-              }
-            });
-            
-            if (count > 0) {
-              avgX /= count;
-              avgY /= count;
-              
-              ctx.fillStyle = 'rgba(168, 85, 247, 0.8)';
-              ctx.font = 'italic 16px sans-serif';
-              ctx.textAlign = 'center';
-              ctx.fillText(constellation.hawaiian_name, avgX, avgY);
-            }
-          }
-        }
-      });
-    }
-
-    skyData?.stars?.forEach(star => {
-      if (star.altitude < 20) return;
-      
-      const pos = azAltToXY(star.azimuth, star.altitude, width, height);
-      if (!pos) return;
-      
-      const size = Math.max(3, 12 - star.magnitude * 1.8);
-      const isHovered = hoveredObject?.name === star.name;
-      const isSelected = selectedObject?.name === star.name;
-
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 4);
-      if (isHovered || isSelected) {
-        gradient.addColorStop(0, 'rgba(236, 72, 153, 1)');
-        gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
-      } else {
-        gradient.addColorStop(0, 'rgba(147, 197, 253, 0.9)');
-        gradient.addColorStop(1, 'rgba(147, 197, 253, 0)');
-      }
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size * 4, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.fillStyle = isHovered || isSelected ? '#ec4899' : '#ffffff';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
-      ctx.fill();
-
-      if (star.hawaiian_name && star.magnitude < 2.5) {
-        ctx.fillStyle = '#93c5fd';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(star.hawaiian_name, pos.x + size + 8, pos.y + 5);
-      }
-    });
-
-    skyData?.planets?.forEach(planet => {
-      if (planet.altitude < 20) return;
-      
-      const pos = azAltToXY(planet.azimuth, planet.altitude, width, height);
-      if (!pos) return;
-      
-      const size = 10;
-      const isHovered = hoveredObject?.name === planet.name;
-      const isSelected = selectedObject?.name === planet.name;
-
-      // Planet glow - changed to bright blue
-      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 3);
-      gradient.addColorStop(0, 'rgba(96, 165, 250, 0.9)'); // Bright blue
-      gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size * 3, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Planet core - changed to bright blue
-      ctx.fillStyle = isHovered || isSelected ? '#3b82f6' : '#60a5fa';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Hawaiian name - changed to bright blue
-      if (planet.hawaiian_name) {
-        ctx.fillStyle = '#60a5fa'; // Bright blue
-        ctx.font = 'bold 15px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(planet.hawaiian_name, pos.x + size + 8, pos.y + 5);
-      }
-    });
-
-    ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
-    ctx.font = 'italic 16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Luna Lani', centerX, centerY - 10);
-    ctx.fillText('(Zenith)', centerX, centerY + 10);
+    dragStartRef.current = {
+      angle: angle - rotationAngle,
+      x: clientX,
+      y: clientY
+    };
+    
+    setIsDragging(true);
   };
 
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const dist = Math.hypot(
-        touch1.clientX - touch2.clientX,
-        touch1.clientY - touch2.clientY
-      );
-      touchStartRef.current = {
-        dist,
-        zoom: zoomLevel,
-        touches: [
-          { x: touch1.clientX, y: touch1.clientY },
-          { x: touch2.clientX, y: touch2.clientY }
-        ],
-        panStart: null
-      };
-      isPanningRef.current = false;
-    } else if (e.touches.length === 1) {
-      touchStartRef.current.panStart = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-        offsetX: panOffset.x,
-        offsetY: panOffset.y
-      };
-      isPanningRef.current = true;
-    }
+  const handleMove = (clientX, clientY) => {
+    if (!isDragging || !overlayRef.current) return;
+    
+    const rect = overlayRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const currentAngle = getAngleFromCenter(clientX, clientY, centerX, centerY);
+    const newRotation = currentAngle - dragStartRef.current.angle;
+    
+    setRotationAngle(newRotation);
   };
 
-  const handleTouchMove = (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const dist = Math.hypot(
-        touch1.clientX - touch2.clientX,
-        touch1.clientY - touch2.clientY
-      );
-      
-      const scale = dist / touchStartRef.current.dist;
-      const newZoom = Math.max(0.5, Math.min(3, touchStartRef.current.zoom * scale));
-      setZoomLevel(newZoom);
-      isPanningRef.current = false;
-    } else if (e.touches.length === 1 && isPanningRef.current && touchStartRef.current.panStart) {
-      e.preventDefault();
-      const deltaX = e.touches[0].clientX - touchStartRef.current.panStart.x;
-      const deltaY = e.touches[0].clientY - touchStartRef.current.panStart.y;
-      setPanOffset({
-        x: touchStartRef.current.panStart.offsetX + deltaX,
-        y: touchStartRef.current.panStart.offsetY + deltaY
-      });
-    }
+  const handleEnd = () => {
+    setIsDragging(false);
   };
 
-  const handleTouchEnd = () => {
-    touchStartRef.current = { dist: 0, zoom: zoomLevel, touches: [], panStart: null };
-    isPanningRef.current = false;
-  };
-
+  // Mouse events
   const handleMouseDown = (e) => {
-    touchStartRef.current.panStart = {
-      x: e.clientX,
-      y: e.clientY,
-      offsetX: panOffset.x,
-      offsetY: panOffset.y
-    };
-    isPanningRef.current = true;
+    e.preventDefault();
+    handleStart(e.clientX, e.clientY);
   };
 
   const handleMouseMove = (e) => {
-    if (isPanningRef.current && touchStartRef.current.panStart) {
-      const deltaX = e.clientX - touchStartRef.current.panStart.x;
-      const deltaY = e.clientY - touchStartRef.current.panStart.y;
-      setPanOffset({
-        x: touchStartRef.current.panStart.offsetX + deltaX,
-        y: touchStartRef.current.panStart.offsetY + deltaY
-      });
-    }
-    
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const hoveredStar = skyData?.stars?.find(star => {
-      if (star.altitude < 20) return false;
-      const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
-      if (!pos) return false;
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20;
-    });
-
-    if (hoveredStar) {
-      setHoveredObject(hoveredStar);
-      canvas.style.cursor = 'pointer';
-      return;
-    }
-
-    const hoveredPlanet = skyData?.planets?.find(planet => {
-      if (planet.altitude < 20) return false;
-      const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
-      if (!pos) return false;
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20;
-    });
-
-    if (hoveredPlanet) {
-      setHoveredObject(hoveredPlanet);
-      canvas.style.cursor = 'pointer';
-      return;
-    }
-
-    setHoveredObject(null);
-    canvas.style.cursor = isPanningRef.current ? 'grabbing' : 'grab';
+    if (!isDragging) return;
+    e.preventDefault();
+    handleMove(e.clientX, e.clientY);
   };
 
   const handleMouseUp = () => {
-    isPanningRef.current = false;
-    if (canvasRef.current) {
-      canvasRef.current.style.cursor = 'grab';
-    }
+    handleEnd();
   };
 
-  const handleCanvasClick = (e) => {
-    // Only register a click if there was no significant pan movement on the X axis
-    if (Math.abs(e.clientX - (touchStartRef.current.panStart?.x || e.clientX)) > 5) return;
-    
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const clickedStar = skyData?.stars?.find(star => {
-      if (star.altitude < 20) return false;
-      const pos = azAltToXY(star.azimuth, star.altitude, canvas.width, canvas.height);
-      if (!pos) return false;
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20;
-    });
-
-    if (clickedStar) {
-      setSelectedObject({ ...clickedStar, type: 'star' });
-      return;
-    }
-
-    const clickedPlanet = skyData?.planets?.find(planet => {
-      if (planet.altitude < 20) return false;
-      const pos = azAltToXY(planet.azimuth, planet.altitude, canvas.width, canvas.height);
-      if (!pos) return false;
-      const distance = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
-      return distance < 20;
-    });
-
-    if (clickedPlanet) {
-      setSelectedObject({ ...clickedPlanet, type: 'planet' });
-      return;
-    }
-
-    setSelectedObject(null);
+  // Touch events
+  const handleTouchStart = (e) => {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    handleStart(touch.clientX, touch.clientY);
   };
 
-  const changeWeek = (direction) => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + (direction * 7));
-    setSelectedDate(newDate);
+  const handleTouchMove = (e) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    handleMove(touch.clientX, touch.clientY);
   };
 
-  const getDetailLink = (obj) => {
-    if (obj.type === 'star') {
-      const star = stars.find(s =>
-        s.english_name === obj.name || s.hawaiian_name === obj.hawaiian_name
-      );
-      return star ? `${createPageUrl("StarDetail")}?id=${star.id}` : null;
+  const handleTouchEnd = () => {
+    handleEnd();
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
     }
-    return null;
-  };
+  }, [isDragging, rotationAngle]);
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center min-h-[600px]">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 text-[#a855f7] animate-spin mx-auto mb-4" />
-            <p className="text-white/70">Calculating precise celestial positions...</p>
-            <p className="text-white/50 text-sm mt-2">Using astronomical algorithms for accuracy</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const dateTime = getCurrentDateTime();
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] flex items-center justify-center mx-auto mb-4">
-          <Compass className="w-8 h-8 text-white" />
-        </div>
         <h1 className="text-4xl font-bold text-white mb-2">
-          Hawaiian Planisphere
+          Interactive Hawaiian Planisphere
         </h1>
-        <p className="text-white/70 text-lg mb-2">
-          {location.name}
+        <p className="text-white/70 text-lg mb-4">
+          Drag the wheel to see the night sky for different dates and times
         </p>
-        <p className="text-white/60 text-sm mb-4">
-          {skyData?.date} • {skyData?.time}
-        </p>
-        <div className="inline-block px-8 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
-          {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible
+        <div className="inline-block px-6 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
+          {dateTime.month} • {dateTime.time}
         </div>
       </div>
+
+      {/* Important Notice */}
+      <Card className="mb-8 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/30 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-3">
+            <Info className="w-6 h-6 text-amber-400 mt-1 flex-shrink-0" />
+            <div>
+              <h3 className="text-amber-200 font-bold text-lg mb-2">Image Assets Needed</h3>
+              <p className="text-white/90 mb-3">
+                To complete this planisphere, you need two images created for Hawaiian latitudes (~20°N):
+              </p>
+              <ol className="list-decimal list-inside space-y-2 text-white/90 ml-4">
+                <li>
+                  <strong>Base Sky Map:</strong> A circular star chart showing stars and constellations visible from 20° above the horizon to the zenith (90°). This should be a fixed image.
+                </li>
+                <li>
+                  <strong>Rotating Overlay:</strong> A circular disc with months around the outer edge and times marked, with a transparent "window" cut out to reveal the visible portion of the sky map.
+                </li>
+              </ol>
+              <p className="text-white/80 mt-3 text-sm">
+                These images can be created using astronomical software (like Stellarium) or by scanning/digitizing a physical planisphere for Hawaiian latitudes.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Planisphere */}
         <div className="lg:col-span-2">
           <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
-            <CardContent className="p-4">
-              {/* Info Box */}
-              <div className="mb-4 p-3 rounded-lg bg-[#60A5FA]/20 backdrop-blur-sm border border-[#a855f7]/30">
-                <div className="flex items-start gap-2">
-                  <Info className="w-5 h-5 text-[#e879f9] mt-0.5 flex-shrink-0" />
-                  <div className="text-white text-sm">
-                    <p className="text-[#e879f9] font-semibold mb-1">Accurate Sky Map</p>
-                    <p className="mb-1">• Center = Luna Lani (Zenith, 90°)</p>
-                    <p className="mb-1">• Edge = 20° horizon limit</p>
-                    <p className="mb-1">• Positions calculated using astronomical algorithms</p>
-                    <p className="text-white/60 text-xs mt-2">Pinch/scroll to zoom • Drag to pan • Click objects for details</p>
+            <CardContent className="p-6">
+              {/* Instructions */}
+              <div className="mb-4 p-4 rounded-lg bg-[#60A5FA]/10 backdrop-blur-sm border border-[#a855f7]/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <RotateCw className="w-5 h-5 text-[#60a5fa]" />
+                  <p className="text-white font-semibold">How to Use</p>
+                </div>
+                <p className="text-white/80 text-sm">
+                  Click and drag the outer wheel (or use your finger on mobile) to rotate it. 
+                  As you rotate, the window reveals different parts of the sky map, showing what's 
+                  visible at that date and time - just like a paper planisphere!
+                </p>
+              </div>
+
+              {/* Planisphere Container */}
+              <div className="relative w-full aspect-square max-w-2xl mx-auto">
+                {/* Base Sky Map Layer - PLACEHOLDER */}
+                <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40">
+                  <div className="w-full h-full bg-gradient-to-br from-[#0A1929] via-[#1a1f3a] to-[#0f1729] relative">
+                    {/* Placeholder stars pattern */}
+                    <div className="absolute inset-0 opacity-60">
+                      {[...Array(100)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute bg-white rounded-full"
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            width: `${Math.random() * 3 + 1}px`,
+                            height: `${Math.random() * 3 + 1}px`,
+                            animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 2}s`
+                          }}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Placeholder constellation lines */}
+                    <svg className="absolute inset-0 w-full h-full opacity-40">
+                      <line x1="30%" y1="30%" x2="40%" y2="25%" stroke="#60a5fa" strokeWidth="2" />
+                      <line x1="40%" y1="25%" x2="45%" y2="35%" stroke="#60a5fa" strokeWidth="2" />
+                      <line x1="60%" y1="60%" x2="70%" y2="65%" stroke="#a855f7" strokeWidth="2" />
+                      <line x1="70%" y1="65%" x2="75%" y2="55%" stroke="#a855f7" strokeWidth="2" />
+                    </svg>
+
+                    {/* Center label */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-[#e879f9] text-sm font-semibold">Luna Lani</p>
+                        <p className="text-white/60 text-xs">(Zenith)</p>
+                      </div>
+                    </div>
+
+                    {/* Instructions overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center bg-black/60 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20 max-w-xs">
+                        <Info className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+                        <p className="text-white text-sm font-semibold mb-1">
+                          Replace with actual sky map
+                        </p>
+                        <p className="text-white/70 text-xs">
+                          Upload your Hawaiian planisphere base image here
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rotating Overlay Layer - PLACEHOLDER */}
+                <div
+                  ref={overlayRef}
+                  className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none select-none"
+                  style={{
+                    transform: `rotate(${rotationAngle}deg)`,
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+                  }}
+                  onMouseDown={handleMouseDown}
+                  onTouchStart={handleTouchStart}
+                >
+                  {/* Outer ring with months */}
+                  <div className="absolute inset-0 rounded-full">
+                    <svg className="w-full h-full" viewBox="0 0 400 400">
+                      {/* Outer circle */}
+                      <circle
+                        cx="200"
+                        cy="200"
+                        r="195"
+                        fill="none"
+                        stroke="rgba(96, 165, 250, 0.6)"
+                        strokeWidth="3"
+                      />
+                      
+                      {/* Month markers */}
+                      {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'].map((month, i) => {
+                        const angle = (i * 30 - 90) * (Math.PI / 180);
+                        const x = 200 + Math.cos(angle) * 175;
+                        const y = 200 + Math.sin(angle) * 175;
+                        const textAngle = i * 30;
+                        
+                        return (
+                          <text
+                            key={month}
+                            x={x}
+                            y={y}
+                            fill="white"
+                            fontSize="12"
+                            fontWeight="bold"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            transform={`rotate(${textAngle}, ${x}, ${y})`}
+                          >
+                            {month}
+                          </text>
+                        );
+                      })}
+
+                      {/* "Window" cutout - semi-transparent overlay with clear section */}
+                      <defs>
+                        <mask id="windowMask">
+                          <rect width="400" height="400" fill="white" />
+                          {/* Clear window area */}
+                          <path
+                            d="M 200 200 L 200 50 A 150 150 0 0 1 330 200 Z"
+                            fill="black"
+                          />
+                        </mask>
+                      </defs>
+                      
+                      {/* Semi-transparent overlay with mask */}
+                      <circle
+                        cx="200"
+                        cy="200"
+                        r="190"
+                        fill="rgba(30, 58, 95, 0.85)"
+                        mask="url(#windowMask)"
+                      />
+
+                      {/* Window border */}
+                      <path
+                        d="M 200 200 L 200 50 A 150 150 0 0 1 330 200 Z"
+                        fill="none"
+                        stroke="rgba(232, 121, 249, 0.8)"
+                        strokeWidth="2"
+                      />
+                    </svg>
+
+                    {/* Rotation indicator */}
+                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-[#e879f9] w-1 h-6 rounded-full" />
                   </div>
                 </div>
               </div>
 
-              {/* Controls */}
-              <div className="flex flex-wrap gap-3 mb-4 items-center">
-                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border border-[#a855f7]/30">
-                  <Calendar className="w-4 h-4 text-[#a855f7]" />
-                  <span className="text-white text-sm font-medium">
-                    {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border-[#a855f7]/30">
-                  <span className="text-white text-sm font-medium">Time:</span>
-                  <Input
-                    type="time"
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="bg-transparent border-0 text-white h-auto p-0 w-20 text-sm"
-                  />
-                </div>
+              {/* Reset Button */}
+              <div className="text-center mt-4">
                 <Button
+                  onClick={() => setRotationAngle(0)}
                   variant="outline"
-                  size="sm"
-                  onClick={() => changeWeek(-1)}
-                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
+                  className="border-[#60a5fa]/30 text-white hover:bg-[#60a5fa]/20"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Week
+                  <RotateCw className="w-4 h-4 mr-2" />
+                  Reset Position
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => changeWeek(1)}
-                  className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
-                >
-                  Week
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedDate(new Date());
-                    setSelectedTime(new Date().toTimeString().slice(0, 5));
-                  }}
-                  className="border-[#ec4899]/30 text-white hover:bg-[#ec4899]/20 bg-[#60A5FA]/10"
-                >
-                  Now
-                </Button>
-                <div className="ml-auto flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
-                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20 bg-[#60A5FA]/10"
-                  >
-                    <ZoomOut className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
-                    className="border-[#3b82f6]/30 text-white hover:bg-[#3b82f6]/20 bg-[#60A5FA]/10"
-                  >
-                    <ZoomIn className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchSkyData}
-                    className="border-white/20 text-white hover:bg-white/10 bg-[#60A5FA]/10"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
-                </div>
               </div>
-
-              {/* Canvas */}
-              <canvas
-                ref={canvasRef}
-                width={1200}
-                height={1200}
-                className="w-full h-auto rounded-xl border-2 border-[#a855f7]/30 cursor-grab active:cursor-grabbing"
-                onClick={handleCanvasClick}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              />
             </CardContent>
           </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Selected Object Info */}
-          {selectedObject && (
-            <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-white font-bold text-lg">
-                      {selectedObject.hawaiian_name || selectedObject.name}
-                    </h3>
-                    <p className="text-white/60 text-sm">{selectedObject.name}</p>
-                  </div>
-                  <Badge className={selectedObject.type === 'planet' ? "bg-[#60a5fa]" : "bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white"}>
-                    {selectedObject.type}
-                  </Badge>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  {selectedObject.constellation && (
-                    <div>
-                      <p className="text-white/50 text-xs">Constellation</p>
-                      <p className="text-white">{selectedObject.constellation}</p>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <p className="text-white/50 text-xs">Azimuth</p>
-                      <p className="text-white">{selectedObject.azimuth?.toFixed(1)}°</p>
-                    </div>
-                    <div>
-                      <p className="text-white/50 text-xs">Altitude</p>
-                      <p className="text-white">{selectedObject.altitude?.toFixed(1)}°</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-white/50 text-xs">Magnitude</p>
-                    <p className="text-white">{selectedObject.magnitude?.toFixed(2)}</p>
-                  </div>
-                  {selectedObject.right_ascension && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <p className="text-white/50 text-xs">RA</p>
-                        <p className="text-white text-sm">{selectedObject.right_ascension.toFixed(2)}h</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs">Dec</p>
-                        <p className="text-white text-sm">{selectedObject.declination?.toFixed(2)}°</p>
-                      </div>
-                    </div>
-                  )}
-                  {selectedObject.distance_au && (
-                    <div>
-                      <p className="text-white/50 text-xs">Distance</p>
-                      <p className="text-white">{selectedObject.distance_au.toFixed(2)} AU</p>
-                    </div>
-                  )}
-                </div>
-
-                {getDetailLink(selectedObject) && (
-                  <Link to={getDetailLink(selectedObject)}>
-                    <Button className="w-full bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white hover:opacity-90">
-                      View Full Details
-                    </Button>
-                  </Link>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Legend */}
+          {/* Current View Info */}
           <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
-              <h3 className="text-white font-bold mb-3">Hōʻailona (Legend)</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-white"></div>
-                  <span className="text-white/80">Nā Hōkū (Stars)</span>
+              <h3 className="text-white font-bold mb-3">Currently Viewing</h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-white/50 text-xs">Month</p>
+                  <p className="text-white text-2xl font-bold">{dateTime.month}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
-                  <span className="text-white/80">Nā Hōkūhele (Planets)</span>
+                <div>
+                  <p className="text-white/50 text-xs">Time</p>
+                  <p className="text-white text-2xl font-bold">{dateTime.time}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-gradient-to-r from-[#60a5fa] to-[#a855f7]"></div>
-                  <span className="text-white/80">Star Lines</span>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-white/50 text-xs mb-1">Rotation</p>
+                  <p className="text-white">{Math.round(rotationAngle)}°</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Info Card */}
+          {/* How It Works */}
           <Card className="bg-gradient-to-br from-[#a855f7]/20 to-[#ec4899]/20 border-[#a855f7]/30">
             <CardContent className="p-4">
-              <div className="flex items-start gap-2 mb-3">
-                <MapPin className="w-4 h-4 text-[#e879f9] mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-white/90 text-sm font-semibold mb-1">Location</p>
-                  <p className="text-white/70 text-xs">{location.name}</p>
-                  <p className="text-white/60 text-xs">{location.lat}°N, {Math.abs(location.lon)}°W</p>
-                </div>
+              <h3 className="text-white font-bold mb-3">How It Works</h3>
+              <div className="space-y-2 text-white/80 text-sm">
+                <p>
+                  This digital planisphere mimics the traditional paper star wheel used by navigators.
+                </p>
+                <p>
+                  The outer wheel shows dates and times. Rotate it to align with your desired viewing time, 
+                  and the window reveals which stars and constellations are visible in the Hawaiian sky.
+                </p>
+                <p className="text-[#60a5fa] italic pt-2">
+                  Once you provide the actual planisphere images, this will show real star positions!
+                </p>
               </div>
-              <p className="text-white/80 italic text-xs leading-relaxed">
-                This planisphere uses astronomical algorithms to calculate precise star and planet positions for your exact location, date, and time - just as traditional Hawaiian navigators tracked the heavens.
-              </p>
+            </CardContent>
+          </Card>
+
+          {/* Next Steps */}
+          <Card className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/30">
+            <CardContent className="p-4">
+              <h3 className="text-emerald-200 font-bold mb-3">Next Steps</h3>
+              <ol className="list-decimal list-inside space-y-2 text-white/90 text-sm">
+                <li>Create or obtain a planisphere for 20°N latitude</li>
+                <li>Separate it into base map and rotating overlay images</li>
+                <li>Upload the images to replace the placeholders</li>
+                <li>Fine-tune the date/time calculations</li>
+              </ol>
             </CardContent>
           </Card>
         </div>
