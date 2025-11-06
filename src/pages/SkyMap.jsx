@@ -35,7 +35,7 @@ export default function SkyMap() {
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/924e825bf_star-card-3591581_640.jpg";
+    img.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/0862d2b1a_IMG_2138.jpeg";
     img.onload = () => {
       backgroundImageRef.current = img;
       setBackgroundLoaded(true);
