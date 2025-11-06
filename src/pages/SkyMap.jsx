@@ -17,7 +17,7 @@ export default function SkyMap() {
   const [loading, setLoading] = useState(true);
   const [selectedObject, setSelectedObject] = useState(null);
   const [hoveredObject, setHoveredObject] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomLevel, setZoomLevel] = 1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("21:00");
@@ -63,49 +63,76 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate HIGHLY ACCURATE astronomical data for a Hawaiian sky planisphere.
+        prompt: `Generate COMPREHENSIVE and ACCURATE astronomical data for a Hawaiian sky planisphere.
 
 CRITICAL REQUIREMENTS:
 Location: ${location.name} (${location.lat}°N, ${location.lon}°W)
 Date: ${dateStr}
 Time: ${selectedTime} local Hawaii time
 
-ACCURACY REQUIREMENTS:
-1. Use REAL astronomical calculations for star/planet positions
-2. Calculate actual azimuth and altitude using spherical trigonometry
-3. Only include objects with altitude >= 20° above horizon
-4. Use actual orbital mechanics for planet positions on this exact date
-5. Verify constellation visibility for this specific date and time
+YOU MUST GENERATE AT LEAST 50+ STARS AND ALL VISIBLE PLANETS.
 
-STAR DATA (magnitude <= 3.5, altitude >= 20°):
-- Include Hawaiian names when available from this list:
-  * Hōkūleʻa (Arcturus)
-  * Hōkūpaʻa (Polaris) 
-  * Hinaiaeleele (Castor)
-  * Nāhōloholo (multiple stars)
-  * ʻAʻā (Sirius)
-  * Kauluakoko (Vega)
-  * Māhoe (Gemini twins)
-- For stars without Hawaiian names, use English name in hawaiian_name field
-- Calculate PRECISE azimuth (0-360°) and altitude (20-90°)
-- Include visual magnitude
+STAR DATA REQUIREMENTS (magnitude <= 10.0, altitude >= 20°):
+- Generate AT LEAST 50 stars that meet the criteria
+- Include ALL bright stars (mag < 3) visible from this location
+- Include medium brightness stars (mag 3-6)
+- Include dimmer stars up to magnitude 10
+- For each star provide:
+  * Accurate English name (e.g., "Sirius", "Vega", "Betelgeuse")
+  * Hawaiian name if known, otherwise use English name
+  * PRECISE azimuth (0-360°) based on star's actual position
+  * PRECISE altitude (20-90°) based on actual celestial mechanics
+  * Accurate visual magnitude
+  * Correct constellation name
+  * Right ascension (hours)
+  * Declination (degrees)
 
-PLANET DATA (only if actually visible):
+Known Hawaiian star names to use when applicable:
+- Hōkūleʻa (Arcturus)
+- Hōkūpaʻa (Polaris) 
+- Hinaiaeleele (Castor)
+- ʻAʻā (Sirius)
+- Kauluakoko (Vega)
+- For other stars, use their English names
+
+PLANET DATA (all planets actually visible tonight):
+Calculate which planets are ACTUALLY above 20° altitude at this time.
 Use these Hawaiian names:
 - Mercury: ʻUkulele
 - Venus: Hōkūloa  
 - Mars: Hōkūʻula
-- Jupiter: Hōkūleʻa
+- Jupiter: Kaʻāwela
 - Saturn: Makulu
 - Uranus: Heleʻekala
 - Neptune: Naholoholo
 
-CONSTELLATION LINES:
-- Only connect stars that are BOTH above 20° altitude
-- Use exact star names from stars array
-- Only include constellations with multiple visible stars
+For each visible planet include:
+- Accurate azimuth and altitude
+- Visual magnitude
+- Distance in AU
 
-Return precise astronomical data:`,
+CONSTELLATION LINES (CRITICAL - MUST INCLUDE):
+You MUST generate constellation line connections for major constellations.
+For EACH major constellation visible (Orion, Ursa Major, Cassiopeia, etc.):
+1. List the specific ENGLISH star names that form the constellation
+2. Create star_connections array with pairs of stars to connect
+3. ONLY connect stars that are BOTH in your stars array
+4. Example format:
+   {
+     "name": "Orion",
+     "hawaiian_name": "Ka Heihei o nā Keiki",
+     "star_connections": [
+       ["Betelgeuse", "Bellatrix"],
+       ["Bellatrix", "Alnitak"],
+       ["Alnitak", "Alnilam"],
+       ["Alnilam", "Mintaka"],
+       ["Rigel", "Saiph"]
+     ]
+   }
+
+INCLUDE AT LEAST 10 MAJOR CONSTELLATIONS with complete line connections.
+
+Generate realistic, scientifically accurate astronomical data:`,
         response_json_schema: {
           type: "object",
           properties: {
