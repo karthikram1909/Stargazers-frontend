@@ -234,13 +234,14 @@ export default function Home() {
               <p className="text-white/70 text-sm mb-3">Planets</p>
               <div className="flex flex-wrap gap-2">
                 {skyData?.visible_planets?.map((planet, index) => (
-                  <div
+                  <Link
                     key={index}
-                    className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium"
+                    to={createPageUrl("Planets")}
+                    className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-105 cursor-pointer"
                   >
                     <div className="font-bold">{planet.hawaiian_name}</div>
                     <div className="text-xs opacity-80">{planet.english_name}</div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
