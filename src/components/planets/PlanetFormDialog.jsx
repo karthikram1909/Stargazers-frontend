@@ -28,9 +28,9 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    if (planet) {
+    if (planet && open) {
       setFormData(planet);
-    } else {
+    } else if (!open) {
       setFormData({
         hawaiian_name: "",
         english_name: "",
@@ -51,7 +51,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
     setUploading(true);
     try {
       const result = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, pronunciation_audio_url: result.file_url });
+      setFormData(prev => ({ ...prev, pronunciation_audio_url: result.file_url }));
     } catch (error) {
       console.error("Error uploading audio:", error);
     } finally {
@@ -66,7 +66,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
     setUploadingImage(true);
     try {
       const result = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, image_url: result.file_url });
+      setFormData(prev => ({ ...prev, image_url: result.file_url }));
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
@@ -97,7 +97,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
                 id="hawaiian_name"
                 value={formData.hawaiian_name}
                 onChange={(e) =>
-                  setFormData({ ...formData, hawaiian_name: e.target.value })
+                  setFormData(prev => ({ ...prev, hawaiian_name: e.target.value }))
                 }
                 required
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
@@ -112,7 +112,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
                 id="english_name"
                 value={formData.english_name}
                 onChange={(e) =>
-                  setFormData({ ...formData, english_name: e.target.value })
+                  setFormData(prev => ({ ...prev, english_name: e.target.value }))
                 }
                 required
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
@@ -127,7 +127,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
             </Label>
             <Select
               value={formData.type}
-              onValueChange={(value) => setFormData({ ...formData, type: value })}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
             >
               <SelectTrigger className="bg-white/10 border-white/20 text-white">
                 <SelectValue />
@@ -194,7 +194,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
               id="meaning"
               value={formData.meaning}
               onChange={(e) =>
-                setFormData({ ...formData, meaning: e.target.value })
+                setFormData(prev => ({ ...prev, meaning: e.target.value }))
               }
               className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               placeholder="The bright one, morning star"
@@ -209,7 +209,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
               id="description"
               value={formData.description}
               onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
+                setFormData(prev => ({ ...prev, description: e.target.value }))
               }
               className="bg-white/10 border-white/20 text-white placeholder:text-white/40 min-h-24"
               placeholder="Scientific and cultural information about this planet..."
@@ -224,7 +224,7 @@ export default function PlanetFormDialog({ open, onOpenChange, planet, onSave, i
               id="mythology"
               value={formData.mythology}
               onChange={(e) =>
-                setFormData({ ...formData, mythology: e.target.value })
+                setFormData(prev => ({ ...prev, mythology: e.target.value }))
               }
               className="bg-white/10 border-white/20 text-white placeholder:text-white/40 min-h-32"
               placeholder="Hawaiian, Greek, Roman mythology and cultural significance..."
