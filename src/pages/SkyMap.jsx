@@ -17,7 +17,7 @@ export default function SkyMap() {
   const [loading, setLoading] = useState(true);
   const [selectedObject, setSelectedObject] = useState(null);
   const [hoveredObject, setHoveredObject] = useState(null);
-  const [zoomLevel, setZoomLevel] = 1);
+  const [zoomLevel, setZoomLevel] = useState(1); // Corrected from `1)` to `useState(1)`
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("21:00");
@@ -548,7 +548,14 @@ Generate realistic, scientifically accurate astronomical data:`,
   };
 
   const handleCanvasClick = (e) => {
-    if (Math.abs(e.clientX - (touchStartRef.current.panStart?.x || e.clientX)) > 5) return;
+    // Only register a click if there was no significant pan movement
+    // This threshold prevents accidental clicks when attempting to pan
+    if (touchStartRef.current.panStart && 
+        (Math.abs(e.clientX - touchStartRef.current.panStart.x) > 5 || 
+         Math.abs(e.clientY - touchStartRef.current.panStart.y) > 5)) {
+      // If movement was significant, treat it as a pan, not a click
+      return;
+    }
     
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
