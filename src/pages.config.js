@@ -6,6 +6,7 @@ import Planets from './pages/Planets';
 import StarDetail from './pages/StarDetail';
 import SkyMap from './pages/SkyMap';
 import Constellations from './pages/Constellations';
+import PlanetDetail from './pages/PlanetDetail';
 import Layout from './Layout.jsx';
 
 
@@ -18,6 +19,7 @@ export const PAGES = {
     "StarDetail": StarDetail,
     "SkyMap": SkyMap,
     "Constellations": Constellations,
+    "PlanetDetail": PlanetDetail,
 }
 
 export const pagesConfig = {

@@ -70,15 +70,26 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [featuredConstellation, setFeaturedConstellation] = useState(null);
   const [moonPhase, setMoonPhase] = useState(null); // New state for moon phase
+  const [allPlanets, setAllPlanets] = useState([]);
 
   useEffect(() => {
     // Calculate accurate moon phase locally
     const phase = calculateMoonPhase();
     setMoonPhase(phase);
     
+    fetchPlanets();
     fetchSkyData();
     fetchFeaturedConstellation();
   }, []);
+
+  const fetchPlanets = async () => {
+    try {
+      const planets = await base44.entities.Planet.list();
+      setAllPlanets(planets);
+    } catch (error) {
+      console.error("Error fetching planets:", error);
+    }
+  };
 
   const fetchFeaturedConstellation = async () => {
     try {
@@ -149,6 +160,23 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  // Match visible planets with database planets to get IDs
+  const getVisiblePlanetsWithIds = () => {
+    if (!skyData?.visible_planets || !allPlanets.length) return [];
+    
+    return skyData.visible_planets.map(visiblePlanet => {
+      const matchedPlanet = allPlanets.find(p => 
+        p.english_name.toLowerCase() === visiblePlanet.english_name.toLowerCase()
+      );
+      return {
+        ...visiblePlanet,
+        id: matchedPlanet?.id
+      };
+    }).filter(planet => planet.id); // Only include planets we found in database
+  };
+
+  const visiblePlanetsWithIds = getVisiblePlanetsWithIds();
 
   if (loading || !moonPhase) { // Updated loading condition to wait for moonPhase
     return (
@@ -233,10 +261,10 @@ export default function Home() {
             <div className="space-y-2">
               <p className="text-white/70 text-sm mb-3">Planets</p>
               <div className="flex flex-wrap gap-2">
-                {skyData?.visible_planets?.map((planet, index) => (
+                {visiblePlanetsWithIds.map((planet, index) => (
                   <Link
                     key={index}
-                    to={createPageUrl("Planets")}
+                    to={`${createPageUrl("PlanetDetail")}?id=${planet.id}`}
                     className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-105 cursor-pointer"
                   >
                     <div className="font-bold">{planet.hawaiian_name}</div>
