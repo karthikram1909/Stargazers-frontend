@@ -163,7 +163,7 @@ export default function Layout({ children }) {
     if (path.includes("wayfinding")) {
       return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/2bc3b79ca_wayfaring.jpg";
     }
-    return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/432ccb59c_couplestargazing.png";
+    return "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/0862d2b1a_IMG_2138.jpeg";
   };
 
   const backgroundImage = getBackgroundImage();
