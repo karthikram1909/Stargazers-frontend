@@ -17,7 +17,7 @@ export default function SkyMap() {
   const [loading, setLoading] = useState(true);
   const [selectedObject, setSelectedObject] = useState(null);
   const [hoveredObject, setHoveredObject] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1); // Corrected from `1)` to `useState(1)`
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("21:00");
@@ -548,14 +548,8 @@ Generate realistic, scientifically accurate astronomical data:`,
   };
 
   const handleCanvasClick = (e) => {
-    // Only register a click if there was no significant pan movement
-    // This threshold prevents accidental clicks when attempting to pan
-    if (touchStartRef.current.panStart && 
-        (Math.abs(e.clientX - touchStartRef.current.panStart.x) > 5 || 
-         Math.abs(e.clientY - touchStartRef.current.panStart.y) > 5)) {
-      // If movement was significant, treat it as a pan, not a click
-      return;
-    }
+    // Only register a click if there was no significant pan movement on the X axis
+    if (Math.abs(e.clientX - (touchStartRef.current.panStart?.x || e.clientX)) > 5) return;
     
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -669,7 +663,7 @@ Generate realistic, scientifically accurate astronomical data:`,
                     {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border border-[#a855f7]/30">
+                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border-[#a855f7]/30">
                   <span className="text-white text-sm font-medium">Time:</span>
                   <Input
                     type="time"
