@@ -233,16 +233,17 @@ export default function Layout({ children }) {
                   className="w-14 h-14 rounded-full object-cover border-2 border-[#60A5FA]"
                 />
                 <div>
-                  <h1 className="text-xl font-bold text-white">Stargazers Anonymous</h1>
-                  <p className="text-sm text-white/80">Kilo Hōkū • Hawaiian Astronomy</p>
+                  <h1 className="text-lg font-bold text-white whitespace-nowrap">Stargazers Anonymous</h1>
+                  <p className="text-xs text-white/80">Kilo Hōkū • Hawaiian Astronomy</p>
                 </div>
               </div>
               <Button
                 onClick={handleFontSizeChange}
-                className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white hover:opacity-90 px-3 py-1.5 text-xs h-8"
+                className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white hover:opacity-90 px-2 py-1 h-auto flex flex-col items-center gap-0.5"
                 title="Change text size"
               >
-                <span className="font-semibold">Type Size: {getFontSizeLabel()}</span>
+                <span className="font-semibold text-[10px]">Type Size</span>
+                <span className="font-normal text-[8px] opacity-80">{getFontSizeLabel()}</span>
               </Button>
             </div>
             
