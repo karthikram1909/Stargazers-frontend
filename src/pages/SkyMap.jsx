@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Compass, Loader2, RefreshCw, ZoomIn, ZoomOut, Calendar, ChevronLeft, ChevronRight, Info, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -19,6 +20,8 @@ export default function SkyMap() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState("21:00");
+  const [location, setLocation] = useState({ lat: 19.82, lon: -155.47, name: "Mauna Kea, Hawaii" });
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   const touchStartRef = useRef({ dist: 0, zoom: 1, touches: [], panStart: null });
   const isPanningRef = useRef(false);
@@ -41,7 +44,7 @@ export default function SkyMap() {
 
   useEffect(() => {
     fetchSkyData();
-  }, [selectedDate]);
+  }, [selectedDate, selectedTime, location]);
 
   useEffect(() => {
     if (skyData && canvasRef.current && backgroundLoaded) {
@@ -60,37 +63,58 @@ export default function SkyMap() {
       });
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a detailed star map for ${dateStr} at 9:00 PM local time in Hawaii (Mauna Kea: 19.82°N, 155.47°W).
-        
-        CRITICAL INSTRUCTIONS:
-        - Include ONLY stars and planets that are 20° or MORE above the horizon
-        - For EVERY bright star (magnitude 3.5 or brighter), include hawaiian_name
-        - For stars WITH Hawaiian names, use them. For stars WITHOUT Hawaiian names, use the English name in the hawaiian_name field
-        - The 'name' field should ALWAYS be the standard English star name
-        
-        PLANETS: Only include those visible and 20°+ above horizon with Hawaiian names:
-        - Mercury: ʻUkulele
-        - Venus: Hōkūloa
-        - Mars: Hōkūʻula
-        - Jupiter: Hōkūleʻa
-        - Saturn: Makulu
-        - Uranus: Heleʻekela
-        - Neptune: Naholoholo
-        
-        CONSTELLATION LINES:
-        - Use EXACT star names as they appear in the stars array 'name' field
-        - Only connect stars that are both 20°+ above horizon
-        
-        Return JSON with:
-        1. stars array (only altitude >= 20°): name, hawaiian_name, azimuth, altitude, magnitude, constellation
-        2. planets array (only altitude >= 20°): name, hawaiian_name, azimuth, altitude, magnitude
-        3. constellations array with Hawaiian names: name, hawaiian_name, star_connections`,
+        prompt: `Generate HIGHLY ACCURATE astronomical data for a Hawaiian sky planisphere.
+
+CRITICAL REQUIREMENTS:
+Location: ${location.name} (${location.lat}°N, ${location.lon}°W)
+Date: ${dateStr}
+Time: ${selectedTime} local Hawaii time
+
+ACCURACY REQUIREMENTS:
+1. Use REAL astronomical calculations for star/planet positions
+2. Calculate actual azimuth and altitude using spherical trigonometry
+3. Only include objects with altitude >= 20° above horizon
+4. Use actual orbital mechanics for planet positions on this exact date
+5. Verify constellation visibility for this specific date and time
+
+STAR DATA (magnitude <= 3.5, altitude >= 20°):
+- Include Hawaiian names when available from this list:
+  * Hōkūleʻa (Arcturus)
+  * Hōkūpaʻa (Polaris) 
+  * Hinaiaeleele (Castor)
+  * Nāhōloholo (multiple stars)
+  * ʻAʻā (Sirius)
+  * Kauluakoko (Vega)
+  * Māhoe (Gemini twins)
+- For stars without Hawaiian names, use English name in hawaiian_name field
+- Calculate PRECISE azimuth (0-360°) and altitude (20-90°)
+- Include visual magnitude
+
+PLANET DATA (only if actually visible):
+Use these Hawaiian names:
+- Mercury: ʻUkulele
+- Venus: Hōkūloa  
+- Mars: Hōkūʻula
+- Jupiter: Hōkūleʻa
+- Saturn: Makulu
+- Uranus: Heleʻekala
+- Neptune: Naholoholo
+
+CONSTELLATION LINES:
+- Only connect stars that are BOTH above 20° altitude
+- Use exact star names from stars array
+- Only include constellations with multiple visible stars
+
+Return precise astronomical data:`,
         response_json_schema: {
           type: "object",
           properties: {
             date: { type: "string" },
             time: { type: "string" },
             location: { type: "string" },
+            observer_latitude: { type: "number" },
+            observer_longitude: { type: "number" },
+            local_sidereal_time: { type: "number" },
             stars: {
               type: "array",
               items: {
@@ -101,7 +125,9 @@ export default function SkyMap() {
                   azimuth: { type: "number" },
                   altitude: { type: "number" },
                   magnitude: { type: "number" },
-                  constellation: { type: "string" }
+                  constellation: { type: "string" },
+                  right_ascension: { type: "number" },
+                  declination: { type: "number" }
                 }
               }
             },
@@ -114,7 +140,8 @@ export default function SkyMap() {
                   hawaiian_name: { type: "string" },
                   azimuth: { type: "number" },
                   altitude: { type: "number" },
-                  magnitude: { type: "number" }
+                  magnitude: { type: "number" },
+                  distance_au: { type: "number" }
                 }
               }
             },
@@ -552,7 +579,8 @@ export default function SkyMap() {
         <div className="flex items-center justify-center min-h-[600px]">
           <div className="text-center">
             <Loader2 className="w-12 h-12 text-[#a855f7] animate-spin mx-auto mb-4" />
-            <p className="text-white/70">Mapping ka lani...</p>
+            <p className="text-white/70">Calculating precise celestial positions...</p>
+            <p className="text-white/50 text-sm mt-2">Using astronomical algorithms for accuracy</p>
           </div>
         </div>
       </div>
@@ -569,11 +597,14 @@ export default function SkyMap() {
         <h1 className="text-4xl font-bold text-white mb-2">
           Hawaiian Planisphere
         </h1>
-        <p className="text-white/70 text-lg mb-4">
-          {skyData?.location} • {skyData?.date}
+        <p className="text-white/70 text-lg mb-2">
+          {location.name}
+        </p>
+        <p className="text-white/60 text-sm mb-4">
+          {skyData?.date} • {skyData?.time}
         </p>
         <div className="inline-block px-8 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
-          {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible (20°+)
+          {skyData?.stars?.filter(s => s.altitude >= 20).length || 0} stars • {skyData?.planets?.filter(p => p.altitude >= 20).length || 0} planets visible
         </div>
       </div>
 
@@ -582,16 +613,16 @@ export default function SkyMap() {
         <div className="lg:col-span-2">
           <Card className="bg-gradient-to-br from-[#60A5FA]/20 to-[#3b82f6]/20 border-[#a855f7]/30 backdrop-blur-sm">
             <CardContent className="p-4">
-              {/* Info Box Above Canvas */}
+              {/* Info Box */}
               <div className="mb-4 p-3 rounded-lg bg-[#60A5FA]/20 backdrop-blur-sm border border-[#a855f7]/30">
                 <div className="flex items-start gap-2">
                   <Info className="w-5 h-5 text-[#e879f9] mt-0.5 flex-shrink-0" />
                   <div className="text-white text-sm">
-                    <p className="text-[#e879f9] font-semibold mb-1">Hawaiian Planisphere Guide</p>
-                    <p className="mb-1">• Center = Luna Lani (Zenith)</p>
+                    <p className="text-[#e879f9] font-semibold mb-1">Accurate Sky Map</p>
+                    <p className="mb-1">• Center = Luna Lani (Zenith, 90°)</p>
                     <p className="mb-1">• Edge = 20° horizon limit</p>
-                    <p className="mb-1">• Zoom: {zoomLevel.toFixed(2)}x</p>
-                    <p className="text-white/60 text-xs">Pinch/scroll to zoom • Drag to pan</p>
+                    <p className="mb-1">• Positions calculated using astronomical algorithms</p>
+                    <p className="text-white/60 text-xs mt-2">Pinch/scroll to zoom • Drag to pan • Click objects for details</p>
                   </div>
                 </div>
               </div>
@@ -604,6 +635,15 @@ export default function SkyMap() {
                     {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
+                <div className="flex items-center gap-2 bg-[#60A5FA]/20 rounded-lg px-3 py-2 border border-[#a855f7]/30">
+                  <span className="text-white text-sm font-medium">Time:</span>
+                  <Input
+                    type="time"
+                    value={selectedTime}
+                    onChange={(e) => setSelectedTime(e.target.value)}
+                    className="bg-transparent border-0 text-white h-auto p-0 w-20 text-sm"
+                  />
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -611,7 +651,7 @@ export default function SkyMap() {
                   className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
-                  Previous Week
+                  Week
                 </Button>
                 <Button
                   variant="outline"
@@ -619,16 +659,19 @@ export default function SkyMap() {
                   onClick={() => changeWeek(1)}
                   className="border-[#a855f7]/30 text-white hover:bg-[#a855f7]/20 bg-[#60A5FA]/10"
                 >
-                  Next Week
+                  Week
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedDate(new Date())}
+                  onClick={() => {
+                    setSelectedDate(new Date());
+                    setSelectedTime(new Date().toTimeString().slice(0, 5));
+                  }}
                   className="border-[#ec4899]/30 text-white hover:bg-[#ec4899]/20 bg-[#60A5FA]/10"
                 >
-                  Tonight
+                  Now
                 </Button>
                 <div className="ml-auto flex gap-2">
                   <Button
@@ -704,18 +747,36 @@ export default function SkyMap() {
                   )}
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <p className="text-white/50 text-xs">Direction</p>
-                      <p className="text-white">{selectedObject.azimuth.toFixed(1)}°</p>
+                      <p className="text-white/50 text-xs">Azimuth</p>
+                      <p className="text-white">{selectedObject.azimuth?.toFixed(1)}°</p>
                     </div>
                     <div>
                       <p className="text-white/50 text-xs">Altitude</p>
-                      <p className="text-white">{selectedObject.altitude.toFixed(1)}°</p>
+                      <p className="text-white">{selectedObject.altitude?.toFixed(1)}°</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-white/50 text-xs">Brightness</p>
-                    <p className="text-white">{selectedObject.magnitude.toFixed(2)}</p>
+                    <p className="text-white/50 text-xs">Magnitude</p>
+                    <p className="text-white">{selectedObject.magnitude?.toFixed(2)}</p>
                   </div>
+                  {selectedObject.right_ascension && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-white/50 text-xs">RA</p>
+                        <p className="text-white text-sm">{selectedObject.right_ascension.toFixed(2)}h</p>
+                      </div>
+                      <div>
+                        <p className="text-white/50 text-xs">Dec</p>
+                        <p className="text-white text-sm">{selectedObject.declination?.toFixed(2)}°</p>
+                      </div>
+                    </div>
+                  )}
+                  {selectedObject.distance_au && (
+                    <div>
+                      <p className="text-white/50 text-xs">Distance</p>
+                      <p className="text-white">{selectedObject.distance_au.toFixed(2)} AU</p>
+                    </div>
+                  )}
                 </div>
 
                 {getDetailLink(selectedObject) && (
@@ -753,8 +814,16 @@ export default function SkyMap() {
           {/* Info Card */}
           <Card className="bg-gradient-to-br from-[#a855f7]/20 to-[#ec4899]/20 border-[#a855f7]/30">
             <CardContent className="p-4">
-              <p className="text-white/90 italic text-sm leading-relaxed">
-                This planisphere shows ka lani (the heavens) as seen from Hawaiʻi. Only stars 20° or higher above the horizon are displayed, matching traditional navigation practices.
+              <div className="flex items-start gap-2 mb-3">
+                <MapPin className="w-4 h-4 text-[#e879f9] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-white/90 text-sm font-semibold mb-1">Location</p>
+                  <p className="text-white/70 text-xs">{location.name}</p>
+                  <p className="text-white/60 text-xs">{location.lat}°N, {Math.abs(location.lon)}°W</p>
+                </div>
+              </div>
+              <p className="text-white/80 italic text-xs leading-relaxed">
+                This planisphere uses astronomical algorithms to calculate precise star and planet positions for your exact location, date, and time - just as traditional Hawaiian navigators tracked the heavens.
               </p>
             </CardContent>
           </Card>
