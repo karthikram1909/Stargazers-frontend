@@ -332,19 +332,15 @@ VALIDATION CHECKLIST before you return:
     // Draw background image if loaded
     if (backgroundImageRef.current) {
       ctx.save();
-      ctx.globalAlpha = 0.4; // Darkened from 0.6 to 0.4 for better readability
+      ctx.globalAlpha = 0.6; // Make it slightly transparent so overlays are visible
       ctx.drawImage(backgroundImageRef.current, 0, 0, width, height);
       ctx.restore();
-      
-      // Add additional dark overlay for better contrast
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-      ctx.fillRect(0, 0, width, height);
     } else {
       // Fallback gradient if image not loaded
       const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
-      bgGradient.addColorStop(0, '#0a0a1e');
-      bgGradient.addColorStop(0.5, '#0f0f28');
-      bgGradient.addColorStop(1, '#050510');
+      bgGradient.addColorStop(0, '#1a0b2e');
+      bgGradient.addColorStop(0.5, '#16213e');
+      bgGradient.addColorStop(1, '#0f0920');
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, width, height);
     }
