@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,20 @@ export default function Planets() {
     queryKey: ['planets'],
     queryFn: async () => {
       const data = await base44.entities.Planet.list();
-      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+      // Sort planets in order from the Sun
+      const planetOrder = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+      return data.sort((a, b) => {
+        const orderA = planetOrder.indexOf(a.english_name);
+        const orderB = planetOrder.indexOf(b.english_name);
+        // If planet not in order list, put it at the end
+        if (orderA === -1 && orderB === -1) {
+            // Both not in the list, sort by Hawaiian name
+            return a.hawaiian_name.localeCompare(b.hawaiian_name);
+        }
+        if (orderA === -1) return 1; // a is not in list, b is (or is also not in list but handled by previous condition)
+        if (orderB === -1) return -1; // b is not in list, a is
+        return orderA - orderB; // Both are in the list, sort by their order
+      });
     },
     initialData: [],
   });
