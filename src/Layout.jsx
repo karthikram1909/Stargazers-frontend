@@ -239,11 +239,10 @@ export default function Layout({ children }) {
               </div>
               <Button
                 onClick={handleFontSizeChange}
-                className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white hover:opacity-90 px-2 py-1 h-auto flex flex-col items-center gap-0"
+                className="border-2 border-[#60A5FA] bg-transparent text-white hover:bg-[#60A5FA]/10 px-3 py-1.5 h-auto"
                 title="Change text size"
               >
                 <span className="font-semibold text-[10px]">Type Size</span>
-                <span className="font-normal text-[8px] opacity-80">{getFontSizeLabel()}</span>
               </Button>
             </div>
             
