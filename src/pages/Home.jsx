@@ -110,7 +110,7 @@ export default function Home() {
         - Mercury: ʻUkulele
         - Venus: Hōkūloa
         - Mars: Hōkūʻula
-        - Jupiter: Hōkūleʻa
+        - Jupiter: Ka'āwela
         - Saturn: Makulu
         - Uranus: Heleʻekela
         - Neptune: Naholoholo

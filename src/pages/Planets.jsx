@@ -43,6 +43,15 @@ export default function Planets() {
         For Saturn, Uranus, and Neptune - set visible: true with accurate data
         For Mercury, Venus, Mars, and Jupiter - set visible: false, visibility_quality: "not_visible"
         
+        Use these exact Hawaiian names:
+        - Mercury: ʻUkulele
+        - Venus: Hōkūloa
+        - Mars: Hōkūʻula
+        - Jupiter: Ka'āwela
+        - Saturn: Makulu
+        - Uranus: Heleʻekala
+        - Neptune: Naholoholo
+        
         For each planet, include: 
         - visible (true/false)
         - visibility_quality (excellent/good/fair/poor/not_visible)
