@@ -193,41 +193,11 @@ export default function SkyMap() {
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
                       </clipPath>
-                      <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="100%" stopColor="#1E3A5F" />
-                      </linearGradient>
                     </defs>
                     
                     <g clipPath="url(#circleClip)">
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
-                      
-                      {/* Text in black area */}
-                      <text 
-                        x="200" 
-                        y="120" 
-                        textAnchor="middle" 
-                        dominantBaseline="middle"
-                        fill="url(#blueGradient)" 
-                        fontSize="16"
-                        fontWeight="bold"
-                        letterSpacing="2"
-                      >
-                        STARGAZERS ANONYMOUS
-                      </text>
-                      <text 
-                        x="200" 
-                        y="145" 
-                        textAnchor="middle" 
-                        dominantBaseline="middle"
-                        fill="url(#blueGradient)" 
-                        fontSize="18"
-                        fontWeight="bold"
-                        letterSpacing="3"
-                      >
-                        MAUI
-                      </text>
                       
                       {/* Outer date ring */}
                       <circle cx="200" cy="200" r="195" fill="none" stroke="white" strokeWidth="2"/>
