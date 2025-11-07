@@ -6,10 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-// Accurate moon phase calculation
+// Accurate moon phase calculation using cosine formula
 const calculateMoonPhase = (date = new Date()) => {
   // Known new moon date: January 6, 2000 at 18:14 UTC
-  // Using a specific reference point for consistency
   const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14));
   const lunarCycle = 29.53058867; // average synodic month length in days
   
@@ -19,41 +18,31 @@ const calculateMoonPhase = (date = new Date()) => {
   // Calculate current position in lunar cycle (0 to lunarCycle)
   const currentCycle = daysSinceNewMoon % lunarCycle;
   
-  // Normalize currentCycle to be positive if negative (e.g., if date is before knownNewMoon)
+  // Normalize currentCycle to be positive if negative
   const normalizedCycle = currentCycle < 0 ? currentCycle + lunarCycle : currentCycle;
 
-  // Calculate illumination percentage - proper formula
-  // Waxing: 0% to 100% (days 0 to 14.76)
-  // Waning: 100% to 0% (days 14.76 to 29.53)
-  let illumination;
-  const halfCycle = lunarCycle / 2;
+  // Calculate illumination percentage using accurate cosine formula
+  // This matches the actual illumination curve of the moon
+  const angle = (normalizedCycle / lunarCycle) * 2 * Math.PI;
+  const illumination = Math.round((1 - Math.cos(angle)) / 2 * 100);
   
-  if (normalizedCycle < halfCycle) {
-    // Waxing: increases from 0 to 100%
-    illumination = (normalizedCycle / halfCycle) * 100;
-  } else {
-    // Waning: decreases from 100 to 0%
-    illumination = ((lunarCycle - normalizedCycle) / halfCycle) * 100;
-  }
-  illumination = Math.round(illumination);
-  
-  // Determine phase name based on cycle position with corrected thresholds
+  // Determine phase name based on cycle position
   let phaseName;
-  if (normalizedCycle < 1.84566) { // ~0-1.8 days
+  if (normalizedCycle < 1.84566) {
     phaseName = "New Moon";
-  } else if (normalizedCycle < 7.38264) { // ~1.8-7.4 days
+  } else if (normalizedCycle < 7.38264) {
     phaseName = "Waxing Crescent";
-  } else if (normalizedCycle < 9.22830) { // ~7.4-9.2 days (First Quarter is around 7.38 days)
+  } else if (normalizedCycle < 9.22830) {
     phaseName = "First Quarter";
-  } else if (normalizedCycle < 13.76528) { // ~9.2-13.8 days
+  } else if (normalizedCycle < 13.76528) {
     phaseName = "Waxing Gibbous";
-  } else if (normalizedCycle < 15.76528) { // ~13.8-15.8 days - NARROWED FULL MOON WINDOW (±1 day around peak at 14.76)
+  } else if (normalizedCycle < 15.76528) {
     phaseName = "Full Moon";
-  } else if (normalizedCycle < 22.14792) { // ~15.8-22.1 days - CORRECTED: now includes early waning gibbous
+  } else if (normalizedCycle < 22.14792) {
     phaseName = "Waning Gibbous";
-  } else if (normalizedCycle < 23.99358) { // ~22.1-23.9 days (Last Quarter is around 22.14 days)
+  } else if (normalizedCycle < 23.99358) {
     phaseName = "Last Quarter";
-  } else { // ~23.9-29.5 days
+  } else {
     phaseName = "Waning Crescent";
   }
   
