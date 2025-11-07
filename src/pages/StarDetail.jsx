@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -86,8 +87,12 @@ export default function StarDetail() {
       <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
         <CardHeader className="pb-4">
           <div className="flex items-start gap-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0 star-twinkle">
-              <Star className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 star-twinkle" style={{ backgroundColor: '#000' }}>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5e18e74fc_IMG_2150.jpeg"
+                alt="Star"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">

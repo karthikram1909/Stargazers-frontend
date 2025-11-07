@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,12 @@ export default function StarCard({ star, onEdit, onDelete }) {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                <Star className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0" style={{ backgroundColor: '#000' }}>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5e18e74fc_IMG_2150.jpeg"
+                  alt="Star"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
