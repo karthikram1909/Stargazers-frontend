@@ -9,7 +9,7 @@ export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartAngle, setDragStartAngle] = useState(0);
-  const [starChartImage, setStarChartImage] = useState("https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/b0b1ed8a3_Screenshot2025-11-06at123426PM.png");
+  const [starChartImage, setStarChartImage] = useState("https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/b0b1ed8a5_Screenshot2025-11-06at123426PM.png");
   const [uploading, setUploading] = useState(false);
   const planisphereRef = useRef(null);
 
@@ -173,6 +173,10 @@ export default function SkyMap() {
                     src={starChartImage}
                     alt="Hawaiian Star Chart"
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error("Image failed to load:", starChartImage);
+                      e.target.style.display = 'none';
+                    }}
                   />
                 </div>
 
@@ -193,11 +197,11 @@ export default function SkyMap() {
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
                       </clipPath>
-                      {/* Much brighter gradient for maximum visibility */}
+                      {/* Extra bright gradient with white at top for maximum visibility */}
                       <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#93C5FD" />
-                        <stop offset="50%" stopColor="#60A5FA" />
-                        <stop offset="100%" stopColor="#3B82F6" />
+                        <stop offset="0%" stopColor="#E0F2FE" />
+                        <stop offset="40%" stopColor="#BAE6FD" />
+                        <stop offset="100%" stopColor="#7DD3FC" />
                       </linearGradient>
                       {/* More pronounced curve for STARGAZERS ANONYMOUS and positioned lower */}
                       <path 
@@ -216,13 +220,13 @@ export default function SkyMap() {
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
                       
-                      {/* Brighter blue text in black area below window */}
-                      <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2">
+                      {/* Extra bright text */}
+                      <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2" stroke="#BAE6FD" strokeWidth="0.5">
                         <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
                           STARGAZERS ANONYMOUS
                         </textPath>
                       </text>
-                      <text fill="url(#blueGradient)" fontSize="28" fontWeight="bold" letterSpacing="4">
+                      <text fill="url(#blueGradient)" fontSize="28" fontWeight="bold" letterSpacing="4" stroke="#BAE6FD" strokeWidth="0.5">
                         <textPath href="#curveBottom" startOffset="50%" textAnchor="middle">
                           MAUI
                         </textPath>
