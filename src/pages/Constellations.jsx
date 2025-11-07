@@ -21,12 +21,7 @@ export default function Constellations() {
     queryKey: ['constellations'],
     queryFn: async () => {
       const data = await base44.entities.Constellation.list();
-      // Flatten the data structure
-      const flattened = data.map(item => ({
-        id: item.id,
-        ...item.data
-      }));
-      return flattened.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
     },
     initialData: [],
   });
