@@ -37,7 +37,7 @@ const calculateMoonPhase = (date = new Date()) => {
   }
   illumination = Math.round(illumination);
   
-  // Determine phase name based on cycle position (approximate thresholds)
+  // Determine phase name based on cycle position with corrected thresholds
   let phaseName;
   if (normalizedCycle < 1.84566) { // ~0-1.8 days
     phaseName = "New Moon";
@@ -45,18 +45,16 @@ const calculateMoonPhase = (date = new Date()) => {
     phaseName = "Waxing Crescent";
   } else if (normalizedCycle < 9.22830) { // ~7.4-9.2 days (First Quarter is around 7.38 days)
     phaseName = "First Quarter";
-  } else if (normalizedCycle < 14.76528) { // ~9.2-14.7 days
+  } else if (normalizedCycle < 13.76528) { // ~9.2-13.8 days
     phaseName = "Waxing Gibbous";
-  } else if (normalizedCycle < 16.61094) { // ~14.7-16.6 days (Full Moon is around 14.76 days)
+  } else if (normalizedCycle < 15.76528) { // ~13.8-15.8 days - NARROWED FULL MOON WINDOW (±1 day around peak at 14.76)
     phaseName = "Full Moon";
-  } else if (normalizedCycle < 22.14792) { // ~16.6-22.1 days
+  } else if (normalizedCycle < 22.14792) { // ~15.8-22.1 days - CORRECTED: now includes early waning gibbous
     phaseName = "Waning Gibbous";
   } else if (normalizedCycle < 23.99358) { // ~22.1-23.9 days (Last Quarter is around 22.14 days)
     phaseName = "Last Quarter";
-  } else if (normalizedCycle < 29.53058) { // ~23.9-29.5 days
+  } else { // ~23.9-29.5 days
     phaseName = "Waning Crescent";
-  } else { // Covers the end of the cycle back to New Moon
-    phaseName = "New Moon";
   }
   
   return {
