@@ -197,15 +197,15 @@ export default function SkyMap() {
                         <stop offset="0%" stopColor="#60A5FA" />
                         <stop offset="100%" stopColor="#1E3A8A" />
                       </linearGradient>
-                      {/* Path for curved text - smile shape at bottom */}
+                      {/* Adjusted curved paths - moved lower and wider arc for better visibility */}
                       <path 
                         id="curveTop" 
-                        d="M 80 290 Q 200 320 320 290" 
+                        d="M 60 305 Q 200 340 340 305" 
                         fill="none"
                       />
                       <path 
                         id="curveBottom" 
-                        d="M 80 320 Q 200 350 320 320" 
+                        d="M 60 335 Q 200 370 340 335" 
                         fill="none"
                       />
                     </defs>
@@ -214,13 +214,13 @@ export default function SkyMap() {
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
                       
-                      {/* Text in black area below window */}
-                      <text fill="url(#blueGradient)" fontSize="24" fontWeight="bold" letterSpacing="3">
+                      {/* Text in black area below window - smaller font size and better placement */}
+                      <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2">
                         <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
                           STARGAZERS ANONYMOUS
                         </textPath>
                       </text>
-                      <text fill="url(#blueGradient)" fontSize="32" fontWeight="bold" letterSpacing="5">
+                      <text fill="url(#blueGradient)" fontSize="28" fontWeight="bold" letterSpacing="4">
                         <textPath href="#curveBottom" startOffset="50%" textAnchor="middle">
                           MAUI
                         </textPath>
