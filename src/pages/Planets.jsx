@@ -125,8 +125,12 @@ export default function Planets() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-center md:text-left">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] flex items-center justify-center mx-auto md:mx-0 mb-4">
-            <Globe className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+              alt="Planets"
+              className="w-full h-full object-cover"
+            />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
             Nā Hōkūhele - The Wandering Stars
@@ -182,7 +186,13 @@ export default function Planets() {
       ) : filteredPlanets.length === 0 && filteredDwarfPlanets.length === 0 ? (
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
-            <Globe className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4">
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                alt="Planets"
+                className="w-full h-full object-cover opacity-30"
+              />
+            </div>
             <h3 className="text-xl text-white mb-2">
               {searchQuery ? "No planets found" : "No planets yet"}
             </h3>
@@ -240,8 +250,12 @@ export default function Planets() {
                           </div>
                         ) : (
                           <div className="flex-shrink-0">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                              <Globe className="w-6 h-6 text-white" />
+                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                              <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                                alt="Planet"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           </div>
                         )}
@@ -359,8 +373,12 @@ export default function Planets() {
                           </div>
                         ) : (
                           <div className="flex-shrink-0">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                              <Globe className="w-6 h-6 text-white" />
+                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                              <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                                alt="Planet"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           </div>
                         )}

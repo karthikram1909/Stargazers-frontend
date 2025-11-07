@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -115,8 +116,12 @@ export default function PlanetDetail() {
                 </div>
               </div>
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center flex-shrink-0 mx-auto md:mx-0">
-                <Globe className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 mx-auto md:mx-0">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                  alt="Planet"
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
             <div className="flex-1 text-center md:text-left">
