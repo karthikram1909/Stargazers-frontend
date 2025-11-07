@@ -167,48 +167,16 @@ export default function SkyMap() {
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
               >
-                {/* Base Star Chart with Fixed Text Overlay */}
+                {/* Base Star Chart - No text overlay */}
                 <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
                   <img 
                     src={starChartImage}
                     alt="Hawaiian Star Chart"
                     className="w-full h-full object-cover"
                   />
-                  {/* Fixed Text Overlay (Not Rotating) */}
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 400">
-                    <defs>
-                      <linearGradient id="blueGradientFixed" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="100%" stopColor="#1E3A8A" />
-                      </linearGradient>
-                      {/* Path for curved text - smile shape at bottom */}
-                      <path 
-                        id="curveTop" 
-                        d="M 80 290 Q 200 320 320 290" 
-                        fill="none"
-                      />
-                      <path 
-                        id="curveBottom" 
-                        d="M 80 320 Q 200 350 320 320" 
-                        fill="none"
-                      />
-                    </defs>
-                    
-                    {/* Curved text */}
-                    <text fill="url(#blueGradientFixed)" fontSize="24" fontWeight="bold" letterSpacing="3">
-                      <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
-                        STARGAZERS ANONYMOUS
-                      </textPath>
-                    </text>
-                    <text fill="url(#blueGradientFixed)" fontSize="32" fontWeight="bold" letterSpacing="5">
-                      <textPath href="#curveBottom" startOffset="50%" textAnchor="middle">
-                        MAUI
-                      </textPath>
-                    </text>
-                  </svg>
                 </div>
 
-                {/* Rotating Overlay */}
+                {/* Rotating Overlay with Text */}
                 <div
                   className="absolute inset-0 pointer-events-none rounded-full overflow-hidden"
                   style={{
@@ -225,11 +193,38 @@ export default function SkyMap() {
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
                       </clipPath>
+                      <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#60A5FA" />
+                        <stop offset="100%" stopColor="#1E3A8A" />
+                      </linearGradient>
+                      {/* Path for curved text - smile shape at bottom */}
+                      <path 
+                        id="curveTop" 
+                        d="M 80 290 Q 200 320 320 290" 
+                        fill="none"
+                      />
+                      <path 
+                        id="curveBottom" 
+                        d="M 80 320 Q 200 350 320 320" 
+                        fill="none"
+                      />
                     </defs>
                     
                     <g clipPath="url(#circleClip)">
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
+                      
+                      {/* Text in black area below window */}
+                      <text fill="url(#blueGradient)" fontSize="24" fontWeight="bold" letterSpacing="3">
+                        <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
+                          STARGAZERS ANONYMOUS
+                        </textPath>
+                      </text>
+                      <text fill="url(#blueGradient)" fontSize="32" fontWeight="bold" letterSpacing="5">
+                        <textPath href="#curveBottom" startOffset="50%" textAnchor="middle">
+                          MAUI
+                        </textPath>
+                      </text>
                       
                       {/* Outer date ring */}
                       <circle cx="200" cy="200" r="195" fill="none" stroke="white" strokeWidth="2"/>
