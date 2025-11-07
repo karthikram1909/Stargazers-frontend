@@ -5,6 +5,7 @@ import { Moon, Star, Sunrise, Sunset, Navigation, Sparkles } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import MoonPhaseIcon from "../components/MoonPhaseIcon";
 
 // Accurate moon phase calculation using cosine formula
 const calculateMoonPhase = (date = new Date()) => {
@@ -28,27 +29,38 @@ const calculateMoonPhase = (date = new Date()) => {
   
   // Determine phase name based on cycle position
   let phaseName;
+  let phaseType; // For the icon component
+  
   if (normalizedCycle < 1.84566) {
     phaseName = "New Moon";
+    phaseType = "new";
   } else if (normalizedCycle < 7.38264) {
     phaseName = "Waxing Crescent";
+    phaseType = "waxing-crescent";
   } else if (normalizedCycle < 9.22830) {
     phaseName = "First Quarter";
+    phaseType = "first-quarter";
   } else if (normalizedCycle < 13.76528) {
     phaseName = "Waxing Gibbous";
+    phaseType = "waxing-gibbous";
   } else if (normalizedCycle < 15.76528) {
     phaseName = "Full Moon";
+    phaseType = "full";
   } else if (normalizedCycle < 22.14792) {
     phaseName = "Waning Gibbous";
+    phaseType = "waning-gibbous";
   } else if (normalizedCycle < 23.99358) {
     phaseName = "Last Quarter";
+    phaseType = "last-quarter";
   } else {
     phaseName = "Waning Crescent";
+    phaseType = "waning-crescent";
   }
   
   return {
     name: phaseName,
-    percentage: illumination
+    percentage: illumination,
+    type: phaseType
   };
 };
 
@@ -198,7 +210,7 @@ export default function Home() {
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-white">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-              <Moon className="w-6 h-6 text-[#0A1929]" />
+              <MoonPhaseIcon phase={moonPhase.type} className="w-6 h-6 text-[#0A1929]" />
             </div>
             <div>
               <div className="text-2xl">{moonPhase.name}</div>
