@@ -193,11 +193,11 @@ export default function SkyMap() {
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
                       </clipPath>
-                      {/* Richer blue gradient */}
+                      {/* Much brighter gradient for maximum visibility */}
                       <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="50%" stopColor="#3B82F6" />
-                        <stop offset="100%" stopColor="#1E3A8A" />
+                        <stop offset="0%" stopColor="#93C5FD" />
+                        <stop offset="50%" stopColor="#60A5FA" />
+                        <stop offset="100%" stopColor="#3B82F6" />
                       </linearGradient>
                       {/* More pronounced curve for STARGAZERS ANONYMOUS and positioned lower */}
                       <path 
@@ -216,7 +216,7 @@ export default function SkyMap() {
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
                       
-                      {/* Richer blue text in black area below window */}
+                      {/* Brighter blue text in black area below window */}
                       <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2">
                         <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
                           STARGAZERS ANONYMOUS
