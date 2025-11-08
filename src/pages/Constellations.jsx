@@ -26,9 +26,7 @@ export default function Constellations() {
     initialData: [],
   });
 
-  // Find Me'e constellation for the icon
-  const meeConstellation = constellations.find(c => c.hawaiian_name === "Me'e" || c.english_name === "Corvus");
-  const constellationIconUrl = meeConstellation?.image_url;
+  const constellationIconUrl = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d504fe57f_IMG_2160.jpeg";
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Constellation.create(data),
@@ -101,19 +99,13 @@ export default function Constellations() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-center md:text-left">
-          {constellationIconUrl ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
-              <img 
-                src={constellationIconUrl}
-                alt="Me'e Constellation"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto md:mx-0 mb-4">
-              <Stars className="w-8 h-8 text-white" />
-            </div>
-          )}
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
+            <img 
+              src={constellationIconUrl}
+              alt="Constellation"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <h1 className="text-4xl font-bold text-white mb-2">
             Constellation Guide
           </h1>
@@ -169,17 +161,13 @@ export default function Constellations() {
       ) : filteredConstellations.length === 0 ? (
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
-            {constellationIconUrl ? (
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4 opacity-30">
-                <img 
-                  src={constellationIconUrl}
-                  alt="Me'e Constellation"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <Stars className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            )}
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4 opacity-30">
+              <img 
+                src={constellationIconUrl}
+                alt="Constellation"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <h3 className="text-xl text-white mb-2">
               {searchQuery ? "No constellations found" : "No constellations yet"}
             </h3>
@@ -227,7 +215,7 @@ export default function Constellations() {
                         </div>
                       </div>
                     </div>
-                  ) : constellationIconUrl ? (
+                  ) : (
                     <div className="flex-shrink-0">
                       <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
                         <img 
@@ -235,12 +223,6 @@ export default function Constellations() {
                           alt="Constellation"
                           className="w-full h-full object-cover"
                         />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
-                        <Stars className="w-6 h-6 text-white" />
                       </div>
                     </div>
                   )}
