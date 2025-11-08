@@ -98,8 +98,12 @@ export default function Moon() {
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center mx-auto mb-4">
-          <MoonIcon className="w-8 h-8 text-white" />
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4">
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a7c8bc5c2_moonphaseimage.jpeg"
+            alt="Moon Phases"
+            className="w-full h-full object-cover"
+          />
         </div>
         <h1 className="text-4xl font-bold text-white mb-2">
           Mahina - Hawaiian Lunar Calendar
