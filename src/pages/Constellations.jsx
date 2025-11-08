@@ -26,7 +26,7 @@ export default function Constellations() {
     initialData: [],
   });
 
-  const constellationIconUrl = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d504fe57f_IMG_2160.jpeg";
+  const constellationIconUrl = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/956757e39_IMG_2167.jpeg";
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Constellation.create(data),
