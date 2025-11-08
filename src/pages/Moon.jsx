@@ -100,7 +100,7 @@ export default function Moon() {
       <div className="text-center mb-8">
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a7c8bc5c2_moonphaseimage.jpeg"
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/a7c8bc5c4_moonphaseimage.jpeg"
             alt="Moon Phases"
             className="w-full h-full object-cover"
           />
