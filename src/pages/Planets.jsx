@@ -127,7 +127,7 @@ export default function Planets() {
         <div className="text-center md:text-left">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
             <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
               alt="Planets"
               className="w-full h-full object-cover"
             />
@@ -188,7 +188,7 @@ export default function Planets() {
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                 alt="Planets"
                 className="w-full h-full object-cover opacity-30"
               />
@@ -252,7 +252,7 @@ export default function Planets() {
                           <div className="flex-shrink-0">
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
                               <img 
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                                 alt="Planet"
                                 className="w-full h-full object-cover"
                               />
@@ -375,7 +375,7 @@ export default function Planets() {
                           <div className="flex-shrink-0">
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
                               <img 
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                                 alt="Planet"
                                 className="w-full h-full object-cover"
                               />
