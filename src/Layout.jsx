@@ -238,9 +238,9 @@ export default function Layout({ children }) {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-3">
                 <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/c48fece3e_KILOHAKU2.png" 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg" 
                   alt="Stargazers Anonymous" 
-                  className="w-14 h-14 rounded-full object-cover border-2 border-[#60A5FA]"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-[#60A5FA]"
                 />
                 <div>
                   <h1 className="text-lg font-bold text-white whitespace-nowrap">Stargazers Anonymous</h1>
