@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+import ImageModal from "./components/ImageModal";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -14,6 +15,8 @@ export default function Layout({ children }) {
   const [fontSize, setFontSize] = useState('normal');
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
 
   // Fetch all searchable data
   const { data: stars } = useQuery({
@@ -48,11 +51,11 @@ export default function Layout({ children }) {
         setSearchOpen(false);
       }
     };
-    
+
     if (searchOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [searchOpen]);
 
@@ -64,11 +67,11 @@ export default function Layout({ children }) {
         setSearchQuery("");
       }
     };
-    
+
     if (searchOpen) {
       document.addEventListener('keydown', handleEsc);
     }
-    
+
     return () => document.removeEventListener('keydown', handleEsc);
   }, [searchOpen]);
 
@@ -88,6 +91,11 @@ export default function Layout({ children }) {
       case 'xlarge': return 'X-Large';
       default: return 'Normal';
     }
+  };
+
+  const handleImageClick = (imageUrl, title) => {
+    setSelectedImage({ url: imageUrl, title: title });
+    setImageModalOpen(true);
   };
 
   // Search filtering
@@ -171,7 +179,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen relative">
       {/* Background with inline style */}
-      <div 
+      <div
         style={{
           position: 'fixed',
           top: 0,
@@ -185,9 +193,9 @@ export default function Layout({ children }) {
           zIndex: 0
         }}
       />
-      
+
       {/* Overlay - Lightened so couple is visible */}
-      <div 
+      <div
         style={{
           position: 'fixed',
           top: 0,
@@ -198,7 +206,7 @@ export default function Layout({ children }) {
           zIndex: 1
         }}
       />
-      
+
       {/* Content */}
       <div className="relative min-h-screen" style={{ zIndex: 2 }}>
         <style>{`
@@ -210,12 +218,12 @@ export default function Layout({ children }) {
             --cyan: #06B6D4;
             --sand: #F8F9FA;
           }
-          
+
           @keyframes twinkle {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
           }
-          
+
           .star-twinkle {
             animation: twinkle 3s ease-in-out infinite;
           }
@@ -237,11 +245,19 @@ export default function Layout({ children }) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-3">
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg" 
-                  alt="Stargazers Anonymous" 
-                  className="w-20 h-20 rounded-full object-cover border-2 border-[#60A5FA]"
-                />
+                <div
+                  onClick={() => handleImageClick(
+                    "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg",
+                    "Stargazers Anonymous - Kilo Hōkū"
+                  )}
+                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                >
+                  <img
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg"
+                    alt="Stargazers Anonymous"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-[#60A5FA]"
+                  />
+                </div>
                 <div>
                   <h1 className="text-lg font-bold text-white whitespace-nowrap">Stargazers Anonymous</h1>
                   <p className="text-xs text-white/80">Kilo Hōkū • Hawaiian Astronomy</p>
@@ -255,7 +271,7 @@ export default function Layout({ children }) {
                 <span className="font-semibold text-[10px]">Type Size</span>
               </Button>
             </div>
-            
+
             <div className="flex gap-1 pb-3 overflow-x-auto no-scrollbar">
               {/* Search Button with Dropdown */}
               <div className="relative search-container">
@@ -269,10 +285,10 @@ export default function Layout({ children }) {
                   <Search className="w-3.5 h-3.5" />
                   Search
                 </button>
-                
+
                 {/* Search Dropdown */}
                 {searchOpen && (
-                  <div 
+                  <div
                     className="fixed left-4 right-4 top-32 sm:absolute sm:left-0 sm:right-auto sm:top-full mt-2 w-auto sm:w-[90vw] sm:max-w-2xl bg-black/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden"
                     style={{ zIndex: 9999 }}
                     onClick={(e) => e.stopPropagation()}
@@ -301,7 +317,7 @@ export default function Layout({ children }) {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="max-h-[70vh] overflow-y-auto">
                       {!searchQuery ? (
                         <div className="p-8 text-center">
@@ -406,7 +422,7 @@ export default function Layout({ children }) {
                   </div>
                 )}
               </div>
-              
+
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -444,6 +460,14 @@ export default function Layout({ children }) {
           </div>
         </footer>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+        imageUrl={selectedImage.url}
+        title={selectedImage.title}
+      />
     </div>
   );
 }
