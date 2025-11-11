@@ -1,6 +1,6 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { Moon, Star, Sunrise, Sunset, Navigation, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -65,44 +65,42 @@ const calculateMoonPhase = (date = new Date()) => {
 };
 
 export default function Home() {
-  const [skyData, setSkyData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [featuredConstellation, setFeaturedConstellation] = useState(null);
-  const [moonPhase, setMoonPhase] = useState(null); // New state for moon phase
-  const [allPlanets, setAllPlanets] = useState([]);
+  const [moonPhase, setMoonPhase] = useState(null);
 
   useEffect(() => {
     // Calculate accurate moon phase locally
     const phase = calculateMoonPhase();
     setMoonPhase(phase);
-    
-    fetchPlanets();
-    fetchSkyData();
-    fetchFeaturedConstellation();
   }, []);
 
-  const fetchPlanets = async () => {
-    try {
+  // Fetch all planets with proper caching
+  const { data: allPlanets = [], isLoading: isLoadingPlanets } = useQuery({
+    queryKey: ['planets'],
+    queryFn: async () => {
       const planets = await base44.entities.Planet.list();
-      setAllPlanets(planets);
-    } catch (error) {
-      console.error("Error fetching planets:", error);
-    }
-  };
+      return planets;
+    },
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+  });
 
-  const fetchFeaturedConstellation = async () => {
-    try {
+  // Fetch featured constellation with proper caching
+  const { data: featuredConstellation } = useQuery({
+    queryKey: ['featuredConstellation'],
+    queryFn: async () => {
       const constellations = await base44.entities.Constellation.list();
-      // Find Orion (Ka Heihei o nā Keiki) or get a random constellation
+      // Find Orion (Ka Heihei o nā Keiki) or get first constellation
       const orion = constellations.find(c => c.english_name === 'Orion');
-      setFeaturedConstellation(orion || constellations[0]);
-    } catch (error) {
-      console.error("Error fetching constellation:", error);
-    }
-  };
+      return orion || constellations[0];
+    },
+    staleTime: 60 * 60 * 1000, // Cache for 1 hour
+    cacheTime: 2 * 60 * 60 * 1000, // Keep in cache for 2 hours
+  });
 
-  const fetchSkyData = async () => {
-    try {
+  // Fetch sky data with improved prompt and proper caching
+  const { data: skyData, isLoading: isLoadingSkyData } = useQuery({
+    queryKey: ['skyData', new Date().toDateString()], // Key changes daily
+    queryFn: async () => {
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-US', { 
         year: 'numeric', 
@@ -112,25 +110,30 @@ export default function Home() {
       });
       
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate current night sky data for Hawaii (Mauna Kea coordinates: 19.82°N, 155.47°W) for TODAY's date ${dateStr}.
-        
-        For visible planets, determine which ones are ACTUALLY visible tonight based on the current date and their orbital positions.
-        
-        Use these exact Hawaiian names for planets when they are visible:
-        - Mercury: ʻUkulele
-        - Venus: Hōkūloa
-        - Mars: Hōkūʻula
-        - Jupiter: Ka'āwela
-        - Saturn: Makulu
-        - Uranus: Heleʻekela
-        - Neptune: Naholoholo
-        
-        Return JSON with: 
-        - current_date
-        - visible_planets (array with english_name and hawaiian_name for planets ACTUALLY visible tonight)
-        - sunset_time (actual for Hawaii on this date)
-        - sunrise_time (actual for Hawaii on this date)
-        - best_viewing_hours`,
+        prompt: `You are an astronomy expert. For Hawaii (Mauna Kea: 19.82°N, 155.47°W) on ${dateStr}:
+
+CRITICAL INSTRUCTIONS:
+1. Use REAL astronomical data from reliable sources to determine which planets are ACTUALLY visible tonight after sunset
+2. A planet is ONLY visible if it is above the horizon during nighttime hours (after sunset, before sunrise)
+3. Research current planetary positions and visibility for this EXACT date
+4. Do NOT guess - use actual astronomical data
+5. If a planet is too close to the Sun or below the horizon at night, do NOT include it
+
+Planet name mappings (use these EXACT names):
+- Mercury: ʻUkulele
+- Venus: Hōkūloa  
+- Mars: Hōkūʻula
+- Jupiter: Kaʻāwela
+- Saturn: Makulu
+- Uranus: Heleʻekela
+- Neptune: Naholoholo
+
+Return accurate data for:
+- Which planets are truly visible tonight (research this carefully)
+- Actual sunset/sunrise times for Hawaii on this date
+- Best viewing hours
+
+IMPORTANT: Only include planets that are actually visible tonight. If uncertain, research current sky conditions for Hawaii.`,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",
@@ -143,41 +146,47 @@ export default function Home() {
                 properties: {
                   english_name: { type: "string" },
                   hawaiian_name: { type: "string" }
-                }
+                },
+                required: ["english_name", "hawaiian_name"]
               }
             },
             sunset_time: { type: "string" },
             sunrise_time: { type: "string" },
             best_viewing_hours: { type: "string" }
-          }
+          },
+          required: ["current_date", "visible_planets", "sunset_time", "sunrise_time", "best_viewing_hours"]
         }
       });
-      setSkyData(result);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching sky data:", error);
-      setLoading(false);
-    }
-  };
+      
+      return result;
+    },
+    staleTime: 2 * 60 * 60 * 1000, // Cache for 2 hours (sky doesn't change that fast)
+    cacheTime: 4 * 60 * 60 * 1000, // Keep in cache for 4 hours
+    refetchOnWindowFocus: false, // Don't refetch when switching tabs
+    refetchOnMount: false, // Don't refetch on component remount
+  });
 
-  // Match visible planets with database planets to get IDs
-  const getVisiblePlanetsWithIds = () => {
+  // Match visible planets with database planets using useMemo to prevent recalculation
+  const visiblePlanetsWithIds = useMemo(() => {
     if (!skyData?.visible_planets || !allPlanets.length) return [];
     
-    return skyData.visible_planets.map(visiblePlanet => {
-      const matchedPlanet = allPlanets.find(p => 
-        p.english_name.toLowerCase() === visiblePlanet.english_name.toLowerCase()
-      );
-      return {
-        ...visiblePlanet,
-        id: matchedPlanet?.id
-      };
-    }).filter(planet => planet.id); // Only include planets we found in database
-  };
+    return skyData.visible_planets
+      .map(visiblePlanet => {
+        const matchedPlanet = allPlanets.find(p => 
+          p.english_name.toLowerCase().trim() === visiblePlanet.english_name.toLowerCase().trim()
+        );
+        return {
+          ...visiblePlanet,
+          id: matchedPlanet?.id,
+          image_url: matchedPlanet?.image_url
+        };
+      })
+      .filter(planet => planet.id); // Only include planets we found in database
+  }, [skyData?.visible_planets, allPlanets]);
 
-  const visiblePlanetsWithIds = getVisiblePlanetsWithIds();
+  const isLoading = isLoadingPlanets || isLoadingSkyData || !moonPhase;
 
-  if (loading || !moonPhase) { // Updated loading condition to wait for moonPhase
+  if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="animate-pulse space-y-6">
@@ -205,7 +214,7 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Moon Phase Card - Now uses dynamic moon phase icon */}
+      {/* Moon Phase Card */}
       <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-white">
@@ -235,15 +244,15 @@ export default function Home() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-white/70">Sunset</span>
-                <span className="text-white font-semibold text-lg">{skyData?.sunset_time}</span>
+                <span className="text-white font-semibold text-lg">{skyData?.sunset_time || "Loading..."}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-white/70">Sunrise</span>
-                <span className="text-white font-semibold text-lg">{skyData?.sunrise_time}</span>
+                <span className="text-white font-semibold text-lg">{skyData?.sunrise_time || "Loading..."}</span>
               </div>
               <div className="pt-3 border-t border-white/10">
                 <span className="text-white/70 text-sm">Best Viewing</span>
-                <p className="text-white mt-1">{skyData?.best_viewing_hours}</p>
+                <p className="text-white mt-1">{skyData?.best_viewing_hours || "Loading..."}</p>
               </div>
             </div>
           </CardContent>
@@ -259,18 +268,22 @@ export default function Home() {
           <CardContent>
             <div className="space-y-2">
               <p className="text-white/70 text-sm mb-3">Planets</p>
-              <div className="flex flex-wrap gap-2">
-                {visiblePlanetsWithIds.map((planet, index) => (
-                  <Link
-                    key={index}
-                    to={`${createPageUrl("PlanetDetail")}?id=${planet.id}`}
-                    className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-105 cursor-pointer"
-                  >
-                    <div className="font-bold">{planet.hawaiian_name}</div>
-                    <div className="text-xs opacity-80">{planet.english_name}</div>
-                  </Link>
-                ))}
-              </div>
+              {visiblePlanetsWithIds.length === 0 ? (
+                <p className="text-white/60 text-sm">Loading planet visibility...</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {visiblePlanetsWithIds.map((planet) => (
+                    <Link
+                      key={planet.id}
+                      to={`${createPageUrl("PlanetDetail")}?id=${planet.id}`}
+                      className="px-4 py-2 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 text-white text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-105 cursor-pointer"
+                    >
+                      <div className="font-bold">{planet.hawaiian_name}</div>
+                      <div className="text-xs opacity-80">{planet.english_name}</div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
