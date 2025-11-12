@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -105,7 +104,7 @@ export default function StarDetail() {
                     className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors p-2 rounded-full hover:bg-white/10"
                     title="Play pronunciation"
                   >
-                    <Volume2 className="w-6 h-6" />
+                    <Volume2 className="w-8 h-8" />
                   </button>
                 )}
               </div>

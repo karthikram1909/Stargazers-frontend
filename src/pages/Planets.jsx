@@ -271,7 +271,7 @@ export default function Planets() {
                                   className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                                   title="Play pronunciation"
                                 >
-                                  <Volume2 className="w-4 h-4" />
+                                  <Volume2 className="w-8 h-8" />
                                 </button>
                               )}
                             </div>
@@ -395,7 +395,7 @@ export default function Planets() {
                                     className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
                                     title="Play pronunciation"
                                   >
-                                    <Volume2 className="w-4 h-4" />
+                                    <Volume2 className="w-8 h-8" />
                                   </button>
                                 )}
                               </div>
