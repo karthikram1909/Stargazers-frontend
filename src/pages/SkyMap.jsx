@@ -109,6 +109,11 @@ export default function SkyMap() {
   const hour = Math.floor((normalizedAngle / 15) % 24); // Each hour approx 15 degrees
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  // Calculate the indicator position - it should stay fixed while the wheel rotates
+  // The indicator points to the current month being viewed
+  // Since the wheel rotates, the indicator angle needs to be opposite to show the correct month
+  const indicatorAngle = -rotationAngle;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
@@ -136,8 +141,8 @@ export default function SkyMap() {
                   <p className="text-white font-semibold">How to Use</p>
                 </div>
                 <p className="text-white/80 text-sm">
-                  Drag the outer wheel to rotate it. The visible portion shows which stars and 
-                  Hawaiian constellations are visible at that date and time from Hawaii.
+                  Drag the outer wheel to rotate it. The red indicator shows which month you're viewing. 
+                  The visible portion shows which stars and Hawaiian constellations are visible at that date and time from Hawaii.
                 </p>
               </div>
 
@@ -278,9 +283,23 @@ export default function SkyMap() {
                           </text>
                         ) : null;
                       })}
-                      
-                      {/* Rotation indicator at top */}
-                      <rect x="197" y="5" width="6" height="20" fill="#e879f9" rx="3"/>
+                    </g>
+                  </svg>
+                </div>
+
+                {/* Static Red Indicator - stays at top, points to current month */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    transform: `rotate(${indicatorAngle}deg)`,
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+                  }}
+                >
+                  <svg className="w-full h-full" viewBox="0 0 400 400">
+                    <g>
+                      {/* Red indicator pointing downward toward the month ring */}
+                      <rect x="197" y="5" width="6" height="25" fill="#ef4444" rx="3"/>
+                      <polygon points="200,30 195,35 205,35" fill="#ef4444"/>
                     </g>
                   </svg>
                 </div>
@@ -336,8 +355,8 @@ export default function SkyMap() {
                   Hawaii's latitude (20°N).
                 </p>
                 <p>
-                  Rotate the outer wheel to align your desired date and time - the visible 
-                  portion reveals which stars are above the horizon.
+                  Rotate the outer wheel to align your desired date and time - the red indicator 
+                  shows which month you're viewing, and the visible portion reveals which stars are above the horizon.
                 </p>
               </div>
             </CardContent>
