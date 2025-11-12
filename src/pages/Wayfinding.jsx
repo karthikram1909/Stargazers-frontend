@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Navigation, Compass, Waves, Wind, Search } from "lucide-react";
 
 const techniques = [
   {
@@ -32,33 +30,6 @@ const keyStars = [
 ];
 
 export default function Wayfinding() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Filter techniques and key stars based on search
-  const filteredTechniques = searchQuery.trim() === "" 
-    ? techniques 
-    : techniques.filter(technique => {
-        const query = searchQuery.toLowerCase();
-        return (
-          technique.title.toLowerCase().includes(query) ||
-          technique.description.toLowerCase().includes(query)
-        );
-      });
-
-  const filteredStars = searchQuery.trim() === "" 
-    ? keyStars 
-    : keyStars.filter(star => {
-        const query = searchQuery.toLowerCase();
-        return (
-          star.name.toLowerCase().includes(query) ||
-          star.western.toLowerCase().includes(query) ||
-          star.position.toLowerCase().includes(query) ||
-          star.use.toLowerCase().includes(query)
-        );
-      });
-
-  const hasSearchQuery = searchQuery.trim() !== "";
-  const hasResults = (hasSearchQuery && (filteredTechniques.length > 0 || filteredStars.length > 0)) || !hasSearchQuery;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -79,212 +50,102 @@ export default function Wayfinding() {
         </p>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-8">
-        <div className="relative max-w-2xl mx-auto">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
-          <Input
-            type="text"
-            placeholder="Search navigation techniques, stars..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm h-12 text-lg"
-          />
+      {/* Introduction */}
+      <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+        <CardContent className="p-8">
+          <p className="text-white/90 text-lg leading-relaxed mb-4">
+            For thousands of years, Polynesian navigators crossed vast ocean expanses using only the stars, 
+            waves, winds, and wildlife. Without instruments, they guided double-hulled canoes thousands of 
+            miles across open ocean, discovering and settling the islands of the Pacific.
+          </p>
+          <p className="text-white/70 leading-relaxed">
+            This knowledge system, called wayfinding, represents one of humanity's greatest intellectual 
+            achievements—a sophisticated science passed down through oral tradition, requiring years of 
+            training and a deep connection with the natural world.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Techniques */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-bold text-white mb-6">
+          Navigation Techniques
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {techniques.map((technique, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+            >
+              <CardHeader>
+                <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
+                  <img 
+                    src={technique.image}
+                    alt={technique.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardTitle className="text-white text-xl text-center">
+                  {technique.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-white/80 leading-relaxed">
+                  {technique.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
-      {/* Search Results */}
-      {hasSearchQuery && !hasResults && (
-        <Card className="mb-8 bg-white/5 border-white/20">
-          <CardContent className="p-8 text-center">
-            <p className="text-white/60">No results found for "{searchQuery}"</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {hasSearchQuery && filteredTechniques.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Navigation Techniques
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredTechniques.map((technique, index) => (
-              <Card
-                key={index}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-              >
-                <CardHeader>
-                  <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
+      {/* Key Navigation Stars */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-bold text-white mb-6">
+          Key Navigation Stars
+        </h2>
+        <div className="space-y-3">
+          {keyStars.map((star, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
+            >
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-shrink-0">
                     <img 
-                      src={technique.image}
-                      alt={technique.title}
-                      className="w-full h-full object-cover"
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
+                      alt="Star Compass"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
                     />
                   </div>
-                  <CardTitle className="text-white text-xl text-center">
-                    {technique.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-white/80 leading-relaxed">
-                    {technique.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {hasSearchQuery && filteredStars.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Key Navigation Stars
-          </h2>
-          <div className="space-y-3">
-            {filteredStars.map((star, index) => (
-              <Card
-                key={index}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-shrink-0">
-                      <img 
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
-                        alt="Star Compass"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
-                      />
+                  <div className="flex-1 grid md:grid-cols-3 gap-4">
+                    <div>
+                      <h3 className="text-white font-bold mb-1">{star.name}</h3>
+                      <p className="text-white/60 text-sm">{star.western}</p>
                     </div>
-                    <div className="flex-1 grid md:grid-cols-3 gap-4">
-                      <div>
-                        <h3 className="text-white font-bold mb-1">{star.name}</h3>
-                        <p className="text-white/60 text-sm">{star.western}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Position
-                        </p>
-                        <p className="text-white/80 text-sm">{star.position}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Navigation Use
-                        </p>
-                        <p className="text-white/80 text-sm">{star.use}</p>
-                      </div>
+                    <div>
+                      <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                        Position
+                      </p>
+                      <p className="text-white/80 text-sm">{star.position}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                        Navigation Use
+                      </p>
+                      <p className="text-white/80 text-sm">{star.use}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Introduction - only show when not searching */}
-      {!hasSearchQuery && (
-        <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
-          <CardContent className="p-8">
-            <p className="text-white/90 text-lg leading-relaxed mb-4">
-              For thousands of years, Polynesian navigators crossed vast ocean expanses using only the stars, 
-              waves, winds, and wildlife. Without instruments, they guided double-hulled canoes thousands of 
-              miles across open ocean, discovering and settling the islands of the Pacific.
-            </p>
-            <p className="text-white/70 leading-relaxed">
-              This knowledge system, called wayfinding, represents one of humanity's greatest intellectual 
-              achievements—a sophisticated science passed down through oral tradition, requiring years of 
-              training and a deep connection with the natural world.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Techniques - only show when not searching */}
-      {!hasSearchQuery && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Navigation Techniques
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredTechniques.map((technique, index) => (
-              <Card
-                key={index}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
-              >
-                <CardHeader>
-                  <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
-                    <img 
-                      src={technique.image}
-                      alt={technique.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <CardTitle className="text-white text-xl text-center">
-                    {technique.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-white/80 leading-relaxed">
-                    {technique.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Key Navigation Stars - only show when not searching */}
-      {!hasSearchQuery && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Key Navigation Stars
-          </h2>
-          <div className="space-y-3">
-            {filteredStars.map((star, index) => (
-              <Card
-                key={index}
-                className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-shrink-0">
-                      <img 
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
-                        alt="Star Compass"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#60A5FA]"
-                      />
-                    </div>
-                    <div className="flex-1 grid md:grid-cols-3 gap-4">
-                      <div>
-                        <h3 className="text-white font-bold mb-1">{star.name}</h3>
-                        <p className="text-white/60 text-sm">{star.western}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Position
-                        </p>
-                        <p className="text-white/80 text-sm">{star.position}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
-                          Navigation Use
-                        </p>
-                        <p className="text-white/80 text-sm">{star.use}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Hōkūleʻa Legacy - only show when not searching */}
-      {!hasSearchQuery && (
-        <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30">
+      {/* Hōkūleʻa Legacy */}
+      <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#0A1929] border-[#60A5FA]/30">
         <CardHeader>
           <CardTitle className="text-white text-2xl">
             The Legacy of Hōkūleʻa
@@ -309,7 +170,6 @@ export default function Wayfinding() {
           </div>
         </CardContent>
       </Card>
-      )}
     </div>
   );
 }
