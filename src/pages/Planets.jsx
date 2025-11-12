@@ -122,32 +122,20 @@ export default function Planets() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div className="text-center md:text-left">
-          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
-              alt="Planets"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Nā Hōkūhele - The Wandering Stars
-          </h1>
-          <p className="text-white/70 text-lg">
-            Planets and their Hawaiian names
-          </p>
+      <div className="text-center md:text-left mb-6">
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
+            alt="Planets"
+            className="w-full h-full object-cover"
+          />
         </div>
-        <Button
-          onClick={() => {
-            setSelectedPlanet(null);
-            setShowForm(true);
-          }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Planet
-        </Button>
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Nā Hōkūhele - The Wandering Stars
+        </h1>
+        <p className="text-white/70 text-lg">
+          Planets and their Hawaiian names
+        </p>
       </div>
 
       {/* Search Bar */}
@@ -195,19 +183,11 @@ export default function Planets() {
             <h3 className="text-xl text-white mb-2">
               {searchQuery ? "No planets found" : "No planets yet"}
             </h3>
-            <p className="text-white/60 mb-6">
+            <p className="text-white/60">
               {searchQuery 
                 ? "Try a different search term" 
-                : "Start building your Hawaiian planet guide"}
+                : "Planets will appear here once added"}
             </p>
-            {!searchQuery && (
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-blue-500 to-blue-600"
-              >
-                Add Your First Planet
-              </Button>
-            )}
           </CardContent>
         </Card>
       ) : (
