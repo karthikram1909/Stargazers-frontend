@@ -247,13 +247,13 @@ export default function Layout({ children }) {
               <div className="flex items-center gap-3">
                 <div
                   onClick={() => handleImageClick(
-                    "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg",
+                    "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/85e138c1e_KILOHOKU.jpeg",
                     "Stargazers Anonymous - Kilo Hōkū"
                   )}
                   className="cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <img
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/f4151c2ae_KILOHOKU.jpeg"
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/85e138c1e_KILOHOKU.jpeg"
                     alt="Stargazers Anonymous"
                     className="w-20 h-20 rounded-full object-cover border-2 border-[#60A5FA]"
                   />
