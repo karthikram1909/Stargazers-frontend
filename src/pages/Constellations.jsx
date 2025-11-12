@@ -96,20 +96,32 @@ export default function Constellations() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center md:text-left mb-6">
-        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
-          <img 
-            src={constellationIconUrl}
-            alt="Constellation"
-            className="w-full h-full object-cover"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div className="text-center md:text-left">
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
+            <img 
+              src={constellationIconUrl}
+              alt="Constellation"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Constellation Guide
+          </h1>
+          <p className="text-white/70 text-lg">
+            Hawaiian star patterns and their navigation significance
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Constellation Guide
-        </h1>
-        <p className="text-white/70 text-lg">
-          Hawaiian star patterns and their navigation significance
-        </p>
+        <Button
+          onClick={() => {
+            setSelectedConstellation(null);
+            setShowForm(true);
+          }}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Constellation
+        </Button>
       </div>
 
       {/* Search Bar */}
@@ -158,11 +170,19 @@ export default function Constellations() {
             <h3 className="text-xl text-white mb-2">
               {searchQuery ? "No constellations found" : "No constellations yet"}
             </h3>
-            <p className="text-white/60">
+            <p className="text-white/60 mb-6">
               {searchQuery 
                 ? "Try a different search term" 
-                : "Constellations will appear here once added"}
+                : "Start building your Hawaiian constellation guide"}
             </p>
+            {!searchQuery && (
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600"
+              >
+                Add Your First Constellation
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
