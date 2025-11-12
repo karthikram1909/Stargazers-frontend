@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,11 +28,10 @@ export default function SkyMap() {
   };
 
   const handleMouseDown = (e) => {
-    // Ensure the ref is attached to the DOM element
     if (!planisphereRef.current) return;
 
     setIsDragging(true);
-    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
+    const rect = planisphereRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
@@ -41,10 +39,9 @@ export default function SkyMap() {
   };
 
   const handleMouseMove = (e) => {
-    // Ensure the ref is attached to the DOM element
     if (!isDragging || !planisphereRef.current) return;
 
-    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
+    const rect = planisphereRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
@@ -56,12 +53,11 @@ export default function SkyMap() {
   };
 
   const handleTouchStart = (e) => {
-    // Ensure the ref is attached to the DOM element and only one touch
     if (e.touches.length !== 1 || !planisphereRef.current) return;
 
     const touch = e.touches[0];
     setIsDragging(true);
-    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
+    const rect = planisphereRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
@@ -69,12 +65,11 @@ export default function SkyMap() {
   };
 
   const handleTouchMove = (e) => {
-    // Ensure the ref is attached to the DOM element, dragging, and only one touch
     if (!isDragging || e.touches.length !== 1 || !planisphereRef.current) return;
 
-    e.preventDefault(); // Prevent scrolling
+    e.preventDefault();
     const touch = e.touches[0];
-    const rect = planisphereRef.current.getBoundingClientRect(); // Use ref instead of e.currentTarget
+    const rect = planisphereRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
@@ -87,13 +82,11 @@ export default function SkyMap() {
 
   React.useEffect(() => {
     if (isDragging) {
-      // Add event listeners to the document for global tracking
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
       document.addEventListener('touchend', handleTouchEnd);
       
-      // Cleanup function to remove event listeners
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -101,18 +94,17 @@ export default function SkyMap() {
         document.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [isDragging, dragStartAngle, rotationAngle]); // Dependencies for useEffect
+  }, [isDragging, dragStartAngle, rotationAngle]);
 
-  // Calculate current date and time based on rotation
-  const normalizedAngle = ((rotationAngle % 360) + 360) % 360; // Normalize angle to 0-359.99
-  const monthIndex = Math.floor((normalizedAngle / 30) % 12); // Each month approx 30 degrees
-  const hour = Math.floor((normalizedAngle / 15) % 24); // Each hour approx 15 degrees
+  // Calculate current month based on rotation - invert the rotation direction
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  // Calculate the indicator position - it should stay fixed while the wheel rotates
-  // The indicator points to the current month being viewed
-  // Since the wheel rotates, the indicator angle needs to be opposite to show the correct month
-  const indicatorAngle = -rotationAngle;
+  const monthDegrees = 360 / 12; // 30 degrees per month
+  
+  // Invert the rotation and ensure positive angle
+  let adjustedAngle = -rotationAngle;
+  adjustedAngle = ((adjustedAngle % 360) + 360) % 360; // Normalize to 0-360
+  
+  const monthIndex = Math.floor(adjustedAngle / monthDegrees) % 12;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -125,7 +117,7 @@ export default function SkyMap() {
           Interactive star wheel showing Hawaiian constellations
         </p>
         <div className="inline-block px-6 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
-          {months[monthIndex]} • {hour.toString().padStart(2, '0')}:00
+          {months[monthIndex]}
         </div>
       </div>
 
@@ -141,8 +133,8 @@ export default function SkyMap() {
                   <p className="text-white font-semibold">How to Use</p>
                 </div>
                 <p className="text-white/80 text-sm">
-                  Drag the outer wheel to rotate it. The red indicator shows which month you're viewing. 
-                  The visible portion shows which stars and Hawaiian constellations are visible at that date and time from Hawaii.
+                  Drag the outer wheel to rotate it. The red indicator at the top shows which month you're viewing. 
+                  The visible portion shows which stars and Hawaiian constellations are visible during that month from Hawaii.
                 </p>
               </div>
 
@@ -167,12 +159,12 @@ export default function SkyMap() {
 
               {/* Planisphere Container */}
               <div 
-                ref={planisphereRef} // Attach the ref here
+                ref={planisphereRef}
                 className="relative w-full aspect-square max-w-2xl mx-auto cursor-grab active:cursor-grabbing"
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
               >
-                {/* Base Star Chart - No text overlay */}
+                {/* Base Star Chart */}
                 <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
                   <img 
                     src={starChartImage}
@@ -202,13 +194,11 @@ export default function SkyMap() {
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
                       </clipPath>
-                      {/* Extra bright gradient with white at top for maximum visibility */}
                       <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stopColor="#E0F2FE" />
                         <stop offset="40%" stopColor="#BAE6FD" />
                         <stop offset="100%" stopColor="#7DD3FC" />
                       </linearGradient>
-                      {/* More pronounced curve for STARGAZERS ANONYMOUS and positioned lower */}
                       <path 
                         id="curveTop" 
                         d="M 50 300 Q 200 355 350 300" 
@@ -225,7 +215,7 @@ export default function SkyMap() {
                       {/* Semi-transparent overlay with window cutout */}
                       <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
                       
-                      {/* Extra bright text */}
+                      {/* Text */}
                       <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2" stroke="#BAE6FD" strokeWidth="0.5">
                         <textPath href="#curveTop" startOffset="50%" textAnchor="middle">
                           STARGAZERS ANONYMOUS
@@ -240,8 +230,7 @@ export default function SkyMap() {
                       {/* Outer date ring */}
                       <circle cx="200" cy="200" r="195" fill="none" stroke="white" strokeWidth="2"/>
                       {months.map((month, i) => {
-                        // Calculate position for month labels
-                        const angle = (i * 30 - 90) * (Math.PI / 180); // -90 to start at 12 o'clock (Jan)
+                        const angle = (i * 30 - 90) * (Math.PI / 180);
                         const x = 200 + 185 * Math.cos(angle);
                         const y = 200 + 185 * Math.sin(angle);
                         return (
@@ -254,7 +243,7 @@ export default function SkyMap() {
                             fill="white" 
                             fontSize="12"
                             fontWeight="bold"
-                            transform={`rotate(${i * 30}, ${x}, ${y})`} // Rotate text for better readability
+                            transform={`rotate(${i * 30}, ${x}, ${y})`}
                           >
                             {month}
                           </text>
@@ -264,11 +253,10 @@ export default function SkyMap() {
                       {/* Inner time ring */}
                       <circle cx="200" cy="200" r="175" fill="none" stroke="white" strokeWidth="1" opacity="0.6"/>
                       {Array.from({length: 24}, (_, i) => {
-                        // Calculate position for hour labels
-                        const angle = (i * 15 - 90) * (Math.PI / 180); // -90 to start at 12 o'clock (0 hour)
+                        const angle = (i * 15 - 90) * (Math.PI / 180);
                         const x = 200 + 170 * Math.cos(angle);
                         const y = 200 + 170 * Math.sin(angle);
-                        return i % 2 === 0 ? ( // Only show even hours for less clutter
+                        return i % 2 === 0 ? (
                           <text 
                             key={i} 
                             x={x} 
@@ -288,13 +276,7 @@ export default function SkyMap() {
                 </div>
 
                 {/* Static Red Indicator - stays at top, points to current month */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    transform: `rotate(${indicatorAngle}deg)`,
-                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-                  }}
-                >
+                <div className="absolute inset-0 pointer-events-none">
                   <svg className="w-full h-full" viewBox="0 0 400 400">
                     <g>
                       {/* Red indicator pointing downward toward the month ring */}
@@ -330,13 +312,9 @@ export default function SkyMap() {
                   <p className="text-white/50 text-xs">Month</p>
                   <p className="text-white text-2xl font-bold">{months[monthIndex]}</p>
                 </div>
-                <div>
-                  <p className="text-white/50 text-xs">Time</p>
-                  <p className="text-white text-2xl font-bold">{hour.toString().padStart(2, '0')}:00</p>
-                </div>
                 <div className="pt-3 border-t border-white/10">
                   <p className="text-white/50 text-xs mb-1">Rotation</p>
-                  <p className="text-white">{Math.round(normalizedAngle)}°</p>
+                  <p className="text-white">{Math.round(((rotationAngle % 360) + 360) % 360)}°</p>
                 </div>
               </div>
             </CardContent>
@@ -348,15 +326,15 @@ export default function SkyMap() {
               <h3 className="text-white font-bold mb-3">How It Works</h3>
               <div className="space-y-2 text-white/80 text-sm">
                 <p>
-                  This digital planisphere shows the Hawaiian night sky at any date and time.
+                  This digital planisphere shows the Hawaiian night sky for any month of the year.
                 </p>
                 <p>
                   The base map shows all visible stars and Hawaiian constellation patterns from 
                   Hawaii's latitude (20°N).
                 </p>
                 <p>
-                  Rotate the outer wheel to align your desired date and time - the red indicator 
-                  shows which month you're viewing, and the visible portion reveals which stars are above the horizon.
+                  Rotate the outer wheel to align your desired month with the red indicator at the top - 
+                  the visible portion reveals which stars are above the horizon during that month.
                 </p>
               </div>
             </CardContent>
