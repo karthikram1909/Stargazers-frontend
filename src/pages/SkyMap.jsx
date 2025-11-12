@@ -113,12 +113,9 @@ export default function SkyMap() {
         <h1 className="text-4xl font-bold text-white mb-2">
           Hawaiian Sky Planisphere
         </h1>
-        <p className="text-white/70 text-lg mb-4">
+        <p className="text-white/70 text-lg">
           Interactive star wheel showing Hawaiian constellations
         </p>
-        <div className="inline-block px-6 py-3 rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#60a5fa] to-[#3b82f6] text-white text-lg font-semibold shadow-lg">
-          {months[monthIndex]}
-        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
