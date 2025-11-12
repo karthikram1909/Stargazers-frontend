@@ -82,25 +82,13 @@ export default function Stars() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Nā Hōkū - Star Guide
-          </h1>
-          <p className="text-white/70">
-            Hawaiian names and meanings of celestial bodies
-          </p>
-        </div>
-        <Button
-          onClick={() => {
-            setSelectedStar(null);
-            setShowForm(true);
-          }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Star
-        </Button>
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Nā Hōkū - Star Guide
+        </h1>
+        <p className="text-white/70">
+          Hawaiian names and meanings of celestial bodies
+        </p>
       </div>
 
       {/* Search Bar */}
@@ -131,19 +119,11 @@ export default function Stars() {
             <h3 className="text-xl text-white mb-2">
               {searchQuery ? "No stars found" : "No stars yet"}
             </h3>
-            <p className="text-white/60 mb-6">
+            <p className="text-white/60">
               {searchQuery 
                 ? "Try a different search term" 
-                : "Start building your Hawaiian star guide"}
+                : "Stars will appear here once added"}
             </p>
-            {!searchQuery && (
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-blue-500 to-blue-600"
-              >
-                Add Your First Star
-              </Button>
-            )}
           </CardContent>
         </Card>
       ) : (

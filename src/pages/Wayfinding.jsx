@@ -153,7 +153,7 @@ export default function Wayfinding() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-white/90 leading-relaxed">
-            In 1976, the voyaging canoe Hōkūleʻa made her maiden voyage from Hawaiʻi to Tahiti 
+            In 1976, the voyaging canoe Hōkūleʻa, guided by master navigators, made her maiden voyage from Hawaiʻi to Tahiti 
             using only traditional wayfinding techniques—no modern instruments. This historic journey, 
             led by master navigator Mau Piailug from Satawal, sparked a Hawaiian cultural renaissance.
           </p>
