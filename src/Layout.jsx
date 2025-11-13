@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -255,7 +254,7 @@ export default function Layout({ children }) {
                   <img
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/85e138c1e_KILOHOKU.jpeg"
                     alt="Stargazers Anonymous"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-[#60A5FA]"
+                    className="w-14 h-14 rounded-full object-cover border-2 border-[#60A5FA]"
                   />
                 </div>
                 <div>
