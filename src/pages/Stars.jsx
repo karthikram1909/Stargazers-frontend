@@ -18,7 +18,14 @@ export default function Stars() {
     queryKey: ['stars'],
     queryFn: async () => {
       const data = await base44.entities.Star.list();
-      return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
+      // Sort by brightness: dimmest to brightest (higher magnitude = dimmer, lower = brighter)
+      return data.sort((a, b) => {
+        // Stars without brightness go to the end
+        if (a.brightness === null || a.brightness === undefined) return 1;
+        if (b.brightness === null || b.brightness === undefined) return -1;
+        // Sort descending (higher number = dimmer, so it comes first)
+        return b.brightness - a.brightness;
+      });
     },
     initialData: [],
   });
