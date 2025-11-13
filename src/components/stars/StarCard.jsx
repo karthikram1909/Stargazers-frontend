@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,42 @@ export default function StarCard({ star, onEdit, onDelete }) {
     window.location.href = newUrl;
   };
 
+  // Calculate icon size based on brightness (magnitude)
+  // Lower magnitude = brighter star = larger icon
+  // Higher magnitude = dimmer star = smaller icon
+  const getIconSize = () => {
+    if (star.brightness === null || star.brightness === undefined) {
+      return "w-10 h-10"; // Default size
+    }
+    
+    const magnitude = star.brightness;
+    
+    if (magnitude < -1) {
+      return "w-16 h-16"; // Exceptionally bright (e.g., Venus)
+    } else if (magnitude < 0) {
+      return "w-14 h-14"; // Very bright (e.g., Sirius)
+    } else if (magnitude < 1) {
+      return "w-12 h-12"; // Bright
+    } else if (magnitude < 2) {
+      return "w-10 h-10"; // Moderately bright
+    } else if (magnitude < 3) {
+      return "w-8 h-8"; // Moderate
+    } else if (magnitude < 4) {
+      return "w-6 h-6"; // Dimmer
+    } else {
+      return "w-5 h-5"; // Dimmest
+    }
+  };
+
+  const iconSize = getIconSize();
+
   return (
     <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
       <div onClick={handleCardClick} className="cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0" style={{ backgroundColor: '#000' }}>
+              <div className={`${iconSize} rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0 transition-all`} style={{ backgroundColor: '#000' }}>
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5e18e74fc_IMG_2150.jpeg"
                   alt="Star"
