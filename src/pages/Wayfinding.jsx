@@ -75,7 +75,7 @@ export default function Wayfinding() {
           {techniques.map((technique, index) => (
             <Card
               key={index}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all"
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm"
             >
               <CardHeader>
                 <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden border-4 border-[#60A5FA] shadow-lg">
