@@ -76,7 +76,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
                       disabled={isPlaying}
                       className={`transition-all ${
                         isPlaying 
-                          ? 'text-[#60A5FA] scale-90' 
+                          ? 'text-white scale-90' 
                           : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
                       }`}
                       title="Play pronunciation"

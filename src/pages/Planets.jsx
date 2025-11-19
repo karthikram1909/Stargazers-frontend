@@ -275,7 +275,7 @@ export default function Planets() {
                                   disabled={playingAudio === planet.id}
                                   className={`transition-all ${
                                     playingAudio === planet.id
-                                      ? 'text-[#60A5FA] scale-90'
+                                      ? 'text-white scale-90'
                                       : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
                                   }`}
                                   title="Play pronunciation"
@@ -404,7 +404,7 @@ export default function Planets() {
                                     disabled={playingAudio === planet.id}
                                     className={`transition-all ${
                                       playingAudio === planet.id
-                                        ? 'text-[#60A5FA] scale-90'
+                                        ? 'text-white scale-90'
                                         : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
                                     }`}
                                     title="Play pronunciation"

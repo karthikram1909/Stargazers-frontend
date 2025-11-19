@@ -138,7 +138,7 @@ export default function PlanetDetail() {
                     disabled={isPlaying}
                     className={`transition-all p-2 rounded-full mx-auto md:mx-0 ${
                       isPlaying
-                        ? 'text-[#60A5FA] bg-white/10 scale-90'
+                        ? 'text-white bg-white/20 scale-90'
                         : 'text-[#0EA5E9] hover:text-[#60A5FA] hover:bg-white/10 active:scale-90'
                     }`}
                     title="Play pronunciation"
