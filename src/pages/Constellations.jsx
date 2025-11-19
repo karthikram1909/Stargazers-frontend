@@ -15,6 +15,7 @@ export default function Constellations() {
   const [searchQuery, setSearchQuery] = useState("");
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
+  const [playingAudio, setPlayingAudio] = useState(null);
 
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
@@ -52,10 +53,13 @@ export default function Constellations() {
     },
   });
 
-  const playPronunciation = (audioUrl) => {
-    if (audioUrl) {
+  const playPronunciation = (audioUrl, constellationId) => {
+    if (audioUrl && playingAudio !== constellationId) {
+      setPlayingAudio(constellationId);
       const audio = new Audio(audioUrl);
       audio.play();
+      audio.onended = () => setPlayingAudio(null);
+      audio.onerror = () => setPlayingAudio(null);
     }
   };
 
@@ -234,8 +238,13 @@ export default function Constellations() {
                         </h3>
                         {constellation.pronunciation_audio_url && (
                           <button
-                            onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
-                            className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                            onClick={() => playPronunciation(constellation.pronunciation_audio_url, constellation.id)}
+                            disabled={playingAudio === constellation.id}
+                            className={`transition-all ${
+                              playingAudio === constellation.id
+                                ? 'text-[#60A5FA] scale-90'
+                                : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                            }`}
                             title="Play pronunciation"
                           >
                             <Volume2 className="w-8 h-8" />

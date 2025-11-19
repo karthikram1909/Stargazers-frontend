@@ -13,6 +13,7 @@ export default function PlanetDetail() {
   const [planetId, setPlanetId] = useState(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -21,9 +22,12 @@ export default function PlanetDetail() {
   }, []);
 
   const playPronunciation = (audioUrl) => {
-    if (audioUrl) {
+    if (audioUrl && !isPlaying) {
+      setIsPlaying(true);
       const audio = new Audio(audioUrl);
       audio.play();
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => setIsPlaying(false);
     }
   };
 
@@ -131,7 +135,12 @@ export default function PlanetDetail() {
                 {planet.pronunciation_audio_url && (
                   <button
                     onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                    className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors p-2 rounded-full hover:bg-white/10 mx-auto md:mx-0"
+                    disabled={isPlaying}
+                    className={`transition-all p-2 rounded-full mx-auto md:mx-0 ${
+                      isPlaying
+                        ? 'text-[#60A5FA] bg-white/10 scale-90'
+                        : 'text-[#0EA5E9] hover:text-[#60A5FA] hover:bg-white/10 active:scale-90'
+                    }`}
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-8 h-8" />
