@@ -16,6 +16,7 @@ export default function Planets() {
   const [searchQuery, setSearchQuery] = useState("");
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
+  const [playingAudio, setPlayingAudio] = useState(null);
 
   const { data: allPlanets, isLoading } = useQuery({
     queryKey: ['planets'],
@@ -83,10 +84,13 @@ export default function Planets() {
     }
   };
 
-  const playPronunciation = (audioUrl) => {
-    if (audioUrl) {
+  const playPronunciation = (audioUrl, planetId) => {
+    if (audioUrl && playingAudio !== planetId) {
+      setPlayingAudio(planetId);
       const audio = new Audio(audioUrl);
       audio.play();
+      audio.onended = () => setPlayingAudio(null);
+      audio.onerror = () => setPlayingAudio(null);
     }
   };
 
@@ -267,8 +271,13 @@ export default function Planets() {
                               </h3>
                               {planet.pronunciation_audio_url && (
                                 <button
-                                  onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                                  className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                                  onClick={() => playPronunciation(planet.pronunciation_audio_url, planet.id)}
+                                  disabled={playingAudio === planet.id}
+                                  className={`transition-all ${
+                                    playingAudio === planet.id
+                                      ? 'text-[#60A5FA] scale-90'
+                                      : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                                  }`}
                                   title="Play pronunciation"
                                 >
                                   <Volume2 className="w-8 h-8" />
@@ -391,8 +400,13 @@ export default function Planets() {
                                 </h3>
                                 {planet.pronunciation_audio_url && (
                                   <button
-                                    onClick={() => playPronunciation(planet.pronunciation_audio_url)}
-                                    className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                                    onClick={() => playPronunciation(planet.pronunciation_audio_url, planet.id)}
+                                    disabled={playingAudio === planet.id}
+                                    className={`transition-all ${
+                                      playingAudio === planet.id
+                                        ? 'text-[#60A5FA] scale-90'
+                                        : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                                    }`}
                                     title="Play pronunciation"
                                   >
                                     <Volume2 className="w-8 h-8" />

@@ -10,6 +10,7 @@ import { createPageUrl } from "@/utils";
 export default function StarDetail() {
   const navigate = useNavigate();
   const [starId, setStarId] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,9 +19,12 @@ export default function StarDetail() {
   }, []);
 
   const playPronunciation = (audioUrl) => {
-    if (audioUrl) {
+    if (audioUrl && !isPlaying) {
+      setIsPlaying(true);
       const audio = new Audio(audioUrl);
       audio.play();
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => setIsPlaying(false);
     }
   };
 
@@ -101,7 +105,12 @@ export default function StarDetail() {
                 {star.pronunciation_audio_url && (
                   <button
                     onClick={() => playPronunciation(star.pronunciation_audio_url)}
-                    className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors p-2 rounded-full hover:bg-white/10"
+                    disabled={isPlaying}
+                    className={`transition-all p-2 rounded-full ${
+                      isPlaying
+                        ? 'text-[#60A5FA] bg-white/10 scale-90'
+                        : 'text-[#0EA5E9] hover:text-[#60A5FA] hover:bg-white/10 active:scale-90'
+                    }`}
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-8 h-8" />

@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-react";
 
 export default function StarCard({ star, onEdit, onDelete }) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
   const playPronunciation = (e) => {
     e.stopPropagation();
-    if (star.pronunciation_audio_url) {
+    if (star.pronunciation_audio_url && !isPlaying) {
+      setIsPlaying(true);
       const audio = new Audio(star.pronunciation_audio_url);
       audio.play();
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => setIsPlaying(false);
     }
   };
 
@@ -68,7 +73,12 @@ export default function StarCard({ star, onEdit, onDelete }) {
                   {star.pronunciation_audio_url && (
                     <button
                       onClick={playPronunciation}
-                      className="text-[#0EA5E9] hover:text-[#60A5FA] transition-colors"
+                      disabled={isPlaying}
+                      className={`transition-all ${
+                        isPlaying 
+                          ? 'text-[#60A5FA] scale-90' 
+                          : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                      }`}
                       title="Play pronunciation"
                     >
                       <Volume2 className="w-4 h-4" />
