@@ -84,13 +84,28 @@ export default function Planets() {
     }
   };
 
+  const audioCache = React.useRef({});
+
+  React.useEffect(() => {
+    allPlanets.forEach(planet => {
+      if (planet.pronunciation_audio_url && !audioCache.current[planet.id]) {
+        const audio = new Audio(planet.pronunciation_audio_url);
+        audio.preload = 'auto';
+        audioCache.current[planet.id] = audio;
+      }
+    });
+  }, [allPlanets]);
+
   const playPronunciation = (audioUrl, planetId) => {
     if (audioUrl && playingAudio !== planetId) {
-      setPlayingAudio(planetId);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      audio.onended = () => setPlayingAudio(null);
-      audio.onerror = () => setPlayingAudio(null);
+      const audio = audioCache.current[planetId];
+      if (audio) {
+        setPlayingAudio(planetId);
+        audio.currentTime = 0;
+        audio.onended = () => setPlayingAudio(null);
+        audio.onerror = () => setPlayingAudio(null);
+        audio.play();
+      }
     }
   };
 

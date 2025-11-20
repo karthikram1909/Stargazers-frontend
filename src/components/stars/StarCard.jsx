@@ -5,15 +5,29 @@ import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-reac
 
 export default function StarCard({ star, onEdit, onDelete }) {
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const audioRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (star.pronunciation_audio_url) {
+      audioRef.current = new Audio(star.pronunciation_audio_url);
+      audioRef.current.preload = 'auto';
+      audioRef.current.onended = () => setIsPlaying(false);
+      audioRef.current.onerror = () => setIsPlaying(false);
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [star.pronunciation_audio_url]);
 
   const playPronunciation = (e) => {
     e.stopPropagation();
-    if (star.pronunciation_audio_url && !isPlaying) {
+    if (audioRef.current && !isPlaying) {
       setIsPlaying(true);
-      const audio = new Audio(star.pronunciation_audio_url);
-      audio.play();
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => setIsPlaying(false);
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
     }
   };
 

@@ -53,13 +53,28 @@ export default function Constellations() {
     },
   });
 
+  const audioCache = React.useRef({});
+
+  React.useEffect(() => {
+    constellations.forEach(constellation => {
+      if (constellation.pronunciation_audio_url && !audioCache.current[constellation.id]) {
+        const audio = new Audio(constellation.pronunciation_audio_url);
+        audio.preload = 'auto';
+        audioCache.current[constellation.id] = audio;
+      }
+    });
+  }, [constellations]);
+
   const playPronunciation = (audioUrl, constellationId) => {
     if (audioUrl && playingAudio !== constellationId) {
-      setPlayingAudio(constellationId);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      audio.onended = () => setPlayingAudio(null);
-      audio.onerror = () => setPlayingAudio(null);
+      const audio = audioCache.current[constellationId];
+      if (audio) {
+        setPlayingAudio(constellationId);
+        audio.currentTime = 0;
+        audio.onended = () => setPlayingAudio(null);
+        audio.onerror = () => setPlayingAudio(null);
+        audio.play();
+      }
     }
   };
 

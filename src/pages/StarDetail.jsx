@@ -11,6 +11,7 @@ export default function StarDetail() {
   const navigate = useNavigate();
   const [starId, setStarId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = React.useRef(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -20,11 +21,15 @@ export default function StarDetail() {
 
   const playPronunciation = (audioUrl) => {
     if (audioUrl && !isPlaying) {
+      if (!audioRef.current || audioRef.current.src !== audioUrl) {
+        audioRef.current = new Audio(audioUrl);
+        audioRef.current.preload = 'auto';
+        audioRef.current.onended = () => setIsPlaying(false);
+        audioRef.current.onerror = () => setIsPlaying(false);
+      }
       setIsPlaying(true);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => setIsPlaying(false);
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
     }
   };
 
