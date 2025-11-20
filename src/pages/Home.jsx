@@ -22,7 +22,7 @@ const calculateMoonPhase = (date = new Date()) => {
   let phaseName;
   let phaseType;
   
-  if (normalizedCycle < 1.84566) {
+  if (normalizedCycle < 1.84566 || normalizedCycle >= 27.68492) {
     phaseName = "New Moon";
     phaseType = "new";
   } else if (normalizedCycle < 7.38264) {
