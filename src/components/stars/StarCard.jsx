@@ -91,11 +91,11 @@ export default function StarCard({ star, onEdit, onDelete }) {
                       className={`transition-all ${
                         isPlaying 
                           ? 'text-white scale-90' 
-                          : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                          : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
                       }`}
                       title="Play pronunciation"
                     >
-                      <Volume2 className="w-4 h-4" />
+                      <Volume2 className="w-8 h-8" />
                     </button>
                   )}
                 </div>

@@ -291,7 +291,7 @@ export default function Planets() {
                                   className={`transition-all ${
                                     playingAudio === planet.id
                                       ? 'text-white scale-90'
-                                      : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                                      : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
                                   }`}
                                   title="Play pronunciation"
                                 >
@@ -420,26 +420,26 @@ export default function Planets() {
                                     className={`transition-all ${
                                       playingAudio === planet.id
                                         ? 'text-white scale-90'
-                                        : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                                        : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
                                     }`}
                                     title="Play pronunciation"
                                   >
                                     <Volume2 className="w-8 h-8" />
                                   </button>
                                 )}
-                              </div>
-                              <p className="text-white/60 text-base">
+                                </div>
+                                <p className="text-white/60 text-base">
                                 {planet.english_name}
-                              </p>
-                              {planet.meaning && (
+                                </p>
+                                {planet.meaning && (
                                 <p className="text-[#60A5FA] text-base italic mt-1">
                                   {planet.meaning}
                                 </p>
-                              )}
-                            </div>
-                            <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
-                              Dwarf
-                            </Badge>
+                                )}
+                                </div>
+                                <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
+                                Dwarf
+                                </Badge>
                           </div>
 
                           {planet.description && (

@@ -258,7 +258,7 @@ export default function Constellations() {
                             className={`transition-all ${
                               playingAudio === constellation.id
                                 ? 'text-white scale-90'
-                                : 'text-[#0EA5E9] hover:text-[#60A5FA] active:scale-90'
+                                : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
                             }`}
                             title="Play pronunciation"
                           >
