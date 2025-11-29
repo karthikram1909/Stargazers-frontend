@@ -1,8 +1,7 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Moon as MoonIcon, Search } from "lucide-react";
+import { Moon as MoonIcon, Search, Volume2 } from "lucide-react";
 import MoonPhaseIcon from "../components/MoonPhaseIcon";
 
 const lunarMonths = [
@@ -26,54 +25,86 @@ const moonPhases = [
     name: "Hilo", 
     meaning: "New Moon", 
     description: "Time for new beginnings and planning.",
-    phase: "new"
+    phase: "new",
+    pronunciation_audio_url: ""
   },
   { 
     day: "4-7", 
     name: "Hoaka", 
     meaning: "Crescent", 
     description: "Time to plant and start projects.",
-    phase: "waxing-crescent"
+    phase: "waxing-crescent",
+    pronunciation_audio_url: ""
   },
   { 
     day: "8-11", 
     name: "Māhealani", 
     meaning: "Full Moon Near", 
     description: "Preparation and growth.",
-    phase: "first-quarter"
+    phase: "first-quarter",
+    pronunciation_audio_url: ""
   },
   { 
     day: "12-15", 
     name: "Poepoe", 
     meaning: "Round", 
     description: "Full moon - time for gathering and celebration.",
-    phase: "full"
+    phase: "full",
+    pronunciation_audio_url: ""
   },
   { 
     day: "16-19", 
     name: "Olekūkahi", 
     meaning: "Waning", 
     description: "Time to harvest and complete projects.",
-    phase: "waning-gibbous"
+    phase: "waning-gibbous",
+    pronunciation_audio_url: ""
   },
   { 
     day: "20-24", 
     name: "Kaloa", 
     meaning: "Long", 
     description: "Rest and reflection period.",
-    phase: "last-quarter"
+    phase: "last-quarter",
+    pronunciation_audio_url: ""
   },
   { 
     day: "25-30", 
     name: "Muku", 
     meaning: "Cut Off", 
     description: "Dark moon - time for rest and introspection.",
-    phase: "waning-crescent"
+    phase: "waning-crescent",
+    pronunciation_audio_url: ""
   },
 ];
 
 export default function Moon() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [playingAudio, setPlayingAudio] = useState(null);
+  const audioCache = useRef({});
+
+  useEffect(() => {
+    moonPhases.forEach((phase, index) => {
+      if (phase.pronunciation_audio_url && !audioCache.current[index]) {
+        const audio = new Audio(phase.pronunciation_audio_url);
+        audio.preload = 'auto';
+        audioCache.current[index] = audio;
+      }
+    });
+  }, []);
+
+  const playPronunciation = (audioUrl, phaseIndex) => {
+    if (audioUrl && playingAudio !== phaseIndex) {
+      const audio = audioCache.current[phaseIndex];
+      if (audio) {
+        setPlayingAudio(phaseIndex);
+        audio.currentTime = 0;
+        audio.onended = () => setPlayingAudio(null);
+        audio.onerror = () => setPlayingAudio(null);
+        audio.play();
+      }
+    }
+  };
 
   const filteredMonths = lunarMonths.filter(month => {
     const query = searchQuery.toLowerCase();
@@ -153,11 +184,25 @@ export default function Moon() {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-baseline gap-3 mb-1">
+                      <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-white font-bold text-lg">
                           {phase.name}
                         </h3>
-                        <span className="text-white/50 text-sm">Days {phase.day}</span>
+                        {phase.pronunciation_audio_url && (
+                          <button
+                            onClick={() => playPronunciation(phase.pronunciation_audio_url, index)}
+                            disabled={playingAudio === index}
+                            className={`transition-all ${
+                              playingAudio === index
+                                ? 'text-white scale-90'
+                                : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
+                            }`}
+                            title="Play pronunciation"
+                          >
+                            <Volume2 className="w-8 h-8" />
+                          </button>
+                        )}
+                        <span className="text-white/50 text-sm ml-2">Days {phase.day}</span>
                       </div>
                       <p className="text-[#60A5FA] text-sm mb-2">
                         {phase.meaning}
