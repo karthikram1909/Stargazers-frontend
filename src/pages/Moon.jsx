@@ -20,62 +20,36 @@ const lunarMonths = [
 ];
 
 const moonPhases = [
-  { 
-    day: "1-3", 
-    name: "Hilo", 
-    meaning: "New Moon", 
-    description: "Time for new beginnings and planning.",
-    phase: "new",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "4-7", 
-    name: "Hoaka", 
-    meaning: "Crescent", 
-    description: "Time to plant and start projects.",
-    phase: "waxing-crescent",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "8-11", 
-    name: "Māhealani", 
-    meaning: "Full Moon Near", 
-    description: "Preparation and growth.",
-    phase: "first-quarter",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "12-15", 
-    name: "Poepoe", 
-    meaning: "Round", 
-    description: "Full moon - time for gathering and celebration.",
-    phase: "full",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "16-19", 
-    name: "Olekūkahi", 
-    meaning: "Waning", 
-    description: "Time to harvest and complete projects.",
-    phase: "waning-gibbous",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "20-24", 
-    name: "Kaloa", 
-    meaning: "Long", 
-    description: "Rest and reflection period.",
-    phase: "last-quarter",
-    pronunciation_audio_url: ""
-  },
-  { 
-    day: "25-30", 
-    name: "Muku", 
-    meaning: "Cut Off", 
-    description: "Dark moon - time for rest and introspection.",
-    phase: "waning-crescent",
-    pronunciation_audio_url: ""
-  },
+  { day: 1, name: "Hilo", meaning: "To twist or braid", description: "First visible crescent. Good for planting root crops.", phase: "new", pronunciation_audio_url: "" },
+  { day: 2, name: "Hoaka", meaning: "Crescent", description: "Crescent moon. Good night for fishing.", phase: "waxing-crescent", pronunciation_audio_url: "" },
+  { day: 3, name: "Kūkahi", meaning: "First standing", description: "Moon stands upright. Plant leafy vegetables.", phase: "waxing-crescent", pronunciation_audio_url: "" },
+  { day: 4, name: "Kūlua", meaning: "Second standing", description: "Good for most activities.", phase: "waxing-crescent", pronunciation_audio_url: "" },
+  { day: 5, name: "Kūkolu", meaning: "Third standing", description: "Excellent for planting and fishing.", phase: "waxing-crescent", pronunciation_audio_url: "" },
+  { day: 6, name: "Kūpau", meaning: "Completely standing", description: "Complete the standing phase. Very productive night.", phase: "waxing-crescent", pronunciation_audio_url: "" },
+  { day: 7, name: "ʻOlekūkahi", meaning: "First nothing", description: "First of the unproductive nights. Rest.", phase: "first-quarter", pronunciation_audio_url: "" },
+  { day: 8, name: "ʻOlekūlua", meaning: "Second nothing", description: "Unproductive night. Avoid planting.", phase: "first-quarter", pronunciation_audio_url: "" },
+  { day: 9, name: "ʻOlekūkolu", meaning: "Third nothing", description: "Unproductive night. Time for reflection.", phase: "first-quarter", pronunciation_audio_url: "" },
+  { day: 10, name: "ʻOlepau", meaning: "Completely nothing", description: "Last unproductive night of this phase.", phase: "first-quarter", pronunciation_audio_url: "" },
+  { day: 11, name: "Huna", meaning: "Hidden", description: "Small and hidden. Good for secretive work.", phase: "waxing-gibbous", pronunciation_audio_url: "" },
+  { day: 12, name: "Mōhalu", meaning: "To unfold", description: "Moon unfolds its light. Plant flowers.", phase: "waxing-gibbous", pronunciation_audio_url: "" },
+  { day: 13, name: "Hua", meaning: "Egg or fruit", description: "Round like an egg. Excellent for planting fruit.", phase: "waxing-gibbous", pronunciation_audio_url: "" },
+  { day: 14, name: "Akua", meaning: "God or spirit", description: "Sacred night. Honor the ancestors.", phase: "full", pronunciation_audio_url: "" },
+  { day: 15, name: "Hoku", meaning: "Full moon", description: "Brightest night. Celebration and gathering.", phase: "full", pronunciation_audio_url: "" },
+  { day: 16, name: "Māhealani", meaning: "Heavenly haze", description: "Moon begins to wane. Complete projects.", phase: "full", pronunciation_audio_url: "" },
+  { day: 17, name: "Kulu", meaning: "To drip", description: "Light drips away. Harvest time.", phase: "waning-gibbous", pronunciation_audio_url: "" },
+  { day: 18, name: "Lāʻaukūkahi", meaning: "First plant", description: "Good for harvesting root vegetables.", phase: "waning-gibbous", pronunciation_audio_url: "" },
+  { day: 19, name: "Lāʻaukūlua", meaning: "Second plant", description: "Continue harvesting.", phase: "waning-gibbous", pronunciation_audio_url: "" },
+  { day: 20, name: "Lāʻaupau", meaning: "Completed plant", description: "Complete the harvest phase.", phase: "waning-gibbous", pronunciation_audio_url: "" },
+  { day: 21, name: "ʻOlekūkahi", meaning: "First nothing", description: "Unproductive night. Rest and reflect.", phase: "last-quarter", pronunciation_audio_url: "" },
+  { day: 22, name: "ʻOlekūlua", meaning: "Second nothing", description: "Avoid starting new projects.", phase: "last-quarter", pronunciation_audio_url: "" },
+  { day: 23, name: "ʻOlepau", meaning: "Completely nothing", description: "Last unproductive night. Prepare for Kāloa.", phase: "last-quarter", pronunciation_audio_url: "" },
+  { day: 24, name: "Kāloakūkahi", meaning: "First long", description: "First of the long nights. Deep fishing.", phase: "waning-crescent", pronunciation_audio_url: "" },
+  { day: 25, name: "Kāloakūlua", meaning: "Second long", description: "Good for deep-sea fishing.", phase: "waning-crescent", pronunciation_audio_url: "" },
+  { day: 26, name: "Kāloapau", meaning: "Completed long", description: "Last of the long nights.", phase: "waning-crescent", pronunciation_audio_url: "" },
+  { day: 27, name: "Kāne", meaning: "Man (deity)", description: "Sacred to the god Kāne. Spiritual practices.", phase: "waning-crescent", pronunciation_audio_url: "" },
+  { day: 28, name: "Lono", meaning: "Sound (deity)", description: "Sacred to the god Lono. Prayer and offerings.", phase: "waning-crescent", pronunciation_audio_url: "" },
+  { day: 29, name: "Mauli", meaning: "Life force", description: "The spirit of life. Introspection.", phase: "new", pronunciation_audio_url: "" },
+  { day: 30, name: "Muku", meaning: "Cut off", description: "Dark moon. Complete rest. End of cycle.", phase: "new", pronunciation_audio_url: "" },
 ];
 
 export default function Moon() {
@@ -202,7 +176,7 @@ export default function Moon() {
                             <Volume2 className="w-8 h-8" />
                           </button>
                         )}
-                        <span className="text-white/50 text-sm ml-2">Days {phase.day}</span>
+                        <span className="text-white/50 text-sm ml-2">Day {phase.day}</span>
                       </div>
                       <p className="text-[#60A5FA] text-sm mb-2">
                         {phase.meaning}
