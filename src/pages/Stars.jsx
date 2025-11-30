@@ -75,6 +75,17 @@ export default function Stars() {
     }
   };
 
+  // Filter stars based on search query
+  const filteredStars = stars.filter(star => {
+    const query = searchQuery.toLowerCase();
+    return (
+      star.hawaiian_name?.toLowerCase().includes(query) ||
+      star.english_name?.toLowerCase().includes(query) ||
+      star.constellation?.toLowerCase().includes(query) ||
+      star.meaning?.toLowerCase().includes(query)
+    );
+  });
+
   // Scroll to last viewed star on mount
   useEffect(() => {
     const lastViewedStarId = sessionStorage.getItem('lastViewedStarId');
@@ -88,17 +99,6 @@ export default function Stars() {
       sessionStorage.removeItem('lastViewedStarId');
     }
   }, [filteredStars, isLoading]);
-
-  // Filter stars based on search query
-  const filteredStars = stars.filter(star => {
-    const query = searchQuery.toLowerCase();
-    return (
-      star.hawaiian_name?.toLowerCase().includes(query) ||
-      star.english_name?.toLowerCase().includes(query) ||
-      star.constellation?.toLowerCase().includes(query) ||
-      star.meaning?.toLowerCase().includes(query)
-    );
-  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
