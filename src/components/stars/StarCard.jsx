@@ -32,6 +32,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
   };
 
   const handleCardClick = () => {
+    sessionStorage.setItem('lastViewedStarId', star.id);
     const newPath = window.location.pathname.replace(/\/[^/]+$/, '/stardetail');
     const newUrl = `${window.location.origin}${newPath}?id=${star.id}`;
     window.location.href = newUrl;
