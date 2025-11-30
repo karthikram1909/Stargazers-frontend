@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +74,20 @@ export default function Stars() {
       deleteMutation.mutate(id);
     }
   };
+
+  // Scroll to last viewed star on mount
+  useEffect(() => {
+    const lastViewedStarId = sessionStorage.getItem('lastViewedStarId');
+    if (lastViewedStarId && stars.length > 0) {
+      const element = document.getElementById(`star-${lastViewedStarId}`);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+      sessionStorage.removeItem('lastViewedStarId');
+    }
+  }, [stars]);
 
   // Filter stars based on search query
   const filteredStars = stars.filter(star => {
@@ -161,6 +175,7 @@ export default function Stars() {
               star={star}
               onEdit={() => handleEdit(star)}
               onDelete={() => handleDelete(star.id)}
+              id={`star-${star.id}`}
             />
           ))}
         </div>

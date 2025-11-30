@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Edit, Trash2, Navigation, ArrowRight, Volume2 } from "lucide-react";
 
-export default function StarCard({ star, onEdit, onDelete }) {
+export default function StarCard({ star, onEdit, onDelete, id }) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const audioRef = React.useRef(null);
 
@@ -68,7 +68,7 @@ export default function StarCard({ star, onEdit, onDelete }) {
   const iconSize = getIconSize();
 
   return (
-    <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
+    <Card id={id} className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-105 transition-all group">
       <div onClick={handleCardClick} className="cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
