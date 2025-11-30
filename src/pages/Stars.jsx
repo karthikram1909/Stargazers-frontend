@@ -78,16 +78,16 @@ export default function Stars() {
   // Scroll to last viewed star on mount
   useEffect(() => {
     const lastViewedStarId = sessionStorage.getItem('lastViewedStarId');
-    if (lastViewedStarId && stars.length > 0) {
+    if (lastViewedStarId && filteredStars.length > 0 && !isLoading) {
       const element = document.getElementById(`star-${lastViewedStarId}`);
       if (element) {
         setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+          element.scrollIntoView({ behavior: 'instant', block: 'center' });
+        }, 50);
       }
       sessionStorage.removeItem('lastViewedStarId');
     }
-  }, [stars]);
+  }, [filteredStars, isLoading]);
 
   // Filter stars based on search query
   const filteredStars = stars.filter(star => {
