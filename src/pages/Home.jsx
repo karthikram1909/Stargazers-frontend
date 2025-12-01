@@ -236,7 +236,7 @@ export default function Home() {
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
               <div className="w-10 h-10 mx-auto mb-3">
-                <MoonPhaseIcon phase="full" />
+                <MoonPhaseIcon phase={moonPhase?.type || "full"} />
               </div>
               <h3 className="text-white font-semibold mb-2">Moon Calendar</h3>
               <p className="text-white/60 text-sm">
