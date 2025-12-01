@@ -142,8 +142,8 @@ export default function PlanisphereModal({
               <svg className="w-full h-full" viewBox="0 0 400 400">
                 <defs>
                   <mask id="viewingWindowModal">
-                    <rect width="400" height="400" fill="white"/>
-                    <ellipse cx="200" cy="130" rx="180" ry="30" fill="black"/>
+                    <rect width="400" height="400" fill="black"/>
+                    <ellipse cx="200" cy="240" rx="180" ry="90" fill="white"/>
                   </mask>
                   <clipPath id="circleClipModal">
                     <circle cx="200" cy="200" r="200"/>
