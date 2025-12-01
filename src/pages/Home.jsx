@@ -217,7 +217,13 @@ export default function Home() {
         <Link to={createPageUrl("Stars")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Star className="w-8 h-8 text-[#0EA5E9] mx-auto mb-3" />
+              <div className="w-10 h-10 rounded-full mx-auto mb-3 overflow-hidden border-2 border-white/20">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5e18e74fc_IMG_2150.jpeg"
+                  alt="Star"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <h3 className="text-white font-semibold mb-2">Star Guide</h3>
               <p className="text-white/60 text-sm">
                 Learn Hawaiian star names
@@ -229,7 +235,9 @@ export default function Home() {
         <Link to={createPageUrl("Moon")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Moon className="w-8 h-8 text-[#60A5FA] mx-auto mb-3" />
+              <div className="w-10 h-10 mx-auto mb-3">
+                <MoonPhaseIcon phase={moonPhase?.type || "full"} />
+              </div>
               <h3 className="text-white font-semibold mb-2">Moon Calendar</h3>
               <p className="text-white/60 text-sm">
                 Hawaiian lunar months
@@ -241,7 +249,13 @@ export default function Home() {
         <Link to={createPageUrl("Wayfinding")}>
           <Card className="bg-white/5 border-white/20 hover:bg-white/10 transition-all cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <Navigation className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+              <div className="w-10 h-10 rounded-full mx-auto mb-3 overflow-hidden border-2 border-[#60A5FA]">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/174409567_starcompass.jpeg"
+                  alt="Star Compass"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <h3 className="text-white font-semibold mb-2">Wayfinding</h3>
               <p className="text-white/60 text-sm">
                 Navigation traditions
