@@ -5,7 +5,7 @@ import { Info, RotateCw, Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const NORTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png";
-const SOUTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png"; // Replace with actual south image when available
+const SOUTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/43a1f0acf_HawaiianPlanisphereSouth.png";
 
 export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
