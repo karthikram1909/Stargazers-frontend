@@ -195,7 +195,7 @@ export default function SkyMap() {
                 onTouchStart={handleTouchStart}
               >
                 {/* Base Star Chart */}
-                <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
+                <div className="absolute inset-[3%] rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
                   <img 
                     src={starChartImage}
                     alt="Hawaiian Star Chart"
