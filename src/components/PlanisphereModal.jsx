@@ -1,16 +1,94 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { X } from "lucide-react";
+import { X, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PlanisphereModal({ 
   open, 
   onOpenChange, 
   starChartImage, 
-  rotationAngle, 
+  rotationAngle: initialRotation, 
   viewDirection,
   months 
 }) {
+  const [rotationAngle, setRotationAngle] = useState(initialRotation);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartAngle, setDragStartAngle] = useState(0);
+  const planisphereRef = useRef(null);
+
+  // Sync with parent rotation when modal opens
+  useEffect(() => {
+    if (open) {
+      setRotationAngle(initialRotation);
+    }
+  }, [open, initialRotation]);
+
+  const handleMouseDown = (e) => {
+    if (!planisphereRef.current) return;
+    e.stopPropagation();
+    setIsDragging(true);
+    const rect = planisphereRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    setDragStartAngle(angle - rotationAngle);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !planisphereRef.current) return;
+    const rect = planisphereRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    setRotationAngle(angle - dragStartAngle);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length !== 1 || !planisphereRef.current) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    const rect = planisphereRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
+    setDragStartAngle(angle - rotationAngle);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || e.touches.length !== 1 || !planisphereRef.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = planisphereRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX) * (180 / Math.PI);
+    setRotationAngle(angle - dragStartAngle);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isDragging, dragStartAngle, rotationAngle]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 bg-black border-0 m-0">
@@ -28,10 +106,21 @@ export default function PlanisphereModal({
             </h3>
           </div>
 
-          {/* Full Planisphere Display */}
+          {/* Reset Button */}
+          <Button
+            onClick={() => setRotationAngle(0)}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
+          >
+            <RotateCw className="w-4 h-4 mr-2" />
+            Reset
+          </Button>
+
+          {/* Full Planisphere Display - Much Larger */}
           <div 
-            className="relative w-[90vmin] h-[90vmin] max-w-[800px] max-h-[800px]"
-            onClick={() => onOpenChange(false)}
+            ref={planisphereRef}
+            className="relative w-[95vmin] h-[95vmin] cursor-grab active:cursor-grabbing select-none"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
           >
             {/* Base Star Chart */}
             <div className="absolute inset-[3%] rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
