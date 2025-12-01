@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Info, RotateCw, Upload } from "lucide-react";
+import { Info, RotateCw, Upload, ZoomIn } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import ImageModal from "../components/ImageModal";
 
 const NORTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png";
 const SOUTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/43a1f0acf_HawaiianPlanisphereSouth.png";
@@ -15,6 +16,7 @@ export default function SkyMap() {
   const [uploading, setUploading] = useState(false);
   const [customNorthImage, setCustomNorthImage] = useState(null);
   const [customSouthImage, setCustomSouthImage] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const planisphereRef = useRef(null);
   
   const starChartImage = viewDirection === "north" 
@@ -195,7 +197,10 @@ export default function SkyMap() {
                 onTouchStart={handleTouchStart}
               >
                 {/* Base Star Chart */}
-                <div className="absolute inset-[3%] rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl">
+                <div 
+                  className="absolute inset-[3%] rounded-full overflow-hidden border-4 border-[#a855f7]/40 shadow-2xl cursor-pointer group"
+                  onClick={() => setImageModalOpen(true)}
+                >
                   <img 
                     src={starChartImage}
                     alt="Hawaiian Star Chart"
@@ -206,6 +211,11 @@ export default function SkyMap() {
                       e.target.style.display = 'none';
                     }}
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-sm rounded-full p-3">
+                      <ZoomIn className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Rotating Overlay with Text */}
@@ -405,6 +415,14 @@ export default function SkyMap() {
           </Card>
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+        imageUrl={starChartImage}
+        title={viewDirection === "north" ? "Ko'olau (North) Sky" : "Kona (South) Sky"}
+      />
     </div>
   );
 }
