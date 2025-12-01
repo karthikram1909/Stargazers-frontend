@@ -4,13 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Info, RotateCw, Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+const NORTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png";
+const SOUTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png"; // Replace with actual south image when available
+
 export default function SkyMap() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartAngle, setDragStartAngle] = useState(0);
-  const [starChartImage, setStarChartImage] = useState("https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/b0b1ed8a5_Screenshot2025-11-06at123426PM.png");
+  const [viewDirection, setViewDirection] = useState("north"); // "north" or "south"
   const [uploading, setUploading] = useState(false);
+  const [customNorthImage, setCustomNorthImage] = useState(null);
+  const [customSouthImage, setCustomSouthImage] = useState(null);
   const planisphereRef = useRef(null);
+  
+  const starChartImage = viewDirection === "north" 
+    ? (customNorthImage || NORTH_IMAGE)
+    : (customSouthImage || SOUTH_IMAGE);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -19,7 +28,11 @@ export default function SkyMap() {
     setUploading(true);
     try {
       const result = await base44.integrations.Core.UploadFile({ file });
-      setStarChartImage(result.file_url);
+      if (viewDirection === "north") {
+        setCustomNorthImage(result.file_url);
+      } else {
+        setCustomSouthImage(result.file_url);
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
@@ -135,6 +148,26 @@ export default function SkyMap() {
                 </p>
               </div>
 
+              {/* Direction Toggle */}
+              <div className="mb-4 flex gap-2">
+                <Button
+                  onClick={() => setViewDirection("north")}
+                  className={`flex-1 ${viewDirection === "north" 
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white" 
+                    : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+                >
+                  Ko'olau (North)
+                </Button>
+                <Button
+                  onClick={() => setViewDirection("south")}
+                  className={`flex-1 ${viewDirection === "south" 
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white" 
+                    : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+                >
+                  Kona (South)
+                </Button>
+              </div>
+
               {/* Upload Button */}
               <div className="mb-4">
                 <label className="cursor-pointer">
@@ -148,7 +181,7 @@ export default function SkyMap() {
                   <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 transition-colors">
                     <Upload className="w-4 h-4 text-white" />
                     <span className="text-white text-sm">
-                      {uploading ? "Uploading..." : "Upload Star Chart Image"}
+                      {uploading ? "Uploading..." : `Upload ${viewDirection === "north" ? "North" : "South"} Chart`}
                     </span>
                   </div>
                 </label>
@@ -281,6 +314,13 @@ export default function SkyMap() {
                       <polygon points="200,30 195,35 205,35" fill="#ef4444"/>
                     </g>
                   </svg>
+                </div>
+
+                {/* Direction Label at Top */}
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30">
+                  <span className="text-white font-semibold text-sm">
+                    {viewDirection === "north" ? "Ko'olau (North)" : "Kona (South)"}
+                  </span>
                 </div>
               </div>
 
