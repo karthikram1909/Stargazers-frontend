@@ -190,7 +190,7 @@ export default function SkyMap() {
               {/* Planisphere Container */}
               <div 
                 ref={planisphereRef}
-                className="relative w-full aspect-square max-w-2xl mx-auto cursor-grab active:cursor-grabbing"
+                className="relative w-full aspect-square max-w-2xl mx-auto cursor-grab active:cursor-grabbing select-none"
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
               >
@@ -199,7 +199,8 @@ export default function SkyMap() {
                   <img 
                     src={starChartImage}
                     alt="Hawaiian Star Chart"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover select-none"
+                    draggable="false"
                     onError={(e) => {
                       console.error("Image failed to load:", starChartImage);
                       e.target.style.display = 'none';
