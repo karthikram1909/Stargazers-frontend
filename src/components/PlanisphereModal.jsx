@@ -143,7 +143,7 @@ export default function PlanisphereModal({
                 <defs>
                   <mask id="viewingWindowModal">
                     <rect width="400" height="400" fill="white"/>
-                    <ellipse cx="200" cy="170" rx="140" ry="100" fill="black"/>
+                    <ellipse cx="200" cy="140" rx="140" ry="70" fill="black"/>
                   </mask>
                   <clipPath id="circleClipModal">
                     <circle cx="200" cy="200" r="200"/>
