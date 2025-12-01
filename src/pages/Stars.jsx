@@ -87,26 +87,25 @@ export default function Stars() {
   });
 
   // Scroll to last viewed star on mount
-  const scrolledRef = useRef(false);
-  const lastViewedStarId = useRef(sessionStorage.getItem('lastViewedStarId'));
-  
   useEffect(() => {
-    if (scrolledRef.current || isLoading || filteredStars.length === 0 || !lastViewedStarId.current) return;
+    if (isLoading || filteredStars.length === 0) return;
     
-    // Clear from session storage immediately
+    const savedStarId = sessionStorage.getItem('lastViewedStarId');
+    if (!savedStarId) return;
+    
+    // Clear immediately to prevent re-runs
     sessionStorage.removeItem('lastViewedStarId');
     
-    // Wait for render to complete
+    // Wait for DOM to be fully painted
     const timer = setTimeout(() => {
-      const element = document.getElementById(`star-${lastViewedStarId.current}`);
+      const element = document.getElementById(`star-${savedStarId}`);
       if (element) {
         element.scrollIntoView({ behavior: 'instant', block: 'center' });
-        scrolledRef.current = true;
       }
-    }, 200);
+    }, 300);
     
     return () => clearTimeout(timer);
-  }, [filteredStars, isLoading]);
+  }, [isLoading, filteredStars.length]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
