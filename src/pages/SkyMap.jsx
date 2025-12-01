@@ -316,12 +316,7 @@ export default function SkyMap() {
                   </svg>
                 </div>
 
-                {/* Direction Label at Top */}
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30">
-                  <span className="text-white font-semibold text-sm">
-                    {viewDirection === "north" ? "Ko'olau (North)" : "Kona (South)"}
-                  </span>
-                </div>
+
               </div>
 
               {/* Reset Button */}
