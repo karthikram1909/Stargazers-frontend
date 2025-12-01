@@ -230,7 +230,7 @@ export default function SkyMap() {
                     <defs>
                       <mask id="viewingWindow">
                         <rect width="400" height="400" fill="white"/>
-                        <ellipse cx="200" cy="170" rx="140" ry="100" fill="black"/>
+                        <ellipse cx="200" cy="185" rx="130" ry="70" fill="black"/>
                       </mask>
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
