@@ -134,7 +134,10 @@ export default function PlanisphereModal({
             {/* Rotating Overlay with Text */}
             <div
               className="absolute inset-0 pointer-events-none rounded-full overflow-hidden"
-              style={{ transform: `rotate(${rotationAngle}deg)` }}
+              style={{ 
+                transform: `rotate(${rotationAngle}deg)`,
+                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+              }}
             >
               <svg className="w-full h-full" viewBox="0 0 400 400">
                 <defs>
