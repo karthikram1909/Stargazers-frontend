@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, RotateCw, Upload, ZoomIn } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import ImageModal from "../components/ImageModal";
+import PlanisphereModal from "../components/PlanisphereModal";
 
 const NORTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/563d0e632_HawaiianPlanisphereNorth.png";
 const SOUTH_IMAGE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/43a1f0acf_HawaiianPlanisphereSouth.png";
@@ -416,12 +416,14 @@ export default function SkyMap() {
         </div>
       </div>
 
-      {/* Image Modal */}
-      <ImageModal
+      {/* Planisphere Modal */}
+      <PlanisphereModal
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
-        imageUrl={starChartImage}
-        title={viewDirection === "north" ? "Ko'olau (North) Sky" : "Kona (South) Sky"}
+        starChartImage={starChartImage}
+        rotationAngle={rotationAngle}
+        viewDirection={viewDirection}
+        months={months}
       />
     </div>
   );
