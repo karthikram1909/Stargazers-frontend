@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,16 +87,22 @@ export default function Stars() {
   });
 
   // Scroll to last viewed star on mount
-  useEffect(() => {
+  const scrolledRef = useRef(false);
+  
+  useLayoutEffect(() => {
+    if (scrolledRef.current || isLoading || filteredStars.length === 0) return;
+    
     const lastViewedStarId = sessionStorage.getItem('lastViewedStarId');
-    if (lastViewedStarId && filteredStars.length > 0 && !isLoading) {
-      const element = document.getElementById(`star-${lastViewedStarId}`);
-      if (element) {
-        setTimeout(() => {
+    if (lastViewedStarId) {
+      // Use requestAnimationFrame to ensure DOM is painted
+      requestAnimationFrame(() => {
+        const element = document.getElementById(`star-${lastViewedStarId}`);
+        if (element) {
           element.scrollIntoView({ behavior: 'instant', block: 'center' });
-        }, 50);
-      }
-      sessionStorage.removeItem('lastViewedStarId');
+          scrolledRef.current = true;
+          sessionStorage.removeItem('lastViewedStarId');
+        }
+      });
     }
   }, [filteredStars, isLoading]);
 
