@@ -228,9 +228,15 @@ export default function SkyMap() {
                 >
                   <svg className="w-full h-full" viewBox="0 0 400 400">
                     <defs>
-                      <mask id="viewingWindow">
+                      {/* North mask - curve bows UP (horizon higher in middle) */}
+                      <mask id="viewingWindowNorth">
                         <rect width="400" height="400" fill="black"/>
-                        <ellipse cx="200" cy="240" rx="180" ry="90" fill="white"/>
+                        <path d="M 20 200 Q 200 120 380 200 L 380 0 L 20 0 Z" fill="white"/>
+                      </mask>
+                      {/* South mask - curve bows DOWN (horizon lower in middle) */}
+                      <mask id="viewingWindowSouth">
+                        <rect width="400" height="400" fill="black"/>
+                        <path d="M 20 200 Q 200 280 380 200 L 380 0 L 20 0 Z" fill="white"/>
                       </mask>
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
@@ -254,7 +260,7 @@ export default function SkyMap() {
                     
                     <g clipPath="url(#circleClip)">
                       {/* Semi-transparent overlay with window cutout */}
-                      <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
+                      <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask={viewDirection === "north" ? "url(#viewingWindowNorth)" : "url(#viewingWindowSouth)"}/>
                       
                       {/* Text */}
                       <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2" stroke="#BAE6FD" strokeWidth="0.5">
