@@ -378,12 +378,12 @@ export default function SkyMap() {
                   This digital planisphere shows the Hawaiian night sky for any month of the year.
                 </p>
                 <p>
-                  The base map shows all visible stars and Hawaiian constellation patterns from 
+                  The base map shows Hawaiian constellation patterns from 
                   Hawaii's latitude (20°N).
                 </p>
                 <p>
                   Rotate the outer wheel to align your desired month with the red indicator at the top - 
-                  the visible portion reveals which stars are above the horizon during that month.
+                  the visible portion reveals which constellations are above the horizon during that month.
                 </p>
               </div>
             </CardContent>
