@@ -228,9 +228,15 @@ export default function SkyMap() {
                 >
                   <svg className="w-full h-full" viewBox="0 0 400 400">
                     <defs>
-                      <mask id="viewingWindow">
-                        <rect width="400" height="400" fill="black"/>
-                        <ellipse cx="200" cy="240" rx="180" ry="90" fill="white"/>
+                      {/* North mask - curved opening at top, black covers bottom half */}
+                      <mask id="viewingWindowNorth">
+                        <rect width="400" height="400" fill="white"/>
+                        <path d="M 0 200 Q 200 280 400 200 L 400 400 L 0 400 Z" fill="black"/>
+                      </mask>
+                      {/* South mask - curved opening at bottom, black covers top half */}
+                      <mask id="viewingWindowSouth">
+                        <rect width="400" height="400" fill="white"/>
+                        <path d="M 0 200 Q 200 120 400 200 L 400 0 L 0 0 Z" fill="black"/>
                       </mask>
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
@@ -253,8 +259,8 @@ export default function SkyMap() {
                     </defs>
                     
                     <g clipPath="url(#circleClip)">
-                      {/* Semi-transparent overlay with window cutout */}
-                      <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask="url(#viewingWindow)"/>
+                      {/* Semi-transparent overlay with window cutout - different for North vs South */}
+                      <rect width="400" height="400" fill="rgba(0,0,0,0.7)" mask={viewDirection === "north" ? "url(#viewingWindowNorth)" : "url(#viewingWindowSouth)"}/>
                       
                       {/* Text */}
                       <text fill="url(#blueGradient)" fontSize="18" fontWeight="bold" letterSpacing="2" stroke="#BAE6FD" strokeWidth="0.5">
