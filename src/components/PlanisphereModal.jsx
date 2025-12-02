@@ -144,7 +144,7 @@ export default function PlanisphereModal({
                   {/* North mask - curved opening at top, black covers bottom half */}
                   <mask id="viewingWindowModalNorth">
                     <rect width="400" height="400" fill="white"/>
-                    <path d="M 0 200 Q 200 120 400 200 L 400 400 L 0 400 Z" fill="black"/>
+                    <path d="M 0 200 Q 200 280 400 200 L 400 0 L 0 0 Z" fill="black"/>
                   </mask>
                   {/* South mask - curved opening at bottom, black covers top half */}
                   <mask id="viewingWindowModalSouth">
