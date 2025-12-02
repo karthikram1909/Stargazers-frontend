@@ -95,7 +95,7 @@ export default function Moon() {
       phase.name.toLowerCase().includes(query) ||
       phase.meaning.toLowerCase().includes(query) ||
       phase.description.toLowerCase().includes(query) ||
-      phase.day.toLowerCase().includes(query)
+      String(phase.day).includes(query)
     );
   });
 
