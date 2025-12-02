@@ -404,21 +404,7 @@ export default function SkyMap() {
             </CardContent>
           </Card>
 
-          {/* Note about mockup */}
-          <Card className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-amber-200 font-bold mb-2">Upload Your Image</h3>
-                  <p className="text-white/90 text-sm">
-                    Click "Upload Star Chart Image" to add your custom Hawaiian constellation 
-                    chart. The image should be circular for best results.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+
         </div>
       </div>
 
