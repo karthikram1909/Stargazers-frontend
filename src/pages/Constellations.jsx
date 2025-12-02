@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Stars, Plus, Trash2, Volume2, Search, ZoomIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ConstellationFormDialog from "../components/constellations/ConstellationFormDialog";
 import ImageModal from "../components/ImageModal";
 
 export default function Constellations() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedConstellation, setSelectedConstellation] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -209,14 +211,18 @@ export default function Constellations() {
           {filteredConstellations.map((constellation) => (
             <Card
               key={constellation.id}
-              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden"
+              className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm hover:scale-[1.02] transition-all overflow-hidden cursor-pointer"
+              onClick={() => navigate(`${createPageUrl("ConstellationDetail")}?id=${constellation.id}`)}
             >
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {constellation.image_url ? (
                     <div 
                       className="flex-shrink-0 relative cursor-pointer group"
-                      onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImageClick(constellation.image_url, constellation.hawaiian_name);
+                      }}
                     >
                       <img 
                         src={constellation.image_url} 
@@ -253,7 +259,10 @@ export default function Constellations() {
                         </h3>
                         {constellation.pronunciation_audio_url && (
                           <button
-                            onClick={() => playPronunciation(constellation.pronunciation_audio_url, constellation.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              playPronunciation(constellation.pronunciation_audio_url, constellation.id);
+                            }}
                             disabled={playingAudio === constellation.id}
                             className={`transition-all ${
                               playingAudio === constellation.id
@@ -327,7 +336,10 @@ export default function Constellations() {
                       variant="ghost"
                       size="icon"
                       className="text-white/70 hover:text-white hover:bg-white/10"
-                      onClick={() => handleEdit(constellation)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(constellation);
+                      }}
                     >
                       <Plus className="w-4 h-4" />
                     </Button>
@@ -335,7 +347,10 @@ export default function Constellations() {
                       variant="ghost"
                       size="icon"
                       className="text-white/70 hover:text-red-400 hover:bg-white/10"
-                      onClick={() => handleDelete(constellation.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(constellation.id);
+                      }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
