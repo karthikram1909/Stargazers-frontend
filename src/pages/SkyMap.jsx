@@ -236,7 +236,7 @@ export default function SkyMap() {
                       {/* South mask - curved opening at bottom, black covers top half */}
                       <mask id="viewingWindowSouth">
                         <rect width="400" height="400" fill="white"/>
-                        <path d="M 0 200 Q 200 120 400 200 L 400 0 L 0 0 Z" fill="black"/>
+                        <path d="M 0 220 Q 200 140 400 220 L 400 0 L 0 0 Z" fill="black"/>
                       </mask>
                       <clipPath id="circleClip">
                         <circle cx="200" cy="200" r="200"/>
