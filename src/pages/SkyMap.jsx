@@ -393,13 +393,9 @@ export default function SkyMap() {
           <Card className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/30">
             <CardContent className="p-4">
               <h3 className="text-emerald-200 font-bold mb-3">Hawaiian Constellations</h3>
-              <p className="text-white/90 text-sm mb-3">
+              <p className="text-white/90 text-sm">
                 This planisphere features traditional Hawaiian star patterns used by ancient 
                 navigators to cross the Pacific Ocean.
-              </p>
-              <p className="text-white/70 text-sm">
-                Upload your own star chart image with Hawaiian constellations to customize 
-                the planisphere.
               </p>
             </CardContent>
           </Card>
