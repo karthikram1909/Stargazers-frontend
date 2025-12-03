@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
@@ -22,9 +21,10 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
     best_viewing_months: "",
     constellation: "",
     brightness: null,
-    pronunciation_audio_url: "", // Added
+    distance_light_years: null,
+    pronunciation_audio_url: "",
   });
-  const [audioFile, setAudioFile] = useState(null); // Added
+  const [audioFile, setAudioFile] = useState(null);
   const [uploading, setUploading] = useState(false); // Added
 
   useEffect(() => {
@@ -39,7 +39,8 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
         best_viewing_months: "",
         constellation: "",
         brightness: null,
-        pronunciation_audio_url: "", // Added
+        distance_light_years: null,
+        pronunciation_audio_url: "",
       });
     }
     setAudioFile(null); // Added
@@ -200,6 +201,27 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
               />
               <p className="text-white/50 text-xs mt-1">Lower = brighter (e.g., -1.46 for Sirius, +2.5 for dim stars)</p>
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="distance_light_years" className="text-white/90">
+              Distance from Earth (Light Years)
+            </Label>
+            <Input
+              id="distance_light_years"
+              type="number"
+              step="0.1"
+              value={formData.distance_light_years ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  distance_light_years: val === "" ? null : parseFloat(val)
+                });
+              }}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+              placeholder="e.g., 36.7"
+            />
           </div>
 
           <div>
