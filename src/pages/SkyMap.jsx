@@ -150,25 +150,6 @@ export default function SkyMap() {
                 </p>
               </div>
 
-              {/* Upload Button */}
-              <div className="mb-4">
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={uploading}
-                    className="hidden"
-                  />
-                  <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 transition-colors">
-                    <Upload className="w-4 h-4 text-white" />
-                    <span className="text-white text-sm">
-                      {uploading ? "Uploading..." : `Upload ${viewDirection === "north" ? "North" : "South"} Chart`}
-                    </span>
-                  </div>
-                </label>
-              </div>
-
               {/* Direction Toggle */}
               <div className="mb-4 flex gap-2">
                 <Button
