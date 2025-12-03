@@ -158,6 +158,15 @@ export default function StarCard({ star, onEdit, onDelete, id }) {
                 </div>
               )}
 
+              {star.distance_light_years !== undefined && star.distance_light_years !== null && (
+                <div>
+                  <span className="text-white/50 text-xs">Distance</span>
+                  <p className="text-white/80 text-base font-medium">
+                    {star.distance_light_years.toLocaleString()} ly
+                  </p>
+                </div>
+              )}
+
               {star.best_viewing_months && (
                 <div>
                   <span className="text-white/50 text-xs">Best Viewing</span>
