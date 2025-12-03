@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Info, RotateCw, Upload, ZoomIn } from "lucide-react";
+import { Info, RotateCw, ZoomIn } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PlanisphereModal from "../components/PlanisphereModal";
 
