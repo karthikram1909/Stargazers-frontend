@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Star, Navigation, Calendar, Sparkles, Eye, Volume2 } from "lucide-react";
+import { ArrowLeft, Star, Navigation, Calendar, Sparkles, Eye, Volume2, Ruler } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -209,6 +209,25 @@ export default function StarDetail() {
                   : star.brightness < 2
                   ? "Bright - prominent in the sky"
                   : "Moderate brightness"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {star.distance_light_years !== undefined && star.distance_light_years !== null && (
+          <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Ruler className="w-5 h-5 text-[#60A5FA]" />
+                Distance from Earth
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-white/90 text-2xl font-semibold">
+                {star.distance_light_years.toLocaleString()} ly
+              </p>
+              <p className="text-white/60 text-sm mt-2">
+                Light years from Earth
               </p>
             </CardContent>
           </Card>
