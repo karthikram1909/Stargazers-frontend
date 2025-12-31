@@ -157,16 +157,6 @@ export default function Planets() {
             Planets and their Hawaiian names
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setSelectedPlanet(null);
-            setShowForm(true);
-          }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Planet
-        </Button>
       </div>
 
       {/* Search Bar */}

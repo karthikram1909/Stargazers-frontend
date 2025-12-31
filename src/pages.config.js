@@ -1,27 +1,27 @@
-import Home from './pages/Home';
-import Stars from './pages/Stars';
-import Moon from './pages/Moon';
-import Wayfinding from './pages/Wayfinding';
-import Planets from './pages/Planets';
-import StarDetail from './pages/StarDetail';
-import SkyMap from './pages/SkyMap';
-import Constellations from './pages/Constellations';
-import PlanetDetail from './pages/PlanetDetail';
 import ConstellationDetail from './pages/ConstellationDetail';
+import Constellations from './pages/Constellations';
+import Home from './pages/Home';
+import Moon from './pages/Moon';
+import PlanetDetail from './pages/PlanetDetail';
+import Planets from './pages/Planets';
+import SkyMap from './pages/SkyMap';
+import StarDetail from './pages/StarDetail';
+import Stars from './pages/Stars';
+import Wayfinding from './pages/Wayfinding';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "Stars": Stars,
-    "Moon": Moon,
-    "Wayfinding": Wayfinding,
-    "Planets": Planets,
-    "StarDetail": StarDetail,
-    "SkyMap": SkyMap,
-    "Constellations": Constellations,
-    "PlanetDetail": PlanetDetail,
     "ConstellationDetail": ConstellationDetail,
+    "Constellations": Constellations,
+    "Home": Home,
+    "Moon": Moon,
+    "PlanetDetail": PlanetDetail,
+    "Planets": Planets,
+    "SkyMap": SkyMap,
+    "StarDetail": StarDetail,
+    "Stars": Stars,
+    "Wayfinding": Wayfinding,
 }
 
 export const pagesConfig = {
