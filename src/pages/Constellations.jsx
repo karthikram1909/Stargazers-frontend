@@ -133,17 +133,7 @@ export default function Constellations() {
             Hawaiian star patterns and their navigation significance
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setSelectedConstellation(null);
-            setShowForm(true);
-          }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Constellation
-        </Button>
-      </div>
+        </div>
 
       {/* Search Bar */}
       <div className="mb-8">
