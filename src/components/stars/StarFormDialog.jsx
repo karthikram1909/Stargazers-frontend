@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+// import { base44 } from "@/api/base44Client"; // REMOVED
 import {
   Dialog,
   DialogContent,
@@ -47,6 +47,7 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
   }, [star, open]);
 
   const handleAudioUpload = async (e) => {
+    /*
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -64,6 +65,8 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
     } finally {
       setUploading(false);
     }
+    */
+    console.log("File upload temporarily disabled");
   };
 
   const handleSubmit = (e) => {
@@ -191,8 +194,8 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
                 value={formData.brightness ?? ""}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setFormData({ 
-                    ...formData, 
+                  setFormData({
+                    ...formData,
                     brightness: val === "" ? null : parseFloat(val)
                   });
                 }}
@@ -214,8 +217,8 @@ export default function StarFormDialog({ open, onOpenChange, star, onSave, isLoa
               value={formData.distance_light_years ?? ""}
               onChange={(e) => {
                 const val = e.target.value;
-                setFormData({ 
-                  ...formData, 
+                setFormData({
+                  ...formData,
                   distance_light_years: val === "" ? null : parseFloat(val)
                 });
               }}

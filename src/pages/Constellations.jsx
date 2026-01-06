@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export default function Constellations() {
   const { data: constellations, isLoading } = useQuery({
     queryKey: ['constellations'],
     queryFn: async () => {
-      const data = await base44.entities.Constellation.list();
+      const data = await api.constellations.list();
       return data.sort((a, b) => a.hawaiian_name.localeCompare(b.hawaiian_name));
     },
     initialData: [],
@@ -31,7 +31,7 @@ export default function Constellations() {
   const constellationIconUrl = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/956757e39_IMG_2167.jpeg";
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Constellation.create(data),
+    mutationFn: (data) => api.constellations.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constellations'] });
       setShowForm(false);
@@ -40,7 +40,7 @@ export default function Constellations() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Constellation.update(id, data),
+    mutationFn: ({ id, data }) => api.constellations.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constellations'] });
       setShowForm(false);
@@ -49,7 +49,7 @@ export default function Constellations() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Constellation.delete(id),
+    mutationFn: (id) => api.constellations.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constellations'] });
     },
@@ -120,7 +120,7 @@ export default function Constellations() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-center md:text-left">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
-            <img 
+            <img
               src={constellationIconUrl}
               alt="Constellation"
               className="w-full h-full object-cover"
@@ -133,7 +133,7 @@ export default function Constellations() {
             Hawaiian star patterns and their navigation significance
           </p>
         </div>
-        </div>
+      </div>
 
       {/* Search Bar */}
       <div className="mb-8">
@@ -153,9 +153,9 @@ export default function Constellations() {
       <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
         <CardContent className="p-8">
           <p className="text-white/90 text-xl leading-relaxed">
-            Constellations served as celestial roadmaps for Hawaiian navigators, helping them 
-            maintain course across thousands of miles of open ocean. Each constellation had its 
-            own name, mythology, and practical navigation use, passed down through generations 
+            Constellations served as celestial roadmaps for Hawaiian navigators, helping them
+            maintain course across thousands of miles of open ocean. Each constellation had its
+            own name, mythology, and practical navigation use, passed down through generations
             of wayfinders.
           </p>
         </CardContent>
@@ -172,7 +172,7 @@ export default function Constellations() {
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4 opacity-30">
-              <img 
+              <img
                 src={constellationIconUrl}
                 alt="Constellation"
                 className="w-full h-full object-cover"
@@ -182,8 +182,8 @@ export default function Constellations() {
               {searchQuery ? "No constellations found" : "No constellations yet"}
             </h3>
             <p className="text-white/60 mb-6">
-              {searchQuery 
-                ? "Try a different search term" 
+              {searchQuery
+                ? "Try a different search term"
                 : "Start building your Hawaiian constellation guide"}
             </p>
             {!searchQuery && (
@@ -207,15 +207,15 @@ export default function Constellations() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {constellation.image_url ? (
-                    <div 
+                    <div
                       className="flex-shrink-0 relative cursor-pointer group"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleImageClick(constellation.image_url, constellation.hawaiian_name);
                       }}
                     >
-                      <img 
-                        src={constellation.image_url} 
+                      <img
+                        src={constellation.image_url}
                         alt={constellation.hawaiian_name}
                         className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg border-2 border-white/20"
                       />
@@ -232,7 +232,7 @@ export default function Constellations() {
                   ) : (
                     <div className="flex-shrink-0">
                       <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
-                        <img 
+                        <img
                           src={constellationIconUrl}
                           alt="Constellation"
                           className="w-full h-full object-cover"
@@ -240,7 +240,7 @@ export default function Constellations() {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex-1">
                     <div className="mb-3">
                       <div className="flex items-center gap-2 mb-1">
@@ -254,11 +254,10 @@ export default function Constellations() {
                               playPronunciation(constellation.pronunciation_audio_url, constellation.id);
                             }}
                             disabled={playingAudio === constellation.id}
-                            className={`transition-all ${
-                              playingAudio === constellation.id
+                            className={`transition-all ${playingAudio === constellation.id
                                 ? 'text-white scale-90'
                                 : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
-                            }`}
+                              }`}
                             title="Play pronunciation"
                           >
                             <Volume2 className="w-8 h-8" />
@@ -356,8 +355,8 @@ export default function Constellations() {
       <Card className="mt-12 bg-gradient-to-br from-[#3B82F6]/20 to-[#60A5FA]/20 border-[#60A5FA]/30">
         <CardContent className="p-6">
           <p className="text-white/90 italic leading-relaxed">
-            "The stars served as a celestial map, with constellations marking key directions 
-            and latitudes. Master navigators memorized the rising and setting positions of 
+            "The stars served as a celestial map, with constellations marking key directions
+            and latitudes. Master navigators memorized the rising and setting positions of
             entire star groups, creating a mental framework that guided voyages across the Pacific."
           </p>
         </CardContent>

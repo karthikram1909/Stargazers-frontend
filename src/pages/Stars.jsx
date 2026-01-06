@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export default function Stars() {
   const { data: stars, isLoading } = useQuery({
     queryKey: ['stars'],
     queryFn: async () => {
-      const data = await base44.entities.Star.list();
+      const data = await api.stars.list();
       // Sort by brightness: dimmest to brightest (higher magnitude = dimmer, lower = brighter)
       return data.sort((a, b) => {
         // Stars without brightness go to the end
@@ -31,7 +31,7 @@ export default function Stars() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Star.create(data),
+    mutationFn: (data) => api.stars.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stars'] });
       setShowForm(false);
@@ -40,7 +40,7 @@ export default function Stars() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Star.update(id, data),
+    mutationFn: ({ id, data }) => api.stars.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stars'] });
       setShowForm(false);
@@ -49,7 +49,7 @@ export default function Stars() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Star.delete(id),
+    mutationFn: (id) => api.stars.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stars'] });
       setSelectedStar(null);
@@ -89,13 +89,13 @@ export default function Stars() {
   // Scroll to last viewed star on mount
   useEffect(() => {
     if (isLoading || filteredStars.length === 0) return;
-    
+
     const savedStarId = sessionStorage.getItem('lastViewedStarId');
     if (!savedStarId) return;
-    
+
     // Clear immediately to prevent re-runs
     sessionStorage.removeItem('lastViewedStarId');
-    
+
     // Wait for DOM to be fully painted
     const timer = setTimeout(() => {
       const element = document.getElementById(`star-${savedStarId}`);
@@ -103,7 +103,7 @@ export default function Stars() {
         element.scrollIntoView({ behavior: 'instant', block: 'center' });
       }
     }, 300);
-    
+
     return () => clearTimeout(timer);
   }, [isLoading, filteredStars.length]);
 
@@ -150,8 +150,8 @@ export default function Stars() {
               {searchQuery ? "No stars found" : "No stars yet"}
             </h3>
             <p className="text-white/60 mb-6">
-              {searchQuery 
-                ? "Try a different search term" 
+              {searchQuery
+                ? "Try a different search term"
                 : "Start building your Hawaiian star guide"}
             </p>
             {!searchQuery && (

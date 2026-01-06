@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+// import { base44 } from "@/api/base44Client"; // REMOVED
 import {
   Dialog,
   DialogContent,
@@ -49,6 +49,7 @@ export default function ConstellationFormDialog({ open, onOpenChange, constellat
   }, [constellation, open]);
 
   const handleAudioUpload = async (e) => {
+    /*
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -64,9 +65,12 @@ export default function ConstellationFormDialog({ open, onOpenChange, constellat
     } finally {
       setUploading(false);
     }
+    */
+    console.log("Audio upload disabled");
   };
 
   const handleImageUpload = async (e) => {
+    /*
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -79,6 +83,8 @@ export default function ConstellationFormDialog({ open, onOpenChange, constellat
     } finally {
       setUploadingImage(false);
     }
+    */
+    console.log("Image upload disabled");
   };
 
   const handleSubmit = (e) => {
@@ -146,9 +152,9 @@ export default function ConstellationFormDialog({ open, onOpenChange, constellat
             {formData.image_url && (
               <div className="mt-2">
                 <p className="text-[#FFD700] text-xs mb-2">✓ Image uploaded</p>
-                <img 
-                  src={formData.image_url} 
-                  alt="Preview" 
+                <img
+                  src={formData.image_url}
+                  alt="Preview"
                   className="w-32 h-32 object-cover rounded-lg border border-white/20"
                 />
               </div>

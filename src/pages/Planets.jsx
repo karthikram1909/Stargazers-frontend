@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,7 @@ export default function Planets() {
   const { data: allPlanets, isLoading } = useQuery({
     queryKey: ['planets'],
     queryFn: async () => {
-      const data = await base44.entities.Planet.list();
+      const data = await api.planets.list();
       // Sort planets in order from the Sun
       const planetOrder = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
       return data.sort((a, b) => {
@@ -29,8 +29,8 @@ export default function Planets() {
         const orderB = planetOrder.indexOf(b.english_name);
         // If planet not in order list, put it at the end
         if (orderA === -1 && orderB === -1) {
-            // Both not in the list, sort by Hawaiian name
-            return a.hawaiian_name.localeCompare(b.hawaiian_name);
+          // Both not in the list, sort by Hawaiian name
+          return a.hawaiian_name.localeCompare(b.hawaiian_name);
         }
         if (orderA === -1) return 1; // a is not in list, b is (or is also not in list but handled by previous condition)
         if (orderB === -1) return -1; // b is not in list, a is
@@ -41,7 +41,7 @@ export default function Planets() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Planet.create(data),
+    mutationFn: (data) => api.planets.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planets'] });
       setShowForm(false);
@@ -50,7 +50,7 @@ export default function Planets() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Planet.update(id, data),
+    mutationFn: ({ id, data }) => api.planets.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planets'] });
       setShowForm(false);
@@ -59,7 +59,7 @@ export default function Planets() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Planet.delete(id),
+    mutationFn: (id) => api.planets.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planets'] });
     },
@@ -144,7 +144,7 @@ export default function Planets() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-center md:text-left">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto md:mx-0 mb-4">
-            <img 
+            <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
               alt="Planets"
               className="w-full h-full object-cover"
@@ -177,8 +177,8 @@ export default function Planets() {
       <Card className="mb-12 bg-gradient-to-br from-white/10 to-white/5 border-white/20 backdrop-blur-sm">
         <CardContent className="p-8">
           <p className="text-white/90 text-xl leading-relaxed">
-            Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved 
-            against the fixed backdrop of stars. These celestial wanderers were observed closely and 
+            Ancient Hawaiians called planets "hōkūhele" meaning "wandering stars" because they moved
+            against the fixed backdrop of stars. These celestial wanderers were observed closely and
             incorporated into navigation, agriculture, and cultural practices.
           </p>
         </CardContent>
@@ -195,7 +195,7 @@ export default function Planets() {
         <Card className="bg-white/5 border-white/20">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mx-auto mb-4">
-              <img 
+              <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                 alt="Planets"
                 className="w-full h-full object-cover opacity-30"
@@ -205,8 +205,8 @@ export default function Planets() {
               {searchQuery ? "No planets found" : "No planets yet"}
             </h3>
             <p className="text-white/60 mb-6">
-              {searchQuery 
-                ? "Try a different search term" 
+              {searchQuery
+                ? "Try a different search term"
                 : "Start building your Hawaiian planet guide"}
             </p>
             {!searchQuery && (
@@ -237,12 +237,12 @@ export default function Planets() {
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row gap-4">
                         {planet.image_url ? (
-                          <div 
+                          <div
                             className="flex-shrink-0 relative cursor-pointer group"
                             onClick={() => handleImageClick(planet.image_url, planet.hawaiian_name)}
                           >
-                            <img 
-                              src={planet.image_url} 
+                            <img
+                              src={planet.image_url}
                               alt={planet.hawaiian_name}
                               className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-2 border-white/20 shadow-lg"
                             />
@@ -259,7 +259,7 @@ export default function Planets() {
                         ) : (
                           <div className="flex-shrink-0">
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
-                              <img 
+                              <img
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                                 alt="Planet"
                                 className="w-full h-full object-cover"
@@ -267,7 +267,7 @@ export default function Planets() {
                             </div>
                           </div>
                         )}
-                        
+
                         <div className="flex-1">
                           <div className="mb-3">
                             <div className="flex items-center gap-2 mb-1">
@@ -278,11 +278,10 @@ export default function Planets() {
                                 <button
                                   onClick={() => playPronunciation(planet.pronunciation_audio_url, planet.id)}
                                   disabled={playingAudio === planet.id}
-                                  className={`transition-all ${
-                                    playingAudio === planet.id
+                                  className={`transition-all ${playingAudio === planet.id
                                       ? 'text-white scale-90'
                                       : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
-                                  }`}
+                                    }`}
                                   title="Play pronunciation"
                                 >
                                   <Volume2 className="w-8 h-8" />
@@ -365,12 +364,12 @@ export default function Planets() {
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row gap-4">
                         {planet.image_url ? (
-                          <div 
+                          <div
                             className="flex-shrink-0 relative cursor-pointer group"
                             onClick={() => handleImageClick(planet.image_url, planet.hawaiian_name)}
                           >
-                            <img 
-                              src={planet.image_url} 
+                            <img
+                              src={planet.image_url}
                               alt={planet.hawaiian_name}
                               className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-2 border-white/20 shadow-lg"
                             />
@@ -387,7 +386,7 @@ export default function Planets() {
                         ) : (
                           <div className="flex-shrink-0">
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
-                              <img 
+                              <img
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/12ba6bacb_planetsicon.jpeg"
                                 alt="Planet"
                                 className="w-full h-full object-cover"
@@ -395,7 +394,7 @@ export default function Planets() {
                             </div>
                           </div>
                         )}
-                        
+
                         <div className="flex-1">
                           <div className="mb-3 flex items-start justify-between">
                             <div>
@@ -407,29 +406,28 @@ export default function Planets() {
                                   <button
                                     onClick={() => playPronunciation(planet.pronunciation_audio_url, planet.id)}
                                     disabled={playingAudio === planet.id}
-                                    className={`transition-all ${
-                                      playingAudio === planet.id
+                                    className={`transition-all ${playingAudio === planet.id
                                         ? 'text-white scale-90'
                                         : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
-                                    }`}
+                                      }`}
                                     title="Play pronunciation"
                                   >
                                     <Volume2 className="w-8 h-8" />
                                   </button>
                                 )}
-                                </div>
-                                <p className="text-white/60 text-base">
+                              </div>
+                              <p className="text-white/60 text-base">
                                 {planet.english_name}
-                                </p>
-                                {planet.meaning && (
+                              </p>
+                              {planet.meaning && (
                                 <p className="text-[#60A5FA] text-base italic mt-1">
                                   {planet.meaning}
                                 </p>
-                                )}
-                                </div>
-                                <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
-                                Dwarf
-                                </Badge>
+                              )}
+                            </div>
+                            <Badge className="bg-indigo-500/30 text-indigo-200 border-indigo-400/30">
+                              Dwarf
+                            </Badge>
                           </div>
 
                           {planet.description && (
