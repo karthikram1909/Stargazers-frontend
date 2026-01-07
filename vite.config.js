@@ -11,5 +11,14 @@ export default defineConfig({
       legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true'
     }),
     react(),
-  ]
+  ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://stargazers-backend.onrender.com',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 });
