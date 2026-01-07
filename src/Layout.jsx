@@ -84,7 +84,7 @@ export default function Layout({ children }) {
   };
 
   const getFontSizeLabel = () => {
-    switch(fontSize) {
+    switch (fontSize) {
       case 'normal': return 'Normal';
       case 'large': return 'Large';
       case 'xlarge': return 'X-Large';
@@ -246,19 +246,19 @@ export default function Layout({ children }) {
               <div className="flex items-center gap-3">
                 <div
                   onClick={() => handleImageClick(
-                    "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/85e138c1e_KILOHOKU.jpeg",
-                    "Stargazers Anonymous - Kilo Hōkū"
+                    "/logo.png",
+                    "Star Gazerz - Kilo Hōkū"
                   )}
                   className="cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <img
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/85e138c1e_KILOHOKU.jpeg"
-                    alt="Stargazers Anonymous"
+                    src="/logo.png"
+                    alt="Star Gazerz"
                     className="w-14 h-14 rounded-full object-cover border-2 border-[#60A5FA]"
                   />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-white whitespace-nowrap">Stargazers Anonymous</h1>
+                  <h1 className="text-lg font-bold text-white whitespace-nowrap">Star Gazerz</h1>
                   <p className="text-xs text-white/80">Kilo Hōkū • Hawaiian Astronomy</p>
                 </div>
               </div>
@@ -429,11 +429,10 @@ export default function Layout({ children }) {
                   <Link
                     key={item.name}
                     to={item.path}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
-                      isActive
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${isActive
                         ? "bg-gradient-to-b from-blue-500 to-cyan-500 text-white shadow-lg"
                         : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {item.name}
