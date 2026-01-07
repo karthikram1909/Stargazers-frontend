@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ export default function StarDetail() {
     queryKey: ['star', starId],
     queryFn: async () => {
       if (!starId) return null;
-      const stars = await base44.entities.Star.list();
+      const stars = await api.stars.list();
       const foundStar = stars.find(s => s.id === starId);
       return foundStar || null;
     },
@@ -96,7 +96,7 @@ export default function StarDetail() {
         <CardHeader className="pb-4">
           <div className="flex items-start gap-6">
             <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 star-twinkle" style={{ backgroundColor: '#000' }}>
-              <img 
+              <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/5e18e74fc_IMG_2150.jpeg"
                 alt="Star"
                 className="w-full h-full object-cover"
@@ -111,11 +111,10 @@ export default function StarDetail() {
                   <button
                     onClick={() => playPronunciation(star.pronunciation_audio_url)}
                     disabled={isPlaying}
-                    className={`transition-all p-2 rounded-full ${
-                      isPlaying
+                    className={`transition-all p-2 rounded-full ${isPlaying
                         ? 'text-white bg-white/20 scale-90'
                         : 'text-[#0EA5E9] hover:text-[#60A5FA] hover:bg-white/10 active:scale-90'
-                    }`}
+                      }`}
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-8 h-8" />
@@ -205,10 +204,10 @@ export default function StarDetail() {
                 {star.brightness < 0
                   ? "Exceptionally bright - one of the brightest stars"
                   : star.brightness < 1
-                  ? "Very bright - easily visible"
-                  : star.brightness < 2
-                  ? "Bright - prominent in the sky"
-                  : "Moderate brightness"}
+                    ? "Very bright - easily visible"
+                    : star.brightness < 2
+                      ? "Bright - prominent in the sky"
+                      : "Moderate brightness"}
               </p>
             </CardContent>
           </Card>

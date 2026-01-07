@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ export default function PlanetDetail() {
     queryKey: ['planet', planetId],
     queryFn: async () => {
       if (!planetId) return null;
-      const planets = await base44.entities.Planet.list();
+      const planets = await api.planets.list();
       const foundPlanet = planets.find(p => p.id === planetId);
       return foundPlanet || null;
     },
@@ -104,12 +104,12 @@ export default function PlanetDetail() {
         <CardHeader className="pb-4">
           <div className="flex flex-col md:flex-row items-start gap-6">
             {planet.image_url ? (
-              <div 
+              <div
                 className="flex-shrink-0 relative cursor-pointer group mx-auto md:mx-0"
                 onClick={() => handleImageClick(planet.image_url, planet.hawaiian_name)}
               >
-                <img 
-                  src={planet.image_url} 
+                <img
+                  src={planet.image_url}
                   alt={planet.hawaiian_name}
                   className="w-40 h-40 object-cover rounded-full border-4 border-white/20 shadow-lg"
                 />
@@ -125,7 +125,7 @@ export default function PlanetDetail() {
               </div>
             ) : (
               <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 mx-auto md:mx-0">
-                <img 
+                <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690537046186188fdedaa7d0/d458030cb_IMG_2152.jpeg"
                   alt="Planet"
                   className="w-full h-full object-cover"
@@ -141,11 +141,10 @@ export default function PlanetDetail() {
                   <button
                     onClick={() => playPronunciation(planet.pronunciation_audio_url)}
                     disabled={isPlaying}
-                    className={`transition-all p-2 rounded-full mx-auto md:mx-0 ${
-                      isPlaying
+                    className={`transition-all p-2 rounded-full mx-auto md:mx-0 ${isPlaying
                         ? 'text-white bg-white/20 scale-90'
                         : 'text-[#0EA5E9] hover:text-[#60A5FA] hover:bg-white/10 active:scale-90'
-                    }`}
+                      }`}
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-8 h-8" />
@@ -204,8 +203,8 @@ export default function PlanetDetail() {
             <Sparkles className="w-5 h-5 text-[#0EA5E9] mt-1 flex-shrink-0" />
             <div>
               <p className="text-white/90 leading-relaxed mb-3">
-                Ancient Hawaiians called planets "hōkūhele" or "wandering stars" because they moved 
-                against the fixed backdrop of stars. These celestial wanderers were closely observed 
+                Ancient Hawaiians called planets "hōkūhele" or "wandering stars" because they moved
+                against the fixed backdrop of stars. These celestial wanderers were closely observed
                 and incorporated into navigation, timekeeping, and cultural practices.
               </p>
               <p className="text-white/70 text-sm italic">

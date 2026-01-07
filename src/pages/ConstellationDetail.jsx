@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { createPageUrl } from "@/utils";
 export default function ConstellationDetail() {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
-  
+
   const navigate = useNavigate();
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState({ url: "", title: "" });
@@ -21,7 +21,7 @@ export default function ConstellationDetail() {
   const { data: constellation, isLoading } = useQuery({
     queryKey: ['constellation', id],
     queryFn: async () => {
-      const results = await base44.entities.Constellation.list();
+      const results = await api.constellations.list();
       return results.find(c => c.id === id);
     },
     enabled: !!id,
@@ -96,11 +96,10 @@ export default function ConstellationDetail() {
                   <button
                     onClick={() => playPronunciation(constellation.pronunciation_audio_url)}
                     disabled={playingAudio}
-                    className={`transition-all ${
-                      playingAudio
+                    className={`transition-all ${playingAudio
                         ? 'text-white scale-90'
                         : 'text-[#0EA5E9] hover:text-[#60A5FA] active:text-white active:scale-90'
-                    }`}
+                      }`}
                     title="Play pronunciation"
                   >
                     <Volume2 className="w-8 h-8" />
@@ -110,7 +109,7 @@ export default function ConstellationDetail() {
               <p className="text-white/60 text-xl">{constellation.english_name}</p>
             </div>
             {constellation.image_url && (
-              <div 
+              <div
                 className="relative cursor-pointer group flex-shrink-0"
                 onClick={() => handleImageClick(constellation.image_url, constellation.hawaiian_name)}
               >

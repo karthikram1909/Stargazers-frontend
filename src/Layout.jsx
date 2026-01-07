@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import { Sparkles, Moon, Compass, Globe, Map, Stars, Type, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 import ImageModal from "./components/ImageModal";
 
@@ -20,19 +20,19 @@ export default function Layout({ children }) {
   // Fetch all searchable data
   const { data: stars } = useQuery({
     queryKey: ['stars'],
-    queryFn: () => base44.entities.Star.list(),
+    queryFn: () => api.stars.list(),
     initialData: [],
   });
 
   const { data: planets } = useQuery({
     queryKey: ['planets'],
-    queryFn: () => base44.entities.Planet.list(),
+    queryFn: () => api.planets.list(),
     initialData: [],
   });
 
   const { data: constellations } = useQuery({
     queryKey: ['constellations'],
-    queryFn: () => base44.entities.Constellation.list(),
+    queryFn: () => api.constellations.list(),
     initialData: [],
   });
 
@@ -430,8 +430,8 @@ export default function Layout({ children }) {
                     key={item.name}
                     to={item.path}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${isActive
-                        ? "bg-gradient-to-b from-blue-500 to-cyan-500 text-white shadow-lg"
-                        : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
+                      ? "bg-gradient-to-b from-blue-500 to-cyan-500 text-white shadow-lg"
+                      : "bg-white/10 text-white/70 hover:bg-white/20 backdrop-blur-sm"
                       }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
