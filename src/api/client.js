@@ -1,4 +1,4 @@
-const BASE_URL = 'https://stargazers-backend.onrender.com/api';
+const BASE_URL = '/api';
 
 export const api = {
     stars: {
