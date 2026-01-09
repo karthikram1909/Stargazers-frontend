@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_BASE44_BACKEND_URL;
 
 export const api = {
     stars: {
